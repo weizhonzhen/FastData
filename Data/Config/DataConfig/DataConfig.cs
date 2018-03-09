@@ -4,6 +4,7 @@ using System.Configuration;
 using Data.Type;
 using Data.Model;
 using Redis;
+using Data.Base;
 
 namespace Data.Config
 {
@@ -111,13 +112,13 @@ namespace Data.Config
         {            
             var result = new ConfigModel();
             var list = new List<ConfigModel>();
-            var cacheKey = string.Format("Data.DataConfig.{0}", key ?? "");
-            var config = (DataConfig)ConfigurationManager.GetSection(isRead ? "ReadData" : "WriteData");
+            var cacheKey = "Data.DataConfig";
+            var config = (DataConfig)ConfigurationManager.GetSection("DataConfig");
 
             #region Db2
             if (config.DB2.Count != 0)
             {
-                if (!RedisInfo.Exists(cacheKey) || RedisInfo.GetItem<List<ConfigModel>>(cacheKey).Count != config.DB2.Count)
+                if (!RedisInfo.Exists(cacheKey, RedisDb.Config) || RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).Count != config.DB2.Count)
                 {
                     foreach (var temp in config.DB2)
                     {
@@ -148,11 +149,11 @@ namespace Data.Config
                         list.Find(a => a.Key == key).LinkCount = result.LinkCount + 1;
                     }
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list);
+                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list,8640, RedisDb.Config);
                 }
                 else
                 {
-                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey).OrderBy(a => a.LinkCount).ToList();
+                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).OrderBy(a => a.LinkCount).ToList();
 
                     if (string.IsNullOrEmpty(key))
                     {
@@ -165,7 +166,7 @@ namespace Data.Config
                         cacheList.Find(a => a.Key == key).LinkCount = result.LinkCount + 1;
                     }
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, cacheList);
+                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, cacheList,8640, RedisDb.Config);
                 }
             }
             #endregion
@@ -173,7 +174,7 @@ namespace Data.Config
             #region oracle
             if (config.Oracle.Count != 0)
             {
-                if (!RedisInfo.Exists(cacheKey) || RedisInfo.GetItem<List<ConfigModel>>(cacheKey).Count != config.Oracle.Count)
+                if (!RedisInfo.Exists(cacheKey, RedisDb.Config) || RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).Count != config.Oracle.Count)
                 {
                     foreach (var temp in config.Oracle)
                     {
@@ -204,11 +205,11 @@ namespace Data.Config
                         list.Find(a => a.Key == key).LinkCount = result.LinkCount + 1;
                     }
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list);
+                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list,8640, RedisDb.Config);
                 }
                 else
                 {
-                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey).OrderBy(a => a.LinkCount).ToList();
+                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).OrderBy(a => a.LinkCount).ToList();
 
                     if (string.IsNullOrEmpty(key))
                     {
@@ -221,7 +222,7 @@ namespace Data.Config
                         cacheList.Find(a => a.Key == key).LinkCount = result.LinkCount + 1;
                     }
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, cacheList);
+                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, cacheList,8640, RedisDb.Config);
                 }
             }
             #endregion
@@ -229,7 +230,7 @@ namespace Data.Config
             #region mysql
             if (config.MySql.Count != 0)
             {
-                if (!RedisInfo.Exists(cacheKey) || RedisInfo.GetItem<List<ConfigModel>>(cacheKey).Count != config.MySql.Count)
+                if (!RedisInfo.Exists(cacheKey, RedisDb.Config) || RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).Count != config.MySql.Count)
                 {
                     foreach (var temp in config.MySql)
                     {
@@ -260,11 +261,11 @@ namespace Data.Config
                         list.Find(a => a.Key == key).LinkCount = result.LinkCount + 1;
                     }
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list);
+                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list,8640, RedisDb.Config);
                 }
                 else
                 {
-                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey).OrderBy(a => a.LinkCount).ToList();
+                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).OrderBy(a => a.LinkCount).ToList();
 
                     if (string.IsNullOrEmpty(key))
                     {
@@ -277,7 +278,7 @@ namespace Data.Config
                         cacheList.Find(a => a.Key == key).LinkCount = result.LinkCount + 1;
                     }
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, cacheList);
+                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, cacheList,8640, RedisDb.Config);
                 }
             }
             #endregion
@@ -285,7 +286,7 @@ namespace Data.Config
             #region sqlserver
             if (config.SqlServer.Count != 0)
             {
-                if (!RedisInfo.Exists(cacheKey) || RedisInfo.GetItem<List<ConfigModel>>(cacheKey).Count != config.SqlServer.Count)
+                if (!RedisInfo.Exists(cacheKey, RedisDb.Config) || RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).Count != config.SqlServer.Count)
                 {
                     foreach (var temp in config.SqlServer)
                     {
@@ -316,11 +317,11 @@ namespace Data.Config
                         list.Find(a => a.Key == key).LinkCount = result.LinkCount + 1;
                     }
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list);
+                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list,8640, RedisDb.Config);
                 }
                 else
                 {
-                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey).OrderBy(a => a.LinkCount).ToList();
+                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).OrderBy(a => a.LinkCount).ToList();
 
                     if (string.IsNullOrEmpty(key))
                     {
@@ -333,7 +334,7 @@ namespace Data.Config
                         cacheList.Find(a => a.Key == key).LinkCount = result.LinkCount + 1;
                     }
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, cacheList);
+                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, cacheList,8640, RedisDb.Config);
                 }
             }
             #endregion
@@ -341,7 +342,7 @@ namespace Data.Config
             #region sqlite
             if (config.SQLite.Count != 0)
             {
-                if (!RedisInfo.Exists(cacheKey) || RedisInfo.GetItem<List<ConfigModel>>(cacheKey).Count != config.SQLite.Count)
+                if (!RedisInfo.Exists(cacheKey, RedisDb.Config) || RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).Count != config.SQLite.Count)
                 {
                     foreach (var temp in config.SQLite)
                     {
@@ -372,11 +373,11 @@ namespace Data.Config
                         list.Find(a => a.Key == key).LinkCount = result.LinkCount + 1;
                     }
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list);
+                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list,8640, RedisDb.Config);
                 }
                 else
                 {
-                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey).OrderBy(a => a.LinkCount).ToList();
+                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).OrderBy(a => a.LinkCount).ToList();
 
                     if (string.IsNullOrEmpty(key))
                     {
@@ -389,7 +390,7 @@ namespace Data.Config
                         cacheList.Find(a => a.Key == key).LinkCount = result.LinkCount + 1;
                     }
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, cacheList);
+                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, cacheList,8640, RedisDb.Config);
                 }
             }
             #endregion
@@ -397,7 +398,7 @@ namespace Data.Config
             #region PostgreSql
             if (config.PostgreSql.Count != 0)
             {
-                if (!RedisInfo.Exists(cacheKey) || RedisInfo.GetItem<List<ConfigModel>>(cacheKey).Count != config.PostgreSql.Count)
+                if (!RedisInfo.Exists(cacheKey, RedisDb.Config) || RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).Count != config.PostgreSql.Count)
                 {
                     foreach (var temp in config.PostgreSql)
                     {
@@ -428,11 +429,11 @@ namespace Data.Config
                         list.Find(a => a.Key == key).LinkCount = result.LinkCount + 1;
                     }
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list);
+                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list,8640, RedisDb.Config);
                 }
                 else
                 {
-                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey).OrderBy(a => a.LinkCount).ToList();
+                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).OrderBy(a => a.LinkCount).ToList();
 
                     if (string.IsNullOrEmpty(key))
                     {
@@ -445,7 +446,7 @@ namespace Data.Config
                         cacheList.Find(a => a.Key == key).LinkCount = result.LinkCount + 1;
                     }
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, cacheList);
+                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, cacheList, 8640, RedisDb.Config);
                 }
             }
             #endregion

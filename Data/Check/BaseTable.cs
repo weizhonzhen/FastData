@@ -109,7 +109,7 @@ namespace Data.Check
         /// <param name="info"></param>
         private static void AddTable(DataQuery item, List<ColumnModel> info, string tableName)
         {
-            var db = BaseContext.GetWriteContext(item.Key);
+            var db = BaseContext.GetContext(item.Key);
             var sql = new StringBuilder();
             sql.AppendFormat("create table {0}(", tableName);
             var lastItem = info.Last();
@@ -155,7 +155,7 @@ namespace Data.Check
         /// <param name="info"></param>
         private static void UpdateTable(DataQuery item, CompareModel<ColumnModel> info, string nameSpace, string tableName)
         {
-            var db = BaseContext.GetWriteContext(item.Key);
+            var db = BaseContext.GetContext(item.Key);
 
             //add colunm
             foreach (var temp in info.AddName)
@@ -320,8 +320,7 @@ namespace Data.Check
         private static void UpdateComments(DataQuery item, string value, string tableName)
         {
             var sql = "";
-            var db = BaseContext.GetWriteContext(item.Key);
-            var readDb = BaseContext.GetReadContext(item.Key);
+            var db = BaseContext.GetContext(item.Key);
 
             if (item.Config.DbType == DataDbType.MySql)
                 sql = string.Format("alter table {0} comment '{1}'", tableName, value);
@@ -332,8 +331,8 @@ namespace Data.Check
             if (item.Config.DbType == DataDbType.SqlServer)
             {
                 sql = string.Format("select count(0) count from sys.extended_properties where object_id('{0}')=major_id and minor_id=0", tableName);
-                var count = readDb.ExecuteSql(sql).DicList[0]["count"].ToStr().ToInt(0);
-                readDb.Dispose();
+                var count = db.ExecuteSql(sql,null,true).DicList[0]["count"].ToStr().ToInt(0);
+                db.Dispose();
                 if (count >= 1)
                     sql = string.Format("execute sp_updateextendedproperty N'MS_Description', '{0}', N'user', N'dbo', N'table', N'{1}', NULL, NULL", value, tableName);
                 else
@@ -355,8 +354,7 @@ namespace Data.Check
         /// <param name="value"></param>
         private static void UpdateColumn(DataQuery item, string name, string value, string type, string tableName)
         {
-            var db = BaseContext.GetWriteContext(item.Key);
-            var readDb = BaseContext.GetReadContext(item);
+            var db = BaseContext.GetContext(item.Key);
             var sql = "";
 
             if (item.Config.DbType == DataDbType.MySql)
@@ -371,8 +369,8 @@ namespace Data.Check
                                     and exists(select 1 from sys.extended_properties where object_id('{0}')=major_id and colid=minor_id)"
                                       , tableName, name);
 
-                var count = readDb.ExecuteSql(sql).DicList[0]["count"].ToStr().ToInt(0);
-                readDb.Dispose();
+                var count = db.ExecuteSql(sql,null,true).DicList[0]["count"].ToStr().ToInt(0);
+                db.Dispose();
 
                 if (count >= 1)
                     sql = string.Format("execute sp_updateextendedproperty N'MS_Description', '{0}', N'user', N'dbo', N'table', N'{1}', N'column', {2}", value, tableName, name);
@@ -472,7 +470,7 @@ namespace Data.Check
         /// <returns></returns>
         private static bool CheckKey(DataQuery item, string name, string tableName)
         {
-            var db = BaseContext.GetReadContext(item);
+            var db = BaseContext.GetContext(item);
             var param = new List<DbParameter>();
 
             var sql = "";
@@ -534,7 +532,7 @@ namespace Data.Check
         /// <returns></returns>
         private static bool IsExistsTable(DataQuery query, string tableName)
         {
-            var db = BaseContext.GetReadContext(query.Key);
+            var db = BaseContext.GetContext(query.Key);
             var param = new List<DbParameter>();
             var result = false;
 
@@ -575,7 +573,7 @@ namespace Data.Check
             var result = new TableModel();
             result.Column = result.Column ?? new List<ColumnModel>();
 
-            var db = BaseContext.GetReadContext(item.Key);
+            var db = BaseContext.GetContext(item.Key);
             var param = new List<DbParameter>();
 
             if (item.Config.DbType == DataDbType.Oracle)

@@ -11,21 +11,9 @@ namespace Data.Base
         /// 获取读上下文
         /// </summary>
         /// <returns></returns>
-        public static ReadContext GetReadContext(DataQuery item)
+        public static DataContext GetContext(DataQuery item)
         {
-            return new ReadContext(item.Key, item.Config); 
-
-            var dataKey = item.Key ?? "LambdaReadDb";
-
-            var context = CallContext.GetData(dataKey) as ReadContext;
-
-            if (context == null)
-            {
-                context = new ReadContext(item.Key, item.Config);
-                CallContext.SetData(dataKey, context);
-            }
-
-            return context;
+            return new DataContext(item.Key, item.Config); 
         }
         #endregion
 
@@ -34,44 +22,9 @@ namespace Data.Base
         /// 获取读上下文
         /// </summary>
         /// <returns></returns>
-        public static ReadContext GetReadContext(string key)
+        public static DataContext GetContext(string key)
         {
-            return new ReadContext(key);
-
-            var dataKey = key ?? "LambdaReadDb";
-            
-            var context = CallContext.GetData(dataKey) as ReadContext;
-
-            if (context == null)
-            {
-                context = new ReadContext(key);
-                CallContext.SetData(dataKey, context);
-            }
-
-            return context;
-        }
-        #endregion
-
-        #region 获取写上下文
-        /// <summary>
-        /// 获取写上下文
-        /// </summary>
-        /// <returns></returns>
-        public static WriteContext GetWriteContext(string key)
-        {
-            return new WriteContext(key);
-
-            var dataKey = key ?? "LambdaWriteDb";
-
-            var context = CallContext.GetData(dataKey) as WriteContext;
-
-            if (context == null)
-            {
-                context = new WriteContext(key);
-                CallContext.SetData(dataKey, context);
-            }
-
-            return context;
+            return new DataContext(key);            
         }
         #endregion
     }

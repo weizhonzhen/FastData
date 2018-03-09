@@ -190,7 +190,7 @@ namespace Data
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static List<T> ToList<T>(this DataQuery item, ReadContext db=null) where T : class, new()
+        public static List<T> ToList<T>(this DataQuery item, DataContext db=null) where T : class, new()
         {
             var stopwatch = new Stopwatch();
             var result = new DataReturn<T>();
@@ -199,7 +199,7 @@ namespace Data
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetReadContext(item);
+                var tempDb = BaseContext.GetContext(item);
                 result = tempDb.GetList<T>(item);
                 tempDb.Dispose();
             }
@@ -223,7 +223,7 @@ namespace Data
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<List<T>> ToListAsy<T>(this DataQuery item, ReadContext db = null) where T : class,new()
+        public static async Task<List<T>> ToListAsy<T>(this DataQuery item, DataContext db = null) where T : class,new()
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -239,7 +239,7 @@ namespace Data
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static Lazy<List<T>> ToLazyList<T>(this DataQuery item, ReadContext db = null) where T : class,new()
+        public static Lazy<List<T>> ToLazyList<T>(this DataQuery item, DataContext db = null) where T : class,new()
         {
             return new Lazy<List<T>>(() => ToList<T>(item,db));
         }
@@ -252,7 +252,7 @@ namespace Data
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<Lazy<List<T>>> ToLazyListAsy<T>(this DataQuery item, ReadContext db = null) where T : class,new()
+        public static async Task<Lazy<List<T>>> ToLazyListAsy<T>(this DataQuery item, DataContext db = null) where T : class,new()
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -268,7 +268,7 @@ namespace Data
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static string ToJson(this DataQuery item, ReadContext db = null)
+        public static string ToJson(this DataQuery item, DataContext db = null)
         {
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
@@ -277,7 +277,7 @@ namespace Data
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetReadContext(item);
+                var tempDb = BaseContext.GetContext(item);
                 result = tempDb.GetJson(item);
                 tempDb.Dispose();
             }
@@ -300,7 +300,7 @@ namespace Data
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<string> ToJsonAsy(this DataQuery item, ReadContext db = null)
+        public static async Task<string> ToJsonAsy(this DataQuery item, DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -315,7 +315,7 @@ namespace Data
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static Lazy<string> ToLazyJson(this DataQuery item, ReadContext db = null)
+        public static Lazy<string> ToLazyJson(this DataQuery item, DataContext db = null)
         {
             return new Lazy<string>(() => ToJson(item,db));
         }
@@ -327,7 +327,7 @@ namespace Data
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<Lazy<string>> ToLazyJsonAsy(this DataQuery item, ReadContext db = null)
+        public static async Task<Lazy<string>> ToLazyJsonAsy(this DataQuery item, DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -344,7 +344,7 @@ namespace Data
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static T ToItem<T>(this DataQuery item, ReadContext db = null) where T : class, new()
+        public static T ToItem<T>(this DataQuery item, DataContext db = null) where T : class, new()
         {
             var result = new DataReturn<T>();
             var stopwatch = new Stopwatch();
@@ -355,7 +355,7 @@ namespace Data
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetReadContext(item);
+                var tempDb = BaseContext.GetContext(item);
                 result = tempDb.GetList<T>(item);
                 tempDb.Dispose();
             }
@@ -380,7 +380,7 @@ namespace Data
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<T> ToItemAsy<T>(this DataQuery item, ReadContext db = null) where T : class,new()
+        public static async Task<T> ToItemAsy<T>(this DataQuery item, DataContext db = null) where T : class,new()
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -396,7 +396,7 @@ namespace Data
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static Lazy<T> ToLazyItem<T>(this DataQuery item, ReadContext db = null) where T : class,new()
+        public static Lazy<T> ToLazyItem<T>(this DataQuery item, DataContext db = null) where T : class,new()
         {
             return new Lazy<T>(()=>ToItem<T>(item,db));
         }
@@ -409,7 +409,7 @@ namespace Data
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<Lazy<T>> ToLazyItemAsy<T>(this DataQuery item, ReadContext db = null) where T : class,new()
+        public static async Task<Lazy<T>> ToLazyItemAsy<T>(this DataQuery item, DataContext db = null) where T : class,new()
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -425,7 +425,7 @@ namespace Data
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static int ToCount(this DataQuery item, ReadContext db = null)
+        public static int ToCount(this DataQuery item, DataContext db = null)
         {
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
@@ -434,7 +434,7 @@ namespace Data
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetReadContext(item);
+                var tempDb = BaseContext.GetContext(item);
                 result = tempDb.GetCount(item);
                 tempDb.Dispose();
             }
@@ -458,7 +458,7 @@ namespace Data
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<int> ToCountAsy<T, T1>(this DataQuery item, ReadContext db = null)
+        public static async Task<int> ToCountAsy<T, T1>(this DataQuery item, DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -476,7 +476,7 @@ namespace Data
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public static PageResult<T> ToPage<T>(this DataQuery item, PageModel pModel, ReadContext db = null) where T : class, new()
+        public static PageResult<T> ToPage<T>(this DataQuery item, PageModel pModel, DataContext db = null) where T : class, new()
         {
             var result = new DataReturn<T>();
             var stopwatch = new Stopwatch();
@@ -485,7 +485,7 @@ namespace Data
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetReadContext(item);
+                var tempDb = BaseContext.GetContext(item);
                 result = tempDb.GetPage<T>(item, pModel);
                 tempDb.Dispose();
             }
@@ -511,7 +511,7 @@ namespace Data
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public static async Task<PageResult<T>> ToPageAsy<T>(this DataQuery item, PageModel pModel, ReadContext db = null) where T : class,new()
+        public static async Task<PageResult<T>> ToPageAsy<T>(this DataQuery item, PageModel pModel, DataContext db = null) where T : class,new()
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -528,7 +528,7 @@ namespace Data
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public static Lazy<PageResult<T>> ToLazyPage<T>(this DataQuery item, PageModel pModel, ReadContext db = null) where T : class,new()
+        public static Lazy<PageResult<T>> ToLazyPage<T>(this DataQuery item, PageModel pModel, DataContext db = null) where T : class,new()
         {
             return new Lazy<PageResult<T>>(() => ToPage<T>(item, pModel,db));
         }
@@ -542,7 +542,7 @@ namespace Data
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public static async Task<Lazy<PageResult<T>>> ToLazyPageAsy<T>(this DataQuery item, PageModel pModel, ReadContext db = null) where T : class,new()
+        public static async Task<Lazy<PageResult<T>>> ToLazyPageAsy<T>(this DataQuery item, PageModel pModel, DataContext db = null) where T : class,new()
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -559,7 +559,7 @@ namespace Data
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public static PageResult ToPage(this DataQuery item, PageModel pModel, ReadContext db = null)
+        public static PageResult ToPage(this DataQuery item, PageModel pModel, DataContext db = null)
         {
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
@@ -568,7 +568,7 @@ namespace Data
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetReadContext(item);
+                var tempDb = BaseContext.GetContext(item);
                 result = tempDb.GetPage(item, pModel);
                 tempDb.Dispose();
             }
@@ -590,7 +590,7 @@ namespace Data
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public static async Task<PageResult> ToPageAsy(this DataQuery item, PageModel pModel, ReadContext db = null)
+        public static async Task<PageResult> ToPageAsy(this DataQuery item, PageModel pModel, DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -607,7 +607,7 @@ namespace Data
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public static Lazy<PageResult> ToLazyPage(this DataQuery item, PageModel pModel, ReadContext db = null)
+        public static Lazy<PageResult> ToLazyPage(this DataQuery item, PageModel pModel, DataContext db = null)
         {
             return new Lazy<PageResult>(() => ToPage(item, pModel,db));
         }
@@ -620,7 +620,7 @@ namespace Data
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public static async Task<Lazy<PageResult>> ToLazyPageAsy(this DataQuery item, PageModel pModel, ReadContext db = null)
+        public static async Task<Lazy<PageResult>> ToLazyPageAsy(this DataQuery item, PageModel pModel, DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -638,7 +638,7 @@ namespace Data
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static List<T> ExecuteSql<T>(string sql, DbParameter[] param, ReadContext db = null, string key = null) where T : class, new()
+        public static List<T> ExecuteSql<T>(string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class, new()
         {
             ConfigModel config = null;
             var result = new DataReturn<T>();
@@ -648,7 +648,7 @@ namespace Data
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetReadContext(key);
+                var tempDb = BaseContext.GetContext(key);
                 result = tempDb.ExecuteSql<T>(sql, param);
                 config = tempDb.config;
                 tempDb.Dispose();
@@ -678,7 +678,7 @@ namespace Data
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static async Task<List<T>> ExecuteSqlAsy<T>(string sql, DbParameter[] param, ReadContext db = null, string key = null) where T : class,new()
+        public static async Task<List<T>> ExecuteSqlAsy<T>(string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class,new()
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -695,7 +695,7 @@ namespace Data
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static Lazy<List<T>> ExecuteLazySql<T>(string sql, DbParameter[] param, ReadContext db = null, string key = null) where T : class,new()
+        public static Lazy<List<T>> ExecuteLazySql<T>(string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class,new()
         {
             return new Lazy<List<T>>(() => ExecuteSql<T>(sql, param,db, key));
         }
@@ -709,7 +709,7 @@ namespace Data
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static async Task<Lazy<List<T>>> ExecuteLazySqlAsy<T>(string sql, DbParameter[] param, ReadContext db = null, string key = null) where T : class,new()
+        public static async Task<Lazy<List<T>>> ExecuteLazySqlAsy<T>(string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class,new()
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -725,7 +725,7 @@ namespace Data
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static List<Dictionary<string, object>> ToDics(this DataQuery item, ReadContext db = null)
+        public static List<Dictionary<string, object>> ToDics(this DataQuery item, DataContext db = null)
         {
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
@@ -734,7 +734,7 @@ namespace Data
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetReadContext(item);
+                var tempDb = BaseContext.GetContext(item);
                 result = tempDb.GetDic(item);
                 tempDb.Dispose();
             }
@@ -758,7 +758,7 @@ namespace Data
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<List<Dictionary<string, object>>> ToDicsAsy(this DataQuery item, ReadContext db = null)
+        public static async Task<List<Dictionary<string, object>>> ToDicsAsy(this DataQuery item, DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -773,7 +773,7 @@ namespace Data
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static Lazy<List<Dictionary<string, object>>> ToLazyDics(this DataQuery item, ReadContext db = null)
+        public static Lazy<List<Dictionary<string, object>>> ToLazyDics(this DataQuery item, DataContext db = null)
         {
             return new Lazy<List<Dictionary<string, object>>>(() => ToDics(item,db));
         }
@@ -785,7 +785,7 @@ namespace Data
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<Lazy<List<Dictionary<string, object>>>> ToLazyDicsAsy(this DataQuery item, ReadContext db = null)
+        public static async Task<Lazy<List<Dictionary<string, object>>>> ToLazyDicsAsy(this DataQuery item, DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -801,7 +801,7 @@ namespace Data
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static Dictionary<string, object> ToDic(this DataQuery item, ReadContext db = null)
+        public static Dictionary<string, object> ToDic(this DataQuery item, DataContext db = null)
         {
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
@@ -811,7 +811,7 @@ namespace Data
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetReadContext(item);
+                var tempDb = BaseContext.GetContext(item);
                 result = tempDb.GetDic(item);
                 tempDb.Dispose();
             }
@@ -835,7 +835,7 @@ namespace Data
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<Dictionary<string, object>> ToDicAsy(this DataQuery item, ReadContext db = null)
+        public static async Task<Dictionary<string, object>> ToDicAsy(this DataQuery item, DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -850,7 +850,7 @@ namespace Data
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static Lazy<Dictionary<string, object>> ToLazyDic(this DataQuery item, ReadContext db = null)
+        public static Lazy<Dictionary<string, object>> ToLazyDic(this DataQuery item, DataContext db = null)
         {
             return new Lazy<Dictionary<string, object>>(() => ToDic(item,db));
         }
@@ -862,7 +862,7 @@ namespace Data
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<Lazy<Dictionary<string, object>>> ToLazyDicAsy(this DataQuery item, ReadContext db = null)
+        public static async Task<Lazy<Dictionary<string, object>>> ToLazyDicAsy(this DataQuery item, DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -879,7 +879,7 @@ namespace Data
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static List<Dictionary<string, object>> ExecuteSql(string sql, DbParameter[] param, ReadContext db = null, string key = null)
+        public static List<Dictionary<string, object>> ExecuteSql(string sql, DbParameter[] param, DataContext db = null, string key = null)
         {
             ConfigModel config = null;
             var result = new DataReturn();
@@ -889,14 +889,14 @@ namespace Data
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetReadContext(key);
-                result = tempDb.ExecuteSql(sql, param);
+                var tempDb = BaseContext.GetContext(key);
+                result = tempDb.ExecuteSql(sql, param,true);
                 config = tempDb.config;
                 tempDb.Dispose();
             }
             else
             {
-                result = db.ExecuteSql(sql, param);
+                result = db.ExecuteSql(sql, param,true);
                 config = db.config;
             }
 
@@ -916,7 +916,7 @@ namespace Data
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static async Task<List<Dictionary<string, object>>> ExecuteSqlAsy(string sql, DbParameter[] param, ReadContext db = null, string key = null)
+        public static async Task<List<Dictionary<string, object>>> ExecuteSqlAsy(string sql, DbParameter[] param, DataContext db = null, string key = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -933,7 +933,7 @@ namespace Data
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static Lazy<List<Dictionary<string, object>>> ExecuteLazySql(string sql, DbParameter[] param, ReadContext db = null, string key = null)
+        public static Lazy<List<Dictionary<string, object>>> ExecuteLazySql(string sql, DbParameter[] param, DataContext db = null, string key = null)
         {
             return new Lazy<List<Dictionary<string, object>>>(() => ExecuteSql(sql, param,db,key));
         }
@@ -947,7 +947,7 @@ namespace Data
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static async Task<Lazy<List<Dictionary<string, object>>>> ExecuteLazySqlAsy(string sql, DbParameter[] param, ReadContext db = null, string key = null)
+        public static async Task<Lazy<List<Dictionary<string, object>>>> ExecuteLazySqlAsy(string sql, DbParameter[] param, DataContext db = null, string key = null)
         {
             return await Task.Factory.StartNew(() =>
             {

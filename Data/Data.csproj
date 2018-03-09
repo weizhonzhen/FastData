@@ -72,9 +72,8 @@
     <Compile Include="Config\MapConfig\MapCollection.cs" />
     <Compile Include="Config\MapConfig\MapConfig.cs" />
     <Compile Include="Config\MapConfig\MapElement.cs" />
-    <Compile Include="Context\WriteContext.cs" />
     <Compile Include="Base\CommandParam.cs" />
-    <Compile Include="Context\ReadContext.cs" />
+    <Compile Include="Context\DataContext.cs" />
     <Compile Include="DataModel\MySql\Data_MapFile.cs" />
     <Compile Include="DataModel\Oracle\Data_MapFile.cs" />
     <Compile Include="DataModel\SqlServer\Data_MapFile.cs" />

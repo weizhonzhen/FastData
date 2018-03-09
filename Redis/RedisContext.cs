@@ -12,36 +12,33 @@ namespace Redis
         /// 获取上下文
         /// </summary>
         /// <returns></returns>
-        public static PooledRedisClientManager GetContext
+        public static PooledRedisClientManager GetContext(int db = 0)
         {
-            get
+            var key = string.Format("redisKey{0}", db);
+
+            if (HttpContext.Current == null)
             {
-                var key = "redisKey";
+                var context = CallContext.GetData(key) as PooledRedisClientManager;
 
-                if (HttpContext.Current == null)
+                if (context == null)
                 {
-                    var context = CallContext.GetData(key) as PooledRedisClientManager;
-
-                    if (context == null)
-                    {
-                        context = ClientInfo;
-                        CallContext.SetData(key, context);
-                    }
-
-                    return context;
+                    context = ClientInfo(db);
+                    CallContext.SetData(key, context);
                 }
-                else
+
+                return context;
+            }
+            else
+            {
+                var context = HttpContext.Current.Items[key] as PooledRedisClientManager;
+
+                if (context == null)
                 {
-                    var context = HttpContext.Current.Items[key] as PooledRedisClientManager;
-
-                    if (context == null)
-                    {
-                        context = ClientInfo;
-                        HttpContext.Current.Items[key] = ClientInfo;
-                    }
-
-                    return context;
+                    context = ClientInfo(db);
+                    HttpContext.Current.Items[key] = ClientInfo(db);
                 }
+
+                return context;
             }
         }
         #endregion
@@ -51,22 +48,20 @@ namespace Redis
         /// 连接配置
         /// </summary>
         /// <returns></returns>
-        private static PooledRedisClientManager ClientInfo
+        private static PooledRedisClientManager ClientInfo(int db = 0)
         {
-            get
-            {
-                //获取配置
-                var config = RedisConfig.GetConfig();
+            //获取配置
+            var config = RedisConfig.GetConfig();
 
-                //redis连接
-                return new PooledRedisClientManager(config.WriteServerList.Split(',')
-                 , config.ReadServerList.Split(','), new RedisClientManagerConfig
-                 {
-                     MaxReadPoolSize = config.MaxReadPoolSize,
-                     MaxWritePoolSize = config.MaxWritePoolSize,
-                     AutoStart = config.AutoStart
-                 });
-            }
+            //redis连接
+            return new PooledRedisClientManager(config.WriteServerList.Split(',')
+             , config.ReadServerList.Split(','), new RedisClientManagerConfig
+             {
+                 DefaultDb = db,
+                 MaxReadPoolSize = config.MaxReadPoolSize,
+                 MaxWritePoolSize = config.MaxWritePoolSize,
+                 AutoStart = config.AutoStart
+             });
         }
         #endregion
     }

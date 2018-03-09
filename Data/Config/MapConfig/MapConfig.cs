@@ -2,6 +2,7 @@
 using System.IO;
 using System.Configuration;
 using Untility.Base;
+using Data.Base;
 using Redis;
 using Data.CacheModel;
 
@@ -41,20 +42,20 @@ namespace Data.Config
                 exeConfig.ExeConfigFilename = string.Format("{0}SqlMap.config", AppDomain.CurrentDomain.BaseDirectory);
                 var info = new FileInfo(exeConfig.ExeConfigFilename);
 
-                if (!RedisInfo.Exists(key,1))
+                if (!RedisInfo.Exists(key, RedisDb.Config))
                 {
                     var temp = getModel(exeConfig, info);
-                    RedisInfo.SetItem<MapConfigModel>(key, temp,1);
+                    RedisInfo.SetItem<MapConfigModel>(key, temp,8640, RedisDb.Config);
                     return temp;
                 }
-                else if (RedisInfo.GetItem<MapConfigModel>(key,1).LastWrite != info.LastWriteTime)
+                else if (RedisInfo.GetItem<MapConfigModel>(key, RedisDb.Config).LastWrite != info.LastWriteTime)
                 {
                     var temp = getModel(exeConfig, info);
-                    RedisInfo.SetItem<MapConfigModel>(key, temp,1);
+                    RedisInfo.SetItem<MapConfigModel>(key, temp,8640, RedisDb.Config);
                     return temp;
                 }
                 else
-                    return RedisInfo.GetItem<MapConfigModel>(key,1);
+                    return RedisInfo.GetItem<MapConfigModel>(key,RedisDb.Config);
             }
             catch(Exception ex)
             {
