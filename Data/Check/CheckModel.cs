@@ -83,6 +83,13 @@ namespace Data.Check
                                     result.AddName.Add(GetColumnType<T>(modelItem, type, name));
                                 break;
                             }
+                        case "Length":
+                        case "Precision":
+                        case "Scale":
+                            {
+                                result.Type.Add(GetColumnType<T>(modelItem, type, name));
+                                break;
+                            }
                         case "DataType":
                             {
                                 result.Type.Add(GetColumnType<T>(modelItem, modelValue, name));
