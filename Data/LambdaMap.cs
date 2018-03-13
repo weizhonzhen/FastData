@@ -79,7 +79,7 @@ namespace Data
             var query = new DataQuery();
             query.Config = DataConfig.GetConfig(false, dbKey);
             query.Key = dbKey;
-            
+
             foreach (var item in list)
             {
                 if (item.ManifestModule.Name == dll)
@@ -96,7 +96,7 @@ namespace Data
             if (query.Config.DbType == DataDbType.Oracle)
             {
                 var listInfo = typeof(Data.DataModel.Oracle.Data_MapFile).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
-                var listAttribute = typeof(Data.DataModel.Oracle.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();                
+                var listAttribute = typeof(Data.DataModel.Oracle.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();
                 BaseTable.Check(query, "Data_MapFile", "Data.DataModel.Oracle", listInfo, listAttribute);
             }
 
@@ -139,11 +139,11 @@ namespace Data
                     temp.FileKey = ReadXml(item, config);
                     temp.FileName = info.FullName;
                     if (SaveXml(key, info, config, db))
-                        RedisInfo.SetItem<MapXmlModel>(key, temp,8640, RedisDb.Xml);
+                        RedisInfo.SetItem<MapXmlModel>(key, temp, 8640, RedisDb.Xml);
                 }
-                else if ((RedisInfo.GetItem<MapXmlModel>(key,RedisDb.Xml).LastWrite - info.LastWriteTime).Minutes != 0)
+                else if ((RedisInfo.GetItem<MapXmlModel>(key, RedisDb.Xml).LastWrite - info.LastWriteTime).Minutes != 0)
                 {
-                    foreach (var temp in RedisInfo.GetItem<MapXmlModel>(key,2).FileKey)
+                    foreach (var temp in RedisInfo.GetItem<MapXmlModel>(key, RedisDb.Xml).FileKey)
                         RedisInfo.RemoveItem(temp, RedisDb.Xml);
 
                     var model = new MapXmlModel();
@@ -151,7 +151,7 @@ namespace Data
                     model.FileKey = ReadXml(item, config);
                     model.FileName = info.FullName;
                     if (SaveXml(key, info, config, db))
-                        RedisInfo.SetItem<MapXmlModel>(key, model,8640, RedisDb.Xml);
+                        RedisInfo.SetItem<MapXmlModel>(key, model, 8640, RedisDb.Xml);
                 }
             }
 
@@ -170,10 +170,10 @@ namespace Data
             else
                 InstanceMap(key);
 
-            if (RedisInfo.Exists(name.ToLower()))
+            if (RedisInfo.Exists(name.ToLower(), RedisDb.Xml))
             {
                 var sql = GetMapSql(name, ref param);
-                return LambdaRead.ExecuteSql<T>(sql, param,db,key);
+                return LambdaRead.ExecuteSql<T>(sql, param, db, key);
             }
             else
                 return new List<T>();
@@ -188,7 +188,7 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return ExecuteMap<T>(name, param,db,key);
+                return ExecuteMap<T>(name, param, db, key);
             });
         }
         #endregion
@@ -199,7 +199,7 @@ namespace Data
         /// </summary>
         public static Lazy<List<T>> ExecuteLazyMap<T>(string name, DbParameter[] param, DataContext db = null, string key = null) where T : class, new()
         {
-            return new Lazy<List<T>>(() => ExecuteMap<T>( name, param,db,key));
+            return new Lazy<List<T>>(() => ExecuteMap<T>(name, param, db, key));
         }
         #endregion
 
@@ -211,7 +211,7 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return new Lazy<List<T>>(() => ExecuteMap<T>(name, param,db,key));
+                return new Lazy<List<T>>(() => ExecuteMap<T>(name, param, db, key));
             });
         }
         #endregion
@@ -228,10 +228,10 @@ namespace Data
             else
                 InstanceMap(key);
 
-            if (RedisInfo.Exists(name.ToLower()))
+            if (RedisInfo.Exists(name.ToLower(), RedisDb.Xml))
             {
                 var sql = GetMapSql(name, ref param);
-                
+
                 return LambdaWrite.ExecuteSql(sql, param, db, key);
             }
             else
@@ -287,11 +287,11 @@ namespace Data
             else
                 InstanceMap(key);
 
-            if (RedisInfo.Exists(name.ToLower()))
+            if (RedisInfo.Exists(name.ToLower(), RedisDb.Xml))
             {
                 var sql = GetMapSql(name, ref param);
 
-                return LambdaRead.ExecuteSql(sql, param,db,key);
+                return LambdaRead.ExecuteSql(sql, param, db, key);
             }
             else
                 return new List<Dictionary<string, object>>();
@@ -306,7 +306,7 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return ExecuteMap(name, param,db,key);
+                return ExecuteMap(name, param, db, key);
             });
         }
         #endregion
@@ -317,7 +317,7 @@ namespace Data
         /// </summary>
         public static Lazy<List<Dictionary<string, object>>> ExecuteLazyMap(string name, DbParameter[] param, DataContext db = null, string key = null)
         {
-            return new Lazy<List<Dictionary<string, object>>>(() => ExecuteMap(name, param,db,key));
+            return new Lazy<List<Dictionary<string, object>>>(() => ExecuteMap(name, param, db, key));
         }
         #endregion
 
@@ -329,7 +329,7 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return new Lazy<List<Dictionary<string, object>>>(() => ExecuteMap(name, param,db,key));
+                return new Lazy<List<Dictionary<string, object>>>(() => ExecuteMap(name, param, db, key));
             });
         }
         #endregion
@@ -378,11 +378,11 @@ namespace Data
             else
                 InstanceMap(key);
 
-            if (RedisInfo.Exists(name.ToLower()))
+            if (RedisInfo.Exists(name.ToLower(), RedisDb.Xml))
             {
                 var sql = GetMapSql(name, ref param);
 
-                return ExecuteSqlPage(pModel, sql, param,db,key);
+                return ExecuteSqlPage(pModel, sql, param, db, key);
             }
             else
                 return new PageResult();
@@ -397,7 +397,7 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return ExecuteMapPage(pModel, name, param,db,key);
+                return ExecuteMapPage(pModel, name, param, db, key);
             });
         }
         #endregion
@@ -408,7 +408,7 @@ namespace Data
         /// </summary>
         public static Lazy<PageResult> ExecuteLazyMapPage(PageModel pModel, string name, DbParameter[] param, DataContext db = null, string key = null)
         {
-            return new Lazy<PageResult>(() => ExecuteMapPage(pModel, name, param,db,key));
+            return new Lazy<PageResult>(() => ExecuteMapPage(pModel, name, param, db, key));
         }
         #endregion
 
@@ -420,11 +420,11 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return new Lazy<PageResult>(() => ExecuteMapPage(pModel, name, param,db,key));
+                return new Lazy<PageResult>(() => ExecuteMapPage(pModel, name, param, db, key));
             });
         }
         #endregion
-        
+
 
         #region 执行分页
         /// <summary>
@@ -469,11 +469,11 @@ namespace Data
             else
                 InstanceMap(key);
 
-            if (RedisInfo.Exists(name.ToLower()))
+            if (RedisInfo.Exists(name.ToLower(), RedisDb.Xml))
             {
                 var sql = GetMapSql(name, ref param);
 
-                return ExecuteSqlPage<T>(pModel, sql, param,db,key);
+                return ExecuteSqlPage<T>(pModel, sql, param, db, key);
             }
             else
                 return new PageResult<T>();
@@ -488,7 +488,7 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return ExecuteMapPage<T>(pModel, name, param,db,key);
+                return ExecuteMapPage<T>(pModel, name, param, db, key);
             });
         }
         #endregion
@@ -499,7 +499,7 @@ namespace Data
         /// </summary>
         public static Lazy<PageResult<T>> ExecuteLazyMapPage<T>(PageModel pModel, string name, DbParameter[] param, DataContext db = null, string key = null) where T : class, new()
         {
-            return new Lazy<PageResult<T>>(() => ExecuteMapPage<T>(pModel, name, param,db,key));
+            return new Lazy<PageResult<T>>(() => ExecuteMapPage<T>(pModel, name, param, db, key));
         }
         #endregion
 
@@ -511,7 +511,7 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return new Lazy<PageResult<T>>(() => ExecuteMapPage<T>(pModel, name, param,db,key));
+                return new Lazy<PageResult<T>>(() => ExecuteMapPage<T>(pModel, name, param, db, key));
             });
         }
         #endregion
@@ -521,11 +521,11 @@ namespace Data
         /// <summary>
         /// 读取xml map并缓存
         /// </summary>
-        private static List<string> ReadXml(string path,ConfigModel config)
+        private static List<string> ReadXml(string path, ConfigModel config)
         {
             var key = new List<string>();
             var sql = new List<string>();
-            GetXmlList(path, "sqlMap", ref key, ref sql,config);
+            GetXmlList(path, "sqlMap", ref key, ref sql, config);
 
             for (var i = 0; i < key.Count; i++)
                 RedisInfo.SetItem(key[i].ToLower(), sql[i], 8640, RedisDb.Xml);
@@ -541,7 +541,7 @@ namespace Data
         /// <param name="path">文件名</param>
         /// <param name="xmlNode">结点</param>
         /// <returns></returns>
-        private static void GetXmlList(string path, string xmlNode, ref List<string> key, ref List<string> sql,ConfigModel config)
+        private static void GetXmlList(string path, string xmlNode, ref List<string> key, ref List<string> sql, ConfigModel config)
         {
             try
             {
@@ -552,7 +552,7 @@ namespace Data
 
                 //载入xml
                 if (config.IsEncrypt)
-                {                    
+                {
                     var temp = BaseSymmetric.DecodeGB2312(File.ReadAllText(path));
                     if (temp != "")
                         xmlDoc.LoadXml(temp);
@@ -609,7 +609,7 @@ namespace Data
                             }
                             #endregion
                         }
-                        else if(temp is XmlText)
+                        else if (temp is XmlText)
                         {
                             #region XmlText
                             key.Add(string.Format("{0}.{1}", item.Attributes["id"].Value.ToLower(), i));
@@ -644,7 +644,7 @@ namespace Data
             var tempParam = param.ToList();
             var sql = new StringBuilder();
 
-            for (var i = 0; i <= RedisInfo.GetItem(name.ToLower()).ToInt(0); i++)
+            for (var i = 0; i <= RedisInfo.GetItem(name.ToLower(), RedisDb.Xml).ToInt(0); i++)
             {
                 #region 文本
                 var txtKey = string.Format("{0}.{1}", name.ToLower(), i);
