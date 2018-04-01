@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using NPOI.HPSF;
 using NPOI.SS.UserModel;
@@ -13,107 +14,174 @@ namespace Untility.Base
     /// </summary>
     public static class BaseExcel
     {
-        #region list导出到Excel文件
+        #region excel实体
         /// <summary>
-        /// list导出到Excel文件
+        /// excel实体
         /// </summary>
-        /// <param name="listContent">内容列表</param>
-        /// <param name="Title">标题列表</param>
-        /// <param name="headerText">表头文本</param>
-        /// <param name="fileName">文件名</param>
-        public static byte[] ToExcel<Content, Title>(List<Content> listContent, Title model, string headerText)
+        public class ExcelModel
+        {
+            /// <summary>
+            /// 工作区
+            /// </summary>
+            public HSSFWorkbook workbook { get; set; }
+
+            /// <summary>
+            /// 工作页
+            /// </summary>
+            public ISheet sheet { get; set; }
+
+            /// <summary>
+            /// 行
+            /// </summary>
+            public IRow row { get; set; }
+
+            /// <summary>
+            /// 单元格
+            /// </summary>
+            public ICell cell { get; set; }
+
+            /// <summary>
+            /// style
+            /// </summary>
+            public ICellStyle style { get; set; }
+
+            /// <summary>
+            /// style
+            /// </summary>
+            public ICellStyle style_n { get; set; }
+        }
+        #endregion
+
+
+        #region 初始化excel
+        /// <summary>
+        /// 初始化excel
+        /// </summary>
+        /// <param name="headerText">标题</param>
+        /// <param name="title">表头</param>
+        /// <returns></returns>
+        public static ExcelModel Init(string headerText, Dictionary<string, object> title)
         {
             try
             {
-                var hssfworkbook = new HSSFWorkbook();
+                var result = new ExcelModel();
 
-                //InitializeWorkbook
-                InitializeWorkbook(hssfworkbook);
-
-                //GenerateData
-                var sheet1 = hssfworkbook.CreateSheet(headerText);
+                result.workbook = new HSSFWorkbook();
+                InitializeWorkbook(result.workbook);
+                result.sheet = result.workbook.CreateSheet(headerText);
 
                 //写入总标题，合并居中
-                var row = sheet1.CreateRow(0);
-                var cell = row.CreateCell(0);
-                cell.SetCellValue(headerText);
+                result.row = result.sheet.CreateRow(0);
+                result.cell = result.row.CreateCell(0);
+                result.cell.SetCellValue(headerText);
 
-                var style = hssfworkbook.CreateCellStyle();
+                var style = result.workbook.CreateCellStyle();
                 style.Alignment = HorizontalAlignment.Center;
-                var font = hssfworkbook.CreateFont();
+                var font = result.workbook.CreateFont();
                 font.FontHeight = 20 * 20;
                 style.SetFont(font);
-                cell.CellStyle = style;
-                sheet1.AddMergedRegion(new CellRangeAddress(0, 0, 0, model.GetType().GetProperties().Length - 1));
+                result.cell.CellStyle = style;
+                result.sheet.AddMergedRegion(new CellRangeAddress(0, 0, 0, title.Count - 1));
 
                 //插入列标题
-                row = sheet1.CreateRow(1);
-                var pInfo = model.GetType().GetProperties();
+                result.row = result.sheet.CreateRow(1);
                 int i = 0;
 
-                if (model != null)
+                foreach (var item in title)
                 {
-                    foreach (var item in pInfo)
-                    {
-                        cell = row.CreateCell(i++);
-
-                        cell.Row.Height = 420;
-                        if (item.GetValue(model, null) == null)
-                            cell.SetCellValue("");
-                        else
-                            cell.SetCellValue(item.GetValue(model, null).ToString());
-
-                        cell.CellStyle = GetStyle(hssfworkbook, true);
-                    }
+                    result.cell = result.row.CreateCell(i++);
+                    result.cell.Row.Height = 420;
+                    result.cell.SetCellValue(item.Value.ToStr());
+                    result.cell.CellStyle = GetStyle(result.workbook, true);
                 }
 
+                return result;
+            }
+            catch (Exception ex)
+            {
+                BaseLog.SaveLog(ex.ToString(), "ToExcel.Init");
+                return null;
+            }
+        }
+        #endregion
+
+        #region 填充内容
+        /// <summary>
+        /// 填充内容
+        /// </summary>
+        /// <param name="listContent">内容列表</param>
+        /// <param name="model"></param>
+        public static void FillContent(List<Dictionary<string, object>> listContent, ExcelModel model, string exclude = "")
+        {
+            try
+            {
                 //插入查询结果
-                i = 0;
+                var i = 0;
                 if (listContent != null)
                 {
+                    model.style_n = GetStyle(model.workbook, false, true);
+                    model.style = GetStyle(model.workbook);
                     foreach (var item in listContent)
                     {
-                        pInfo = (item.GetType()).GetProperties();
-                        row = sheet1.CreateRow(i + 2);
+                        model.row = model.sheet.CreateRow(i + 2);
                         int j = 0;
-                        foreach (var itemContent in pInfo)
+                        foreach (var temp in item)
                         {
-                            cell = row.CreateCell(j++);
-                            cell.Row.Height = 420;
+                            if (temp.Key.ToLower() == exclude.ToLower())
+                                continue;
 
-                            if (itemContent.GetValue(item, null) == null)
-                                cell.SetCellValue("");
+                            model.cell = model.row.CreateCell(j++);
+                            model.cell.Row.Height = 420;
+                            model.cell.SetCellValue(temp.Value.ToStr());
+
+                            if (temp.Value.ToStr().Contains("\n"))
+                                model.cell.CellStyle = model.style_n;
                             else
-                                cell.SetCellValue(itemContent.GetValue(item, null).ToString());
-
-                            cell.CellStyle = GetStyle(hssfworkbook);
+                                model.cell.CellStyle = model.style;
                         }
 
                         i++;
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                BaseLog.SaveLog(ex.ToString(), "ToExcel.FillContent");
+            }
+        }
+        #endregion
 
+        #region 获取excel流
+        /// <summary>
+        /// 获取excel流
+        /// </summary>
+        /// <returns></returns>
+        public static byte[] Result(ExcelModel model, Dictionary<string, object> title)
+        {
+            try
+            {
                 //自动列宽
-                pInfo = model.GetType().GetProperties();
-                i = 0;
-                foreach (var item in pInfo)
+                var i = 0;
+                foreach (var item in title)
                 {
-                    sheet1.AutoSizeColumn(i++, true);
-                    sheet1.HorizontallyCenter = true;
+                    model.sheet.AutoSizeColumn(i++, true);
+                    model.sheet.Autobreaks = true;
+                    model.sheet.HorizontallyCenter = true;
                 }
 
                 var file = new MemoryStream();
-                hssfworkbook.Write(file);
+                model.workbook.Write(file);
 
                 return file.ToArray();
             }
             catch (Exception ex)
             {
-                BaseLog.SaveLog(ex.ToString(), "ToExcel.exp");
-                return new byte[1];
+                BaseLog.SaveLog(ex.ToString(), "ToExcel.Result");
+                return null;
             }
         }
         #endregion
+
 
         #region excel工作区
         /// <summary>
@@ -138,7 +206,7 @@ namespace Untility.Base
         /// 样式
         /// </summary>
         /// <returns></returns>
-        private static ICellStyle GetStyle(HSSFWorkbook hssfworkbook, bool IsHead = false)
+        private static ICellStyle GetStyle(HSSFWorkbook hssfworkbook, bool IsHead = false, bool IsWrapText = false)
         {
             var style = hssfworkbook.CreateCellStyle();
             style.Alignment = HorizontalAlignment.Center;
@@ -147,6 +215,7 @@ namespace Untility.Base
             style.BorderLeft = BorderStyle.Thin;
             style.BorderRight = BorderStyle.Thin;
             style.BorderBottom = BorderStyle.Thin;
+            style.WrapText = IsWrapText;
 
             style.Indention = 0;
 
@@ -155,6 +224,6 @@ namespace Untility.Base
 
             return style;
         }
-        #endregion
+        #endregion    
     }
 }
