@@ -127,7 +127,7 @@ namespace Data.Context
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
                 if (item.Take == 1)
-                    result.item = BaseDataReader.ToList<T>(dr, item.Config, item.AsName).First<T>();
+                    result.item = BaseDataReader.ToList<T>(dr, item.Config, item.AsName).FirstOrDefault<T>()?? new T();
                 else
                     result.list = BaseDataReader.ToList<T>(dr, item.Config, item.AsName);
 
@@ -180,6 +180,8 @@ namespace Data.Context
                     dr.Close();
                     dr.Dispose();
                 }
+                else
+                    result.pageResult.list = new T();
 
                 result.pageResult.pModel = pModel;
             }
@@ -226,6 +228,8 @@ namespace Data.Context
                     dr.Close();
                     dr.Dispose();
                 }
+                else
+                    result.PageResult.list = new List<Dictionary<string, object>>();
 
                 result.PageResult.pModel = pModel;
             }
@@ -273,6 +277,8 @@ namespace Data.Context
                     dr.Close();
                     dr.Dispose();
                 }
+                else
+                    result.PageResult.list = new List<Dictionary<string, object>>();
 
                 result.PageResult.pModel = pModel;
             }
@@ -311,10 +317,10 @@ namespace Data.Context
                         pModel.TotalPage = pModel.TotalRecord / pModel.PageSize;
                     else
                         pModel.TotalPage = (pModel.TotalRecord / pModel.PageSize) + 1;
-                    
+
                     if (pModel.StarId > pModel.TotalPage)
                         pModel.StarId = pModel.TotalPage;
-                    
+
                     var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql);
 
                     result.pageResult.list = BaseDataReader.ToList<T>(dr, config, null);
@@ -323,8 +329,10 @@ namespace Data.Context
                     dr.Close();
                     dr.Dispose();
                 }
+                else
+                    result.pageResult.list = new List<T>();
 
-                result.pageResult.pModel = pModel;
+               result.pageResult.pModel = pModel;
             }
             catch (Exception ex)
             {
@@ -601,7 +609,7 @@ namespace Data.Context
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
                 if (item.Take == 1)
-                    result.Dic = BaseJson.DataReaderToDic(dr).FirstOrDefault();
+                    result.Dic = BaseJson.DataReaderToDic(dr).FirstOrDefault()??new Dictionary<string,object>();
                 else
                     result.DicList = BaseJson.DataReaderToDic(dr);
 
