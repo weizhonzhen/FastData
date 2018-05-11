@@ -31,7 +31,7 @@ namespace Untility.Base
                 var list = new List<T>();
 
                 //载入xml
-                xmlDoc.Load(xmlValue);
+                xmlDoc.LoadXml(xmlValue);
 
                 //结点
                 var nodelList = xmlDoc.SelectNodes(xmlNodel);
@@ -67,13 +67,13 @@ namespace Untility.Base
         /// <param name="FileName">文件名</param>
         /// <param name="xmlNodel">结点</param>
         /// <returns></returns>
-        public static List<string> GetXmlListAsync(HttpContextBase context,string FileName, string xmlNodel)
+        public static List<string> GetXmlListForFileAsync(HttpContextBase context, string FileName, string xmlNodel)
         {
             try
             {
                 //变量
                 var xmlDoc = new XmlDocument();
-                
+
                 //载入xml
                 xmlDoc.Load(context.Server.MapPath(FileName));
 
@@ -95,24 +95,24 @@ namespace Untility.Base
             }
         }
         #endregion
-        
-        #region 返回字符串列表
+
+        #region 返回字符串列表 文件 
         /// <summary>
-        /// 返回字符串列表
+        /// 返回字符串列表 文件 
         /// </summary>
         /// <param name="FileName">文件名</param>
         /// <param name="xmlNodel">结点</param>
         /// <returns></returns>
-        public static List<string> GetXmlList(string FileName, string xmlNodel)
+        public static List<string> GetXmlListForFile(string FileName, string xmlNodel)
         {
             try
             {
                 //变量
                 var xmlDoc = new XmlDocument();
-                
+
                 //载入xml
                 xmlDoc.Load(HttpContext.Current.Server.MapPath(FileName));
-               
+
                 //结点
                 var nodelList = xmlDoc.SelectNodes(xmlNodel);
 
@@ -132,16 +132,70 @@ namespace Untility.Base
         }
         #endregion
 
-        #region 返回字符串
+        #region 返回字符串列表
         /// <summary>
-        /// 返回字符串
+        /// 返回字符串列表
+        /// </summary>
+        /// <param name="xmlValue">xml</param>
+        /// <param name="xmlNodel">结点</param>
+        /// <returns></returns>
+        public static List<string> GetXmlList(string xmlValue, string xmlNodel)
+        {
+            try
+            {
+                //变量
+                var xmlDoc = new XmlDocument();
+
+                //载入xml
+                xmlDoc.LoadXml(xmlValue);
+
+                //结点
+                var nodelList = xmlDoc.SelectNodes(xmlNodel);
+
+                var list = new List<string>();
+
+                foreach (XmlNode item in nodelList)
+                {
+                    list.Add(item.InnerXml);
+                }
+
+                return list;
+            }
+            catch
+            {
+                return new List<string>();
+            }
+        }
+        #endregion
+
+        #region 返回字符串 文件 
+        /// <summary>
+        /// 返回字符串 文件 
         /// </summary>
         /// <param name="FileName">文件名</param>
         /// <param name="xmlNodel">结点</param>
         /// <returns></returns>
-        public static string GetXmlString(string FileName, string xmlNodel)
+        public static string GetXmlStringForFile(string FileName, string xmlNodel)
         {
-            var list = GetXmlList(FileName, xmlNodel);
+            var list = GetXmlListForFile(FileName, xmlNodel);
+
+            if (list.Count != 0)
+                return list.First();
+            else
+                return "";
+        }
+        #endregion
+
+        #region 返回字符串
+        /// <summary>
+        /// 返回字符串
+        /// </summary>
+        /// <param name="xmlValue">xml</param>
+        /// <param name="xmlNodel">结点</param>
+        /// <returns></returns>
+        public static string GetXmlString(string xmlValue, string xmlNodel)
+        {
+            var list = GetXmlList(xmlValue, xmlNodel);
 
             if (list.Count != 0)
                 return list.First();

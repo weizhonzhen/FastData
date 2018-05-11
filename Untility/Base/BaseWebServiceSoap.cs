@@ -26,16 +26,41 @@ namespace Untility.Base
         /// <returns> 结果集xml</returns>  
         public static XmlDocument QuerySoapWebService(string url, string methodName, Hashtable pars, int timeOut)
         {
+            var refValue = "";
             //名字空间在缓存中是否存在
             if (xmlNameSpace.ContainsKey(url))
             {
                 //存在时，读取缓存，然后执行调用  
-                return QuerySoapWebService(url, methodName, pars, xmlNameSpace[url].ToString(), timeOut);
+                return QuerySoapWebService(url, methodName, pars, xmlNameSpace[url].ToString(), timeOut, ref refValue);
             }
             else
             {
                 //不存在时直接从wsdl的请求中读取名字空间，然后执行调用  
-                return QuerySoapWebService(url, methodName, pars, GetNamespace(url), timeOut);
+                return QuerySoapWebService(url, methodName, pars, GetNamespace(url), timeOut, ref refValue);
+            }
+        }
+        #endregion
+
+        #region 通过SOAP协议动态调用webservice
+        /// <summary>  
+        /// 通过SOAP协议动态调用webservice   
+        /// </summary>  
+        /// <param name="url"> webservice地址</param>  
+        /// <param name="methodName"> 调用方法名</param>  
+        /// <param name="pars"> 参数表</param>  
+        /// <returns> 结果集xml</returns>  
+        public static XmlDocument QuerySoapWebService(string url, string methodName, Hashtable pars, int timeOut, ref string refValue)
+        {
+            //名字空间在缓存中是否存在
+            if (xmlNameSpace.ContainsKey(url))
+            {
+                //存在时，读取缓存，然后执行调用  
+                return QuerySoapWebService(url, methodName, pars, xmlNameSpace[url].ToString(), timeOut, ref refValue);
+            }
+            else
+            {
+                //不存在时直接从wsdl的请求中读取名字空间，然后执行调用  
+                return QuerySoapWebService(url, methodName, pars, GetNamespace(url), timeOut, ref refValue);
             }
         }
         #endregion
@@ -49,7 +74,7 @@ namespace Untility.Base
         /// <param name="pars"> 参数表</param>  
         /// <param name="xmlNs"> 名字空间</param>  
         /// <returns> 结果集</returns>  
-        private static XmlDocument QuerySoapWebService(string url, string methodName, Hashtable pars, string xmlNs, int timeOut)
+        private static XmlDocument QuerySoapWebService(string url, string methodName, Hashtable pars, string xmlNs, int timeOut, ref string refValue)
         {
             xmlNameSpace[url] = xmlNs;//加入缓存，提高效率  
 
@@ -83,6 +108,13 @@ namespace Untility.Base
             mgr.AddNamespace("soap", "http://schemas.xmlsoap.org/soap/envelope/");
 
             // 返回结果  
+            refValue = returnDoc.InnerText;
+
+            var length = refValue.IndexOf('<');
+
+            if (length != -1)
+                refValue = refValue.Substring(length, refValue.Length - length);
+
             string RetXml = returnDoc.SelectSingleNode("//soap:Body/*/*", mgr).InnerXml;
 
             returnValueDoc.LoadXml("<root>" + RetXml + "</root>");
@@ -286,7 +318,24 @@ namespace Untility.Base
         /// <returns></returns>
         public static String QuerySoapWebServiceString(string url, string methodName, Hashtable pars, int timeOut)
         {
-            var doc = QuerySoapWebService(url, methodName, pars, timeOut);
+            var refValue = "";
+            var doc = QuerySoapWebService(url, methodName, pars, timeOut, ref refValue);
+            return doc.InnerText;
+        }
+        #endregion
+
+        #region 通过SOAP协议动态调用webservice
+        /// <summary>
+        /// 通过SOAP协议动态调用webservice
+        /// </summary>
+        /// <param name="url">地址</param>
+        /// <param name="methodName">方法名</param>
+        /// <param name="pars">参数</param>
+        /// <param name="timeOut">时间</param>
+        /// <returns></returns>
+        public static String QuerySoapWebServiceString(string url, string methodName, Hashtable pars, int timeOut, ref string refValue)
+        {
+            var doc = QuerySoapWebService(url, methodName, pars, timeOut, ref refValue);
             return doc.InnerText;
         }
         #endregion

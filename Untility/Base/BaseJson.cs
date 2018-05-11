@@ -106,7 +106,7 @@ namespace Untility.Base
         /// <typeparam name="T">实体</typeparam>
         /// <param name="Json">json</param>
         /// <returns></returns>
-        public static T JsonToModel<T>(string jsonValue) where T : class,new()
+        public static T JsonToModel<T>(string jsonValue) where T : class, new()
         {
             try
             {
@@ -127,6 +127,7 @@ namespace Untility.Base
         /// <param name="jsonValue"></param>
         /// <returns></returns>
         public static List<T> JsonToList<T>(string jsonValue) where T : class,new()
+        public static List<T> JsonToList<T>(string jsonValue) where T : class, new()
         {
             try
             {
@@ -143,6 +144,63 @@ namespace Untility.Base
             catch
             {
                 return new List<T>();
+            }
+        }
+        #endregion
+
+        #region json转dic
+        /// <summary>
+        /// json转dic
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="jsonValue"></param>
+        /// <returns></returns>
+        public static Dictionary<string, object> JsonToDic(string jsonValue)
+        {
+            try
+            {
+                var item = new Dictionary<string, object>();
+
+                var jo = JObject.Parse(jsonValue);
+
+                foreach (var temp in jo)
+                {
+                    item.Add(temp.Key, temp.Value);
+                }
+                return item;
+            }
+            catch
+            {
+                return new Dictionary<string, object>();
+            }
+        }
+        #endregion
+
+        #region json转dics
+        /// <summary>
+        /// json转dics
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="jsonValue"></param>
+        /// <returns></returns>
+        public static List<Dictionary<string, object>> JsonToDics(string jsonValue)
+        {
+            try
+            {
+                var item = new List<Dictionary<string, object>>();
+
+                var ja = JArray.Parse(jsonValue);
+
+                foreach (var jo in ja)
+                {
+                    item.Add(JsonToDic(jo.ToString()));
+                }
+
+                return item;
+            }
+            catch
+            {
+                return new List<Dictionary<string, object>>();
             }
         }
         #endregion
