@@ -126,7 +126,6 @@ namespace Untility.Base
         /// <typeparam name="T"></typeparam>
         /// <param name="jsonValue"></param>
         /// <returns></returns>
-        public static List<T> JsonToList<T>(string jsonValue) where T : class,new()
         public static List<T> JsonToList<T>(string jsonValue) where T : class, new()
         {
             try
