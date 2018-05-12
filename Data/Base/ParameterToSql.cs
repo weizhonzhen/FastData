@@ -24,7 +24,7 @@ namespace Data.Base
             foreach (var item in param)
             {
                 if (item != null)
-                    Sql = string.Format("{0}{1}={2},", Sql, item.ParameterName, item.Value);                   
+                    Sql = string.Format("{0}{1}={2},", Sql, item.ParameterName, item.Value);               
             }
 
             return Sql;

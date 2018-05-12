@@ -44,7 +44,7 @@ namespace Untility.Base
             /// style
             /// </summary>
             public ICellStyle style { get; set; }
-
+            
             /// <summary>
             /// style
             /// </summary>
@@ -60,7 +60,7 @@ namespace Untility.Base
         /// <param name="headerText">标题</param>
         /// <param name="title">表头</param>
         /// <returns></returns>
-        public static ExcelModel Init(string headerText, Dictionary<string, object> title)
+        public static ExcelModel Init(string headerText,Dictionary<string, object> title)
         {
             try
             {
@@ -97,7 +97,7 @@ namespace Untility.Base
 
                 return result;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 BaseLog.SaveLog(ex.ToString(), "ToExcel.Init");
                 return null;
@@ -111,10 +111,10 @@ namespace Untility.Base
         /// </summary>
         /// <param name="listContent">内容列表</param>
         /// <param name="model"></param>
-        public static void FillContent(List<Dictionary<string, object>> listContent, ExcelModel model, string exclude = "")
+        public static void FillContent(List<Dictionary<string,object>> listContent,ExcelModel model,string exclude="")
         {
             try
-            {
+            { 
                 //插入查询结果
                 var i = 0;
                 if (listContent != null)
@@ -161,14 +161,14 @@ namespace Untility.Base
             try
             {
                 //自动列宽
-                var i = 0;
+               var i = 0;
                 foreach (var item in title)
                 {
                     model.sheet.AutoSizeColumn(i++, true);
                     model.sheet.Autobreaks = true;
-                    model.sheet.HorizontallyCenter = true;
+                    model.sheet.HorizontallyCenter = true;                    
                 }
-
+                
                 var file = new MemoryStream();
                 model.workbook.Write(file);
 
@@ -206,7 +206,7 @@ namespace Untility.Base
         /// 样式
         /// </summary>
         /// <returns></returns>
-        private static ICellStyle GetStyle(HSSFWorkbook hssfworkbook, bool IsHead = false, bool IsWrapText = false)
+        private static ICellStyle GetStyle(HSSFWorkbook hssfworkbook, bool IsHead = false,bool IsWrapText=false)
         {
             var style = hssfworkbook.CreateCellStyle();
             style.Alignment = HorizontalAlignment.Center;

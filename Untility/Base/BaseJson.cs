@@ -106,7 +106,7 @@ namespace Untility.Base
         /// <typeparam name="T">实体</typeparam>
         /// <param name="Json">json</param>
         /// <returns></returns>
-        public static T JsonToModel<T>(string jsonValue) where T : class, new()
+        public static T JsonToModel<T>(string jsonValue) where T : class,new()
         {
             try
             {
@@ -126,7 +126,7 @@ namespace Untility.Base
         /// <typeparam name="T"></typeparam>
         /// <param name="jsonValue"></param>
         /// <returns></returns>
-        public static List<T> JsonToList<T>(string jsonValue) where T : class, new()
+        public static List<T> JsonToList<T>(string jsonValue) where T : class,new()
         {
             try
             {
@@ -146,7 +146,7 @@ namespace Untility.Base
             }
         }
         #endregion
-
+        
         #region json转dic
         /// <summary>
         /// json转dic
@@ -154,7 +154,7 @@ namespace Untility.Base
         /// <typeparam name="T"></typeparam>
         /// <param name="jsonValue"></param>
         /// <returns></returns>
-        public static Dictionary<string, object> JsonToDic(string jsonValue)
+        public static Dictionary<string,object> JsonToDic(string jsonValue)
         {
             try
             {

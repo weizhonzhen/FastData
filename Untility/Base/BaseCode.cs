@@ -13,7 +13,7 @@ namespace Untility.Base
         /// </summary>
         /// <returns></returns>
         public static byte[] CreateValidateGraphic(out String Code, int CodeLength, int Width, int Height, int FontSize)
-        {
+        {            
             var sCode = String.Empty;
 
             //颜色

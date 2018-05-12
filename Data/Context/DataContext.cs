@@ -34,12 +34,6 @@ namespace Data.Context
             cmd.Dispose();
             conn.Dispose();
             GC.SuppressFinalize(this);
-
-            var cacheKey = "Data.DataConfig";
-            var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey,RedisDb.Config);
-
-            cacheList.Find(a => a.ConnStr == config.ConnStr).LinkCount--;
-            RedisInfo.SetItem<List<ConfigModel>>(cacheKey, cacheList,8640, RedisDb.Config);
         }
         #endregion
 
@@ -51,7 +45,7 @@ namespace Data.Context
         {
             try
             {
-                this.config = config == null ? DataConfig.GetConfig(true, key) : config;
+                this.config = config == null ? DataConfig.GetConfig(key) : config;
                 conn = DbProviderFactories.GetFactory(this.config.ProviderName).CreateConnection();
                 conn.ConnectionString = this.config.ConnStr;
                 conn.Open();
@@ -127,7 +121,7 @@ namespace Data.Context
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
                 if (item.Take == 1)
-                    result.item = BaseDataReader.ToList<T>(dr, item.Config, item.AsName).FirstOrDefault<T>()?? new T();
+                    result.item = BaseDataReader.ToList<T>(dr, item.Config, item.AsName).FirstOrDefault<T>() ?? new T();
                 else
                     result.list = BaseDataReader.ToList<T>(dr, item.Config, item.AsName);
 
@@ -181,7 +175,7 @@ namespace Data.Context
                     dr.Dispose();
                 }
                 else
-                    result.pageResult.list = new T();
+                    result.pageResult.list = new List<T>();
 
                 result.pageResult.pModel = pModel;
             }
@@ -317,10 +311,10 @@ namespace Data.Context
                         pModel.TotalPage = pModel.TotalRecord / pModel.PageSize;
                     else
                         pModel.TotalPage = (pModel.TotalRecord / pModel.PageSize) + 1;
-
+                    
                     if (pModel.StarId > pModel.TotalPage)
                         pModel.StarId = pModel.TotalPage;
-
+                    
                     var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql);
 
                     result.pageResult.list = BaseDataReader.ToList<T>(dr, config, null);
@@ -329,10 +323,8 @@ namespace Data.Context
                     dr.Close();
                     dr.Dispose();
                 }
-                else
-                    result.pageResult.list = new List<T>();
 
-               result.pageResult.pModel = pModel;
+                result.pageResult.pModel = pModel;
             }
             catch (Exception ex)
             {
@@ -539,14 +531,16 @@ namespace Data.Context
                 var dr = BaseExecute.ToDataReader(cmd, sql);
 
                 result.DicList = BaseJson.DataReaderToDic(dr);
-
+                result.writeReturn.IsSuccess = true;
                 dr.Close();
                 dr.Dispose();
             }
             catch (Exception ex)
             {
+                result.writeReturn.IsSuccess = false;
+                result.writeReturn.IsError = true;
                 Task.Factory.StartNew(() =>
-                {
+                {                    
                     DbLog.LogException(config.IsOutError, config.DbType, ex, "ExecuteSql", result.Sql);
                 });
             }
@@ -609,7 +603,7 @@ namespace Data.Context
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
                 if (item.Take == 1)
-                    result.Dic = BaseJson.DataReaderToDic(dr).FirstOrDefault()??new Dictionary<string,object>();
+                    result.Dic = BaseJson.DataReaderToDic(dr).FirstOrDefault()??new Dictionary<string, object>();
                 else
                     result.DicList = BaseJson.DataReaderToDic(dr);
 

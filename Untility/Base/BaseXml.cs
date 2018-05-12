@@ -67,13 +67,13 @@ namespace Untility.Base
         /// <param name="FileName">文件名</param>
         /// <param name="xmlNodel">结点</param>
         /// <returns></returns>
-        public static List<string> GetXmlListForFileAsync(HttpContextBase context, string FileName, string xmlNodel)
+        public static List<string> GetXmlListForFileAsync(HttpContextBase context,string FileName, string xmlNodel)
         {
             try
             {
                 //变量
                 var xmlDoc = new XmlDocument();
-
+                
                 //载入xml
                 xmlDoc.Load(context.Server.MapPath(FileName));
 
@@ -109,10 +109,10 @@ namespace Untility.Base
             {
                 //变量
                 var xmlDoc = new XmlDocument();
-
+                
                 //载入xml
                 xmlDoc.Load(HttpContext.Current.Server.MapPath(FileName));
-
+               
                 //结点
                 var nodelList = xmlDoc.SelectNodes(xmlNodel);
 

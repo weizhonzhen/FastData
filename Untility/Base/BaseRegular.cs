@@ -23,6 +23,13 @@ namespace Untility.Base
             return Convert.ToDateTime(strValue);
         }
 
+        public static DateTime ToDate(this string strValue)
+        {
+            if (strValue.ToStr() == "")
+                return DateTime.MinValue;
+            return Convert.ToDateTime(strValue);
+        }
+
         public static string ToDate(this object strValue, string format)
         {
             if (strValue.ToStr() == "")
@@ -30,8 +37,16 @@ namespace Untility.Base
             else
                 return Convert.ToDateTime(strValue).ToString(format);
         }
-        #endregion 
 
+        public static string ToDate(this DateTime strValue, string format)
+        {
+            if (strValue.ToStr() == "")
+                return null;
+            else
+                return Convert.ToDateTime(strValue).ToString(format);
+        }
+        #endregion
+        
         #region 验证时间
         /// <summary>
         /// 验证时间

@@ -31,12 +31,12 @@ namespace Untility.Base
             if (xmlNameSpace.ContainsKey(url))
             {
                 //存在时，读取缓存，然后执行调用  
-                return QuerySoapWebService(url, methodName, pars, xmlNameSpace[url].ToString(), timeOut, ref refValue);
+                return QuerySoapWebService(url, methodName, pars, xmlNameSpace[url].ToString(), timeOut,ref refValue);
             }
             else
             {
                 //不存在时直接从wsdl的请求中读取名字空间，然后执行调用  
-                return QuerySoapWebService(url, methodName, pars, GetNamespace(url), timeOut, ref refValue);
+                return QuerySoapWebService(url, methodName, pars, GetNamespace(url), timeOut,ref refValue);
             }
         }
         #endregion
@@ -74,7 +74,7 @@ namespace Untility.Base
         /// <param name="pars"> 参数表</param>  
         /// <param name="xmlNs"> 名字空间</param>  
         /// <returns> 结果集</returns>  
-        private static XmlDocument QuerySoapWebService(string url, string methodName, Hashtable pars, string xmlNs, int timeOut, ref string refValue)
+        private static XmlDocument QuerySoapWebService(string url, string methodName, Hashtable pars, string xmlNs, int timeOut,ref string refValue)
         {
             xmlNameSpace[url] = xmlNs;//加入缓存，提高效率  
 
@@ -319,7 +319,7 @@ namespace Untility.Base
         public static String QuerySoapWebServiceString(string url, string methodName, Hashtable pars, int timeOut)
         {
             var refValue = "";
-            var doc = QuerySoapWebService(url, methodName, pars, timeOut, ref refValue);
+            var doc = QuerySoapWebService(url, methodName, pars, timeOut,ref refValue);
             return doc.InnerText;
         }
         #endregion

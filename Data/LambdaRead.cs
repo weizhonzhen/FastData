@@ -63,7 +63,7 @@ namespace Data
         public static DataQuery Query<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> field = null,string key=null)
         {
             var result = new DataQuery();
-            result.Config = DataConfig.GetConfig(true, key);
+            result.Config = DataConfig.GetConfig(key);
             result.Key = key;
 
             var taskField = Task.Factory.StartNew(delegate
