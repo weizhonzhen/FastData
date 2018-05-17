@@ -11,7 +11,7 @@ namespace Redis
     /// </summary>
     public static class RedisInfo
     {
-       
+
         #region 是否存在
         /// <summary>
         /// 是否存在 
@@ -23,7 +23,10 @@ namespace Redis
             {
                 using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
                 {
-                    return redis.ContainsKey(key);
+                    if (string.IsNullOrEmpty(key))
+                        return false;
+                    else
+                        return redis.ContainsKey(key);
                 }
             }
             catch (RedisException ex)
@@ -46,11 +49,11 @@ namespace Redis
         {
             return await Task.Factory.StartNew(() =>
             {
-                return Exists(key,db);
+                return Exists(key, db);
             });
         }
         #endregion
-        
+
         #region 设置值 item
         /// <summary>
         /// 设置值 item
@@ -60,13 +63,16 @@ namespace Redis
         /// <param name="model">值</param>
         /// <param name="hours">存期限</param>
         /// <returns></returns>
-        public static bool SetItem<T>(string key, T model, int hours = 24*30*12, int db = 0)
+        public static bool SetItem<T>(string key, T model, int hours = 24 * 30 * 12, int db = 0)
         {
             try
             {
                 using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
                 {
-                    return redis.Set<T>(key, model, DateTime.Now.AddHours(hours));
+                    if (string.IsNullOrEmpty(key))
+                        return false;
+                    else
+                        return redis.Set<T>(key, model, DateTime.Now.AddHours(hours));
                 }
             }
             catch (RedisException ex)
@@ -89,11 +95,11 @@ namespace Redis
         /// <param name="model">值</param>
         /// <param name="hours">存期限</param>
         /// <returns></returns>
-        public static async Task<bool> SetItemAsy<T>(string key, T model, int hours = 24*30*12, int db = 0)
+        public static async Task<bool> SetItemAsy<T>(string key, T model, int hours = 24 * 30 * 12, int db = 0)
         {
             return await Task.Factory.StartNew(() =>
             {
-                return SetItem<T>(key, model, hours,db);
+                return SetItem<T>(key, model, hours, db);
             });
         }
         #endregion
@@ -107,20 +113,23 @@ namespace Redis
         /// <param name="model">值</param>
         /// <param name="hours">存期限</param>
         /// <returns></returns>
-        public static bool SetItem(string key, string model, int hours = 24*30*12, int db = 0)
+        public static bool SetItem(string key, string model, int hours = 24 * 30 * 12, int db = 0)
         {
             try
             {
                 using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
                 {
-                    return redis.Set<string>(key, model, DateTime.Now.AddHours(hours));
+                    if (string.IsNullOrEmpty(key))
+                        return false;
+                    else
+                        return redis.Set<string>(key, model, DateTime.Now.AddHours(hours));
                 }
             }
             catch (RedisException ex)
             {
                 Task.Factory.StartNew(() =>
                 {
-                    SaveLog(ex, "SetItem",key);
+                    SaveLog(ex, "SetItem", key);
                 });
                 return false;
             }
@@ -136,15 +145,15 @@ namespace Redis
         /// <param name="model">值</param>
         /// <param name="hours">存期限</param>
         /// <returns></returns>
-        public static async Task<bool> SetItemAsy(string key, string model, int hours = 24*30*12, int db = 0)
+        public static async Task<bool> SetItemAsy(string key, string model, int hours = 24 * 30 * 12, int db = 0)
         {
             return await Task.Factory.StartNew(() =>
             {
-                return SetItem(key, model, hours,db);
+                return SetItem(key, model, hours, db);
             });
         }
         #endregion
-        
+
         #region 设置值 item
         /// <summary>
         /// 设置值 item
@@ -160,7 +169,10 @@ namespace Redis
             {
                 using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
                 {
-                    return redis.Set<string>(key, model, DateTime.Now.AddMinutes(Minutes));
+                    if (string.IsNullOrEmpty(key))
+                        return false;
+                    else
+                        return redis.Set<string>(key, model, DateTime.Now.AddMinutes(Minutes));
                 }
             }
             catch (RedisException ex)
@@ -191,7 +203,7 @@ namespace Redis
             });
         }
         #endregion
-        
+
         #region 获取值 item
         /// <summary>
         /// 获取值 item
@@ -205,14 +217,17 @@ namespace Redis
             {
                 using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
                 {
-                    return redis.Get<string>(key);
+                    if (string.IsNullOrEmpty(key))
+                        return "";
+                    else
+                        return redis.Get<string>(key);
                 }
             }
             catch (RedisException ex)
             {
                 Task.Factory.StartNew(() =>
                 {
-                    SaveLog(ex, "GetItem",key);
+                    SaveLog(ex, "GetItem", key);
                 });
                 return "";
             }
@@ -230,7 +245,7 @@ namespace Redis
         {
             return await Task.Factory.StartNew(() =>
             {
-                return GetItem(key,db);
+                return GetItem(key, db);
             });
         }
         #endregion
@@ -242,13 +257,16 @@ namespace Redis
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="key">键</param>
         /// <returns></returns>
-        public static T GetItem<T>(string key, int db = 0) where T : class,new()
+        public static T GetItem<T>(string key, int db = 0) where T : class, new()
         {
             try
             {
                 using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
                 {
-                    return redis.Get<T>(key);
+                    if (string.IsNullOrEmpty(key))
+                        return new T();
+                    else
+                        return redis.Get<T>(key);
                 }
             }
             catch (RedisException ex)
@@ -269,11 +287,11 @@ namespace Redis
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="key">键</param>
         /// <returns></returns>
-        public static async Task<T> GetItemAsy<T>(string key, int db = 0) where T : class,new()
+        public static async Task<T> GetItemAsy<T>(string key, int db = 0) where T : class, new()
         {
             return await Task.Factory.StartNew(() =>
             {
-                return GetItem<T>(key,db);
+                return GetItem<T>(key, db);
             });
         }
         #endregion
@@ -290,7 +308,10 @@ namespace Redis
             {
                 using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
                 {
-                    return redis.Remove(key);
+                    if (string.IsNullOrEmpty(key))
+                        return false;
+                    else
+                        return redis.Remove(key);
                 }
             }
             catch (RedisException ex)
@@ -314,11 +335,11 @@ namespace Redis
         {
             return await Task.Factory.StartNew(() =>
             {
-                return RemoveItem(key,db);
+                return RemoveItem(key, db);
             });
         }
-        #endregion                
-        
+        #endregion
+
         #region 设置值 Dic
         /// <summary>
         /// 设置值 Dic
@@ -359,7 +380,7 @@ namespace Redis
         {
             return await Task.Factory.StartNew(() =>
             {
-                return SetDic<T>(dic,db);
+                return SetDic<T>(dic, db);
             });
         }
         #endregion
@@ -371,7 +392,7 @@ namespace Redis
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="keys">键</param>
         /// <returns></returns>
-        public static IDictionary<string, T> GetDic<T>(string[] keys, int db = 0) where T : class,new()
+        public static IDictionary<string, T> GetDic<T>(string[] keys, int db = 0) where T : class, new()
         {
             try
             {
@@ -390,7 +411,7 @@ namespace Redis
             }
         }
         #endregion
-        
+
         #region 获取值 dic asy
         /// <summary>
         /// 获取值 dic asy
@@ -398,11 +419,11 @@ namespace Redis
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="keys">键</param>
         /// <returns></returns>
-        public static async Task<IDictionary<string, T>> GetDicAsy<T>(string[] keys, int db = 0) where T : class,new()
+        public static async Task<IDictionary<string, T>> GetDicAsy<T>(string[] keys, int db = 0) where T : class, new()
         {
             return await Task.Factory.StartNew(() =>
             {
-                return GetDic<T>(keys,db);
+                return GetDic<T>(keys, db);
             });
         }
         #endregion
@@ -420,7 +441,7 @@ namespace Redis
                 using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
                 {
                     redis.RemoveAll(keys);
-                    
+
                     return true;
                 }
             }
@@ -445,7 +466,7 @@ namespace Redis
         {
             return await Task.Factory.StartNew(() =>
             {
-                return RemoveDic(keys,db);
+                return RemoveDic(keys, db);
             });
         }
         #endregion
@@ -464,7 +485,10 @@ namespace Redis
             {
                 using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
                 {
-                    redis.EnqueueItemOnList(queueName, message);
+                    if (string.IsNullOrEmpty(queueName))
+                        return;
+                    else
+                        redis.EnqueueItemOnList(queueName, message);
                 }
             }
             catch (RedisException ex)
@@ -503,7 +527,10 @@ namespace Redis
             {
                 using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
                 {
-                    return redis.DequeueItemFromList(queueName);
+                    if (string.IsNullOrEmpty(queueName))
+                        return "";
+                    else
+                        return redis.DequeueItemFromList(queueName);
                 }
             }
             catch (RedisException ex)
@@ -529,11 +556,11 @@ namespace Redis
         {
             return await Task.Factory.StartNew(() =>
             {
-               return Receive(queueName, db);
+                return Receive(queueName, db);
             });
         }
         #endregion
-        
+
 
         #region 发布消息(发布者订阅者模式)
         /// <summary>
@@ -548,7 +575,10 @@ namespace Redis
             {
                 using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
                 {
-                    redis.PublishMessage(channel, message);
+                    if (string.IsNullOrEmpty(channel))
+                        return;
+                    else
+                        redis.PublishMessage(channel, message);
                 }
             }
             catch (RedisException ex)
@@ -592,12 +622,17 @@ namespace Redis
             {
                 using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
                 {
-                    using (var item = redis.CreateSubscription())
+                    if (string.IsNullOrEmpty(channel))
+                        return;
+                    else
                     {
-                        item.OnMessage = message;
-                        item.OnSubscribe = subscribe;
-                        item.OnUnSubscribe = unSubscribe;
-                        item.SubscribeToChannels(channel);
+                        using (var item = redis.CreateSubscription())
+                        {
+                            item.OnMessage = message;
+                            item.OnSubscribe = subscribe;
+                            item.OnUnSubscribe = unSubscribe;
+                            item.SubscribeToChannels(channel);
+                        }
                     }
                 }
             }
@@ -637,7 +672,7 @@ namespace Redis
             SaveLog(string.Format("方法：{0},对象：{1},出错详情：{2}", CurrentMethod, typeof(T).Name, ex.ToString()), "redis_exp");
         }
         #endregion
-        
+
         #region 出错日志
         /// <summary>
         /// 出错日志
@@ -650,7 +685,7 @@ namespace Redis
             SaveLog(string.Format("方法：{0},键：{1},出错详情：{2}", CurrentMethod, key, ex.ToString()), "redis_exp");
         }
         #endregion
-        
+
         #region 写日志
         /// <summary>
         /// 说明：写日记
