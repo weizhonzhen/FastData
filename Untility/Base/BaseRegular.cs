@@ -46,7 +46,7 @@ namespace Untility.Base
                 return Convert.ToDateTime(strValue).ToString(format);
         }
         #endregion
-        
+
         #region 验证时间
         /// <summary>
         /// 验证时间
@@ -56,7 +56,7 @@ namespace Untility.Base
         public static bool IsDate(this string dateValue)
         {
             DateTime date = new DateTime();
-            
+
             if (DateTime.TryParse(dateValue, out date))
             {
                 return true;
@@ -78,7 +78,7 @@ namespace Untility.Base
         {
             int tmp = 0;
             if (Int32.TryParse(str, out tmp))
-                return tmp;
+                return (int)tmp;
             else
                 return defValue;
         }
@@ -96,7 +96,7 @@ namespace Untility.Base
         {
             float tmp = 0;
             if (float.TryParse(strValue, out tmp))
-                return tmp;
+                return (float)tmp;
             else
                 return defValue;
         }
@@ -114,7 +114,7 @@ namespace Untility.Base
         {
             double tmp = 0;
             if (double.TryParse(strValue, out tmp))
-                return tmp;
+                return (double)tmp;
             else
                 return defValue;
         }
@@ -132,7 +132,7 @@ namespace Untility.Base
         {
             long tmp = 0;
             if (Int64.TryParse(strValue, out tmp))
-                return tmp;
+                return (Int64)tmp;
             else
                 return defValue;
         }
@@ -150,7 +150,7 @@ namespace Untility.Base
         {
             Decimal tmp = 0;
             if (Decimal.TryParse(strValue, out tmp))
-                return tmp;
+                return (decimal)tmp;
             else
                 return defValue;
         }
@@ -168,7 +168,7 @@ namespace Untility.Base
         {
             byte tmp = 0;
             if (byte.TryParse(strValue, out tmp))
-                return tmp;
+                return (byte)tmp;
             else
                 return defValue;
         }
@@ -186,12 +186,12 @@ namespace Untility.Base
         {
             Int16 tmp = 0;
             if (Int16.TryParse(strValue, out tmp))
-                return tmp;
+                return (Int16)tmp;
             else
                 return defValue;
         }
         #endregion
-        
+
         #region object型转换为string
         /// <summary>
         /// 标签：2015.7.13，魏中针
@@ -230,7 +230,7 @@ namespace Untility.Base
         /// <returns></returns>
         public static bool IsMobilePhone(this string mobilePhone)
         {
-            if (mobilePhone == null || mobilePhone.Length > 11) 
+            if (mobilePhone == null || mobilePhone.Length > 11)
                 return false;
             return Regex.IsMatch(mobilePhone, @"^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}");
         }
@@ -366,7 +366,7 @@ namespace Untility.Base
             //处理15位的身份证号码
             if (IdCard.Length == 15)
                 birthday = string.Format("19{0}-{1}-{2}", IdCard.Substring(6, 2), IdCard.Substring(8, 2), IdCard.Substring(10, 2));
-            
+
             if (birthday.IsDate())
                 return Convert.ToDateTime(birthday);
             else
@@ -400,7 +400,7 @@ namespace Untility.Base
             }
         }
         #endregion
-        
+
         #region 获取特性内容
         /// <summary>
         /// 获取特性内容
