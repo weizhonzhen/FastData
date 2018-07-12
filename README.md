@@ -52,7 +52,7 @@ LambdaMap.InstanceMap(db);
                 <isNullOrEmpty prepend=" and " property="roleId">a.roleId=?roleId</isNullOrEmpty>
                 <isNotNullOrEmpty prepend=" and " property="isAdmin">a.isAdmin=?isAdmin</isNotNullOrEmpty>
                 <if condition="areaId>8" prepend=" and " property="areaId">a.areaId=?areaId</if>
-                <isPropertyAvailable prepend=" and " property="isDel">a.isDel=?isDel</isPropertyAvailable>
+               <choose property="userNo"><condition prepend=" and " property="userNo>5">a.userNo=:userNo and a.userNo=5</condition></choose>
               </dynamic>
             </select>
         </sqlMap>
