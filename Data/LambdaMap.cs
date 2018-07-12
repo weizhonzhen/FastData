@@ -516,16 +516,15 @@ namespace Data
         }
         #endregion
 
-
         #region 读取xml map并缓存
         /// <summary>
         /// 读取xml map并缓存
         /// </summary>
-        private static List<string> ReadXml(string path,ConfigModel config)
+        private static List<string> ReadXml(string path, ConfigModel config)
         {
             var key = new List<string>();
             var sql = new List<string>();
-            GetXmlList(path, "sqlMap", ref key, ref sql,config);
+            GetXmlList(path, "sqlMap", ref key, ref sql, config);
 
             for (var i = 0; i < key.Count; i++)
                 RedisInfo.SetItem(key[i].ToLower(), sql[i], 8640, RedisDb.Xml);
@@ -541,7 +540,7 @@ namespace Data
         /// <param name="path">文件名</param>
         /// <param name="xmlNode">结点</param>
         /// <returns></returns>
-        private static void GetXmlList(string path, string xmlNode, ref List<string> key, ref List<string> sql,ConfigModel config)
+        private static void GetXmlList(string path, string xmlNode, ref List<string> key, ref List<string> sql, ConfigModel config)
         {
             try
             {
@@ -552,7 +551,7 @@ namespace Data
 
                 //载入xml
                 if (config.IsEncrypt)
-                {                    
+                {
                     var temp = BaseSymmetric.DecodeGB2312(File.ReadAllText(path));
                     if (temp != "")
                         xmlDoc.LoadXml(temp);
@@ -602,15 +601,25 @@ namespace Data
 
                                     foreach (XmlNode dyn in node.ChildNodes)
                                     {
-                                        //条件
-                                        key.Add(string.Format("{0}.condition.{1}", tempKey, i));
-                                        key.Add(dyn.Name);
-
-                                        //条件值
-                                        if (dyn.Attributes["compareValue"] != null)
+                                        if (dyn.Name != "isPropertyAvailable")
                                         {
-                                            key.Add(string.Format("{0}.condition.value.{1}", tempKey, i));
-                                            sql.Add(dyn.Attributes["compareValue"].Value.ToLower());
+                                            //条件类型
+                                            key.Add(string.Format("{0}.{1}.condition.{2}", tempKey, dyn.Attributes["property"].Value.ToLower(), i));
+                                            sql.Add(dyn.Name);
+
+                                            //比较条件值
+                                            if (dyn.Attributes["compareValue"] != null)
+                                            {
+                                                key.Add(string.Format("{0}.{1}.condition.value.{2}", tempKey, dyn.Attributes["property"].Value.ToLower(), i));
+                                                sql.Add(dyn.Attributes["compareValue"].Value.ToLower());
+                                            }
+
+                                            //判断条件内容
+                                            if (dyn.Attributes["condition"] != null)
+                                            {
+                                                key.Add(string.Format("{0}.{1}.condition.value.{2}", tempKey, dyn.Attributes["property"].Value.ToLower(), i));
+                                                sql.Add(dyn.Attributes["condition"].Value.ToLower());
+                                            }
                                         }
 
                                         //属性和值
@@ -624,7 +633,7 @@ namespace Data
                             }
                             #endregion
                         }
-                        else if(temp is XmlText)
+                        else if (temp is XmlText)
                         {
                             #region XmlText
                             key.Add(string.Format("{0}.{1}", item.Attributes["id"].Value.ToLower(), i));
@@ -677,14 +686,14 @@ namespace Data
                         foreach (var temp in param)
                         {
                             var paramKey = string.Format("{0}.{1}.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
-                            var conditionKey = string.Format("{0}.condition.{1}", name.ToLower(), i);
-                            var conditionValueKey = string.Format("{0}.condition.value.{1}", name.ToLower(), i);
+                            var conditionKey = string.Format("{0}.{1}.condition.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
+                            var conditionValueKey = string.Format("{0}.{1}.condition.value.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
                             if (RedisInfo.Exists(paramKey, RedisDb.Xml))
                             {
                                 var tempKey = string.Format("#{0}#", temp.ParameterName.ToLower());
                                 var paramSql = RedisInfo.GetItem(paramKey, RedisDb.Xml).ToLower();
-                                var condition = RedisInfo.GetItem(conditionKey).ToLower();
-                                var conditionValue = RedisInfo.GetItem(conditionValueKey).ToLower();
+                                var condition = RedisInfo.GetItem(conditionKey).ToStr().ToLower();
+                                var conditionValue = RedisInfo.GetItem(conditionValueKey).ToStr().ToLower();
                                 switch (condition)
                                 {
                                     case "isEqual":
@@ -710,7 +719,7 @@ namespace Data
                                                 if (paramSql.IndexOf(tempKey) >= 0)
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToString()));
+                                                    tempSql.Append(paramSql.ToString().Replace(temp.ParameterName.ToLower(), temp.Value.ToString()));
                                                 }
                                                 else
                                                     tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
@@ -783,6 +792,23 @@ namespace Data
                                                 tempParam.Remove(temp);
                                             break;
                                         }
+                                    case "if":
+                                        {
+                                            conditionValue = conditionValue.Replace(temp.ParameterName.ToLower(), temp.Value.ToStr());
+                                            if (BaseCodeDom.GetResult(conditionValue))
+                                            {
+                                                if (paramSql.IndexOf(tempKey) >= 0)
+                                                {
+                                                    tempParam.Remove(temp);
+                                                    tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToString()));
+                                                }
+                                                else
+                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                            }
+                                            else
+                                                tempParam.Remove(temp);
+                                            break;
+                                        }
                                     default:
                                         {
                                             //isPropertyAvailable
@@ -798,8 +824,6 @@ namespace Data
                                         }
                                 }
                             }
-                            else
-                                tempParam.Remove(temp);
                         }
 
                         if (tempSql.ToString() != "")
@@ -821,10 +845,10 @@ namespace Data
         /// <summary>
         /// map xml 存数据库
         /// </summary>
-        /// <param name="dbReadKey"></param>
+        /// <param name="dbKey"></param>
         /// <param name="key"></param>
         /// <param name="info"></param>
-        private static bool SaveXml(string key, FileInfo info, ConfigModel config, DataContext db)
+        private static bool SaveXml(string dbKey, string key, FileInfo info, ConfigModel config, DataContext db)
         {
             if (config.IsMapSave)
             {
@@ -847,9 +871,9 @@ namespace Data
                 {
                     var model = new DataModel.MySql.Data_MapFile();
                     model.MapId = key;
-                    var query = LambdaRead.Query<DataModel.MySql.Data_MapFile>(a => a.MapId == key, null);
+                    var query = LambdaRead.Query<DataModel.MySql.Data_MapFile>(a => a.MapId == key, null, dbKey);
 
-                    if (query.ToCount(db) == 0)
+                    if (query.ToCount() == 0)
                     {
                         model.FileName = info.Name;
                         model.FilePath = info.FullName;
@@ -866,9 +890,9 @@ namespace Data
                 {
                     var model = new DataModel.Oracle.Data_MapFile();
                     model.MapId = key;
-                    var query = LambdaRead.Query<DataModel.Oracle.Data_MapFile>(a => a.MapId == key, null);
+                    var query = LambdaRead.Query<DataModel.Oracle.Data_MapFile>(a => a.MapId == key, null, dbKey);
 
-                    if (query.ToCount(db) == 0)
+                    if (query.ToCount() == 0)
                     {
                         model.FileName = info.Name;
                         model.FilePath = info.FullName;
@@ -885,9 +909,9 @@ namespace Data
                 {
                     var model = new DataModel.SqlServer.Data_MapFile();
                     model.MapId = key;
-                    var query = LambdaRead.Query<DataModel.SqlServer.Data_MapFile>(a => a.MapId == key, null);
+                    var query = LambdaRead.Query<DataModel.SqlServer.Data_MapFile>(a => a.MapId == key, null, dbKey);
 
-                    if (query.ToCount(db) == 0)
+                    if (query.ToCount() == 0)
                     {
                         model.FileName = info.Name;
                         model.FilePath = info.FullName;
