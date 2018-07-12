@@ -39,10 +39,8 @@ LambdaMap.InstanceMap(db);
         <?xml version="1.0" encoding="utf-8" ?>
           <sqlMap>
             <select id="GetUser">
-              select a.userid,a.fullname,c.orgname,a.userno,a.isadmin,b.rolename
+              select a.*
               from base_user a
-              left join base_role b on a.roleid=b.roleid
-              left join base_org c on a.orgid=c.orgid and c.isactive='0' and c.IsDel='0'
               <dynamic prepend=" where 1=1">
                 <isPropertyAvailable prepend=" and " property="userId">a.userId=?userId</isPropertyAvailable>
                 <isEqual compareValue="5" prepend=" and " property="userName">a.userName=?userName</isEqual>
@@ -52,7 +50,9 @@ LambdaMap.InstanceMap(db);
                 <isNullOrEmpty prepend=" and " property="roleId">a.roleId=?roleId</isNullOrEmpty>
                 <isNotNullOrEmpty prepend=" and " property="isAdmin">a.isAdmin=?isAdmin</isNotNullOrEmpty>
                 <if condition="areaId>8" prepend=" and " property="areaId">a.areaId=?areaId</if>
-               <choose property="userNo"><condition prepend=" and " property="userNo>5">a.userNo=:userNo and a.userNo=5</condition></choose>
+                <choose property="userNo">
+                   <condition prepend=" and " property="userNo>5">a.userNo=:userNo and a.userNo=5</condition>
+                </choose>
               </dynamic>
             </select>
         </sqlMap>
