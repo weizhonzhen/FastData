@@ -11,7 +11,7 @@ LambdaMap.InstanceProperties(AppDomain.CurrentDomain.GetAssemblies(), namespace,
 LambdaMap.InstanceMap(db);
 
 
-web.config
+//web.config
 <configSections>
     <section name="RedisConfig" type="Redis.Config.RedisConfig" />
     <section name="DataConfig" type="Data.Config.DataConfig,Data" />
@@ -34,7 +34,7 @@ web.config
    </SqlServer>
  </DataConfig>
  
- map xml
+ //map xml
         <?xml version="1.0" encoding="utf-8" ?>
           <sqlMap>
             <select id="GetUser">
@@ -56,7 +56,7 @@ web.config
             </select>
         </sqlMap>
         
-map.config
+//map.config
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <configSections>
