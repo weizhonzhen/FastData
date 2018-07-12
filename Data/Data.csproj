@@ -58,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\BaseCodeDom.cs" />
     <Compile Include="Base\BaseContext.cs" />
     <Compile Include="Base\BaseDataReader.cs" />
     <Compile Include="Base\BaseExecute.cs" />
