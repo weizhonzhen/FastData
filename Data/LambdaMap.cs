@@ -79,7 +79,7 @@ namespace Data
             var query = new DataQuery();
             query.Config = DataConfig.GetConfig(dbKey);
             query.Key = dbKey;
-            
+
             foreach (var item in list)
             {
                 if (item.ManifestModule.Name == dll)
@@ -96,7 +96,7 @@ namespace Data
             if (query.Config.DbType == DataDbType.Oracle)
             {
                 var listInfo = typeof(Data.DataModel.Oracle.Data_MapFile).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
-                var listAttribute = typeof(Data.DataModel.Oracle.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();                
+                var listAttribute = typeof(Data.DataModel.Oracle.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();
                 BaseTable.Check(query, "Data_MapFile", "Data.DataModel.Oracle", listInfo, listAttribute);
             }
 
@@ -139,9 +139,9 @@ namespace Data
                     temp.FileKey = ReadXml(item, config);
                     temp.FileName = info.FullName;
                     if (SaveXml(key, info, config, db))
-                        RedisInfo.SetItem<MapXmlModel>(key, temp,8640, RedisDb.Xml);
+                        RedisInfo.SetItem<MapXmlModel>(key, temp, 8640, RedisDb.Xml);
                 }
-                else if ((RedisInfo.GetItem<MapXmlModel>(key,RedisDb.Xml).LastWrite - info.LastWriteTime).Minutes != 0)
+                else if ((RedisInfo.GetItem<MapXmlModel>(key, RedisDb.Xml).LastWrite - info.LastWriteTime).Minutes != 0)
                 {
                     foreach (var temp in RedisInfo.GetItem<MapXmlModel>(key, RedisDb.Xml).FileKey)
                         RedisInfo.RemoveItem(temp, RedisDb.Xml);
@@ -151,7 +151,7 @@ namespace Data
                     model.FileKey = ReadXml(item, config);
                     model.FileName = info.FullName;
                     if (SaveXml(key, info, config, db))
-                        RedisInfo.SetItem<MapXmlModel>(key, model,8640, RedisDb.Xml);
+                        RedisInfo.SetItem<MapXmlModel>(key, model, 8640, RedisDb.Xml);
                 }
             }
 
@@ -172,8 +172,8 @@ namespace Data
 
             if (RedisInfo.Exists(name.ToLower(), RedisDb.Xml))
             {
-                var sql = GetMapSql(name, ref param);
-                return LambdaRead.ExecuteSql<T>(sql, param,db,key);
+                var sql = GetMapSql(name, ref param, db, key);
+                return LambdaRead.ExecuteSql<T>(sql, param, db, key);
             }
             else
                 return new List<T>();
@@ -188,7 +188,7 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return ExecuteMap<T>(name, param,db,key);
+                return ExecuteMap<T>(name, param, db, key);
             });
         }
         #endregion
@@ -199,7 +199,7 @@ namespace Data
         /// </summary>
         public static Lazy<List<T>> ExecuteLazyMap<T>(string name, DbParameter[] param, DataContext db = null, string key = null) where T : class, new()
         {
-            return new Lazy<List<T>>(() => ExecuteMap<T>( name, param,db,key));
+            return new Lazy<List<T>>(() => ExecuteMap<T>(name, param, db, key));
         }
         #endregion
 
@@ -211,7 +211,7 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return new Lazy<List<T>>(() => ExecuteMap<T>(name, param,db,key));
+                return new Lazy<List<T>>(() => ExecuteMap<T>(name, param, db, key));
             });
         }
         #endregion
@@ -230,8 +230,8 @@ namespace Data
 
             if (RedisInfo.Exists(name.ToLower(), RedisDb.Xml))
             {
-                var sql = GetMapSql(name, ref param);
-                
+                var sql = GetMapSql(name, ref param, db, key);
+
                 return LambdaWrite.ExecuteSql(sql, param, db, key);
             }
             else
@@ -289,9 +289,9 @@ namespace Data
 
             if (RedisInfo.Exists(name.ToLower(), RedisDb.Xml))
             {
-                var sql = GetMapSql(name, ref param);
+                var sql = GetMapSql(name, ref param, db, key);
 
-                return LambdaRead.ExecuteSql(sql, param,db,key);
+                return LambdaRead.ExecuteSql(sql, param, db, key);
             }
             else
                 return new List<Dictionary<string, object>>();
@@ -306,7 +306,7 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return ExecuteMap(name, param,db,key);
+                return ExecuteMap(name, param, db, key);
             });
         }
         #endregion
@@ -317,7 +317,7 @@ namespace Data
         /// </summary>
         public static Lazy<List<Dictionary<string, object>>> ExecuteLazyMap(string name, DbParameter[] param, DataContext db = null, string key = null)
         {
-            return new Lazy<List<Dictionary<string, object>>>(() => ExecuteMap(name, param,db,key));
+            return new Lazy<List<Dictionary<string, object>>>(() => ExecuteMap(name, param, db, key));
         }
         #endregion
 
@@ -329,7 +329,7 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return new Lazy<List<Dictionary<string, object>>>(() => ExecuteMap(name, param,db,key));
+                return new Lazy<List<Dictionary<string, object>>>(() => ExecuteMap(name, param, db, key));
             });
         }
         #endregion
@@ -380,9 +380,9 @@ namespace Data
 
             if (RedisInfo.Exists(name.ToLower(), RedisDb.Xml))
             {
-                var sql = GetMapSql(name, ref param);
+                var sql = GetMapSql(name, ref param, db, key);
 
-                return ExecuteSqlPage(pModel, sql, param,db,key);
+                return ExecuteSqlPage(pModel, sql, param, db, key);
             }
             else
                 return new PageResult();
@@ -397,7 +397,7 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return ExecuteMapPage(pModel, name, param,db,key);
+                return ExecuteMapPage(pModel, name, param, db, key);
             });
         }
         #endregion
@@ -408,7 +408,7 @@ namespace Data
         /// </summary>
         public static Lazy<PageResult> ExecuteLazyMapPage(PageModel pModel, string name, DbParameter[] param, DataContext db = null, string key = null)
         {
-            return new Lazy<PageResult>(() => ExecuteMapPage(pModel, name, param,db,key));
+            return new Lazy<PageResult>(() => ExecuteMapPage(pModel, name, param, db, key));
         }
         #endregion
 
@@ -420,11 +420,11 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return new Lazy<PageResult>(() => ExecuteMapPage(pModel, name, param,db,key));
+                return new Lazy<PageResult>(() => ExecuteMapPage(pModel, name, param, db, key));
             });
         }
         #endregion
-        
+
 
         #region 执行分页
         /// <summary>
@@ -471,9 +471,9 @@ namespace Data
 
             if (RedisInfo.Exists(name.ToLower(), RedisDb.Xml))
             {
-                var sql = GetMapSql(name, ref param);
+                var sql = GetMapSql(name, ref param, db, key);
 
-                return ExecuteSqlPage<T>(pModel, sql, param,db,key);
+                return ExecuteSqlPage<T>(pModel, sql, param, db, key);
             }
             else
                 return new PageResult<T>();
@@ -488,7 +488,7 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return ExecuteMapPage<T>(pModel, name, param,db,key);
+                return ExecuteMapPage<T>(pModel, name, param, db, key);
             });
         }
         #endregion
@@ -499,7 +499,7 @@ namespace Data
         /// </summary>
         public static Lazy<PageResult<T>> ExecuteLazyMapPage<T>(PageModel pModel, string name, DbParameter[] param, DataContext db = null, string key = null) where T : class, new()
         {
-            return new Lazy<PageResult<T>>(() => ExecuteMapPage<T>(pModel, name, param,db,key));
+            return new Lazy<PageResult<T>>(() => ExecuteMapPage<T>(pModel, name, param, db, key));
         }
         #endregion
 
@@ -511,10 +511,11 @@ namespace Data
         {
             return await Task.Factory.StartNew(() =>
             {
-                return new Lazy<PageResult<T>>(() => ExecuteMapPage<T>(pModel, name, param,db,key));
+                return new Lazy<PageResult<T>>(() => ExecuteMapPage<T>(pModel, name, param, db, key));
             });
         }
         #endregion
+
 
         #region 读取xml map并缓存
         /// <summary>
@@ -693,10 +694,13 @@ namespace Data
         /// <param name="name"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        private static string GetMapSql(string name, ref DbParameter[] param)
+        private static string GetMapSql(string name, ref DbParameter[] param, DataContext db, string key)
         {
             var tempParam = param.ToList();
             var sql = new StringBuilder();
+            var flag = "";
+            if (db != null) { flag = db.config.Flag; }
+            if (key != null) { flag = DataConfig.GetConfig(key).Flag; }
 
             for (var i = 0; i <= RedisInfo.GetItem(name.ToLower(), RedisDb.Xml).ToInt(0); i++)
             {
@@ -720,6 +724,7 @@ namespace Data
                             var conditionValueKey = string.Format("{0}.{1}.condition.value.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
                             if (RedisInfo.Exists(paramKey, RedisDb.Xml))
                             {
+                                var flagParam = string.Format("{0}{1}", flag, temp.ParameterName.ToLower());
                                 var tempKey = string.Format("#{0}#", temp.ParameterName.ToLower());
                                 var paramSql = RedisInfo.GetItem(paramKey, RedisDb.Xml).ToLower();
                                 var condition = RedisInfo.GetItem(conditionKey).ToStr().ToLower();
@@ -734,6 +739,11 @@ namespace Data
                                                 {
                                                     tempParam.Remove(temp);
                                                     tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToString()));
+                                                }
+                                                else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
+                                                {
+                                                    tempParam.Remove(temp);
+                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
                                                 }
                                                 else
                                                     tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
@@ -751,6 +761,11 @@ namespace Data
                                                     tempParam.Remove(temp);
                                                     tempSql.Append(paramSql.ToString().Replace(temp.ParameterName.ToLower(), temp.Value.ToString()));
                                                 }
+                                                else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
+                                                {
+                                                    tempParam.Remove(temp);
+                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                }
                                                 else
                                                     tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
                                             }
@@ -766,6 +781,11 @@ namespace Data
                                                 {
                                                     tempParam.Remove(temp);
                                                     tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToString()));
+                                                }
+                                                else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
+                                                {
+                                                    tempParam.Remove(temp);
+                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
                                                 }
                                                 else
                                                     tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
@@ -783,6 +803,11 @@ namespace Data
                                                     tempParam.Remove(temp);
                                                     tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToString()));
                                                 }
+                                                else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
+                                                {
+                                                    tempParam.Remove(temp);
+                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                }
                                                 else
                                                     tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
                                             }
@@ -798,6 +823,11 @@ namespace Data
                                                 {
                                                     tempParam.Remove(temp);
                                                     tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToString()));
+                                                }
+                                                else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
+                                                {
+                                                    tempParam.Remove(temp);
+                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
                                                 }
                                                 else
                                                     tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
@@ -815,6 +845,11 @@ namespace Data
                                                     tempParam.Remove(temp);
                                                     tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToString()));
                                                 }
+                                                else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
+                                                {
+                                                    tempParam.Remove(temp);
+                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                }
                                                 else
                                                     tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
                                             }
@@ -831,6 +866,11 @@ namespace Data
                                                 {
                                                     tempParam.Remove(temp);
                                                     tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToString()));
+                                                }
+                                                else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
+                                                {
+                                                    tempParam.Remove(temp);
+                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
                                                 }
                                                 else
                                                     tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
@@ -858,6 +898,11 @@ namespace Data
                                                         tempParam.Remove(temp);
                                                         tempSql.Append(condition.Replace(tempKey, temp.Value.ToString()));
                                                     }
+                                                    else if (condition.IndexOf(flagParam) < 0 && flag != "")
+                                                    {
+                                                        tempParam.Remove(temp);
+                                                        tempSql.Append(condition.Replace(tempKey, temp.Value.ToString()));
+                                                    }
                                                     else
                                                         tempSql.Append(condition);
                                                     break;
@@ -876,6 +921,11 @@ namespace Data
                                             {
                                                 tempParam.Remove(temp);
                                                 tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToString()));
+                                            }
+                                            else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
+                                            {
+                                                tempParam.Remove(temp);
+                                                tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
                                             }
                                             else
                                                 tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
@@ -905,10 +955,10 @@ namespace Data
         /// <summary>
         /// map xml 存数据库
         /// </summary>
-        /// <param name="dbKey"></param>
+        /// <param name="dbReadKey"></param>
         /// <param name="key"></param>
         /// <param name="info"></param>
-        private static bool SaveXml(string dbKey, string key, FileInfo info, ConfigModel config, DataContext db)
+        private static bool SaveXml(string key, FileInfo info, ConfigModel config, DataContext db)
         {
             if (config.IsMapSave)
             {
@@ -931,9 +981,9 @@ namespace Data
                 {
                     var model = new DataModel.MySql.Data_MapFile();
                     model.MapId = key;
-                    var query = LambdaRead.Query<DataModel.MySql.Data_MapFile>(a => a.MapId == key, null, dbKey);
+                    var query = LambdaRead.Query<DataModel.MySql.Data_MapFile>(a => a.MapId == key, null);
 
-                    if (query.ToCount() == 0)
+                    if (query.ToCount(db) == 0)
                     {
                         model.FileName = info.Name;
                         model.FilePath = info.FullName;
@@ -950,9 +1000,9 @@ namespace Data
                 {
                     var model = new DataModel.Oracle.Data_MapFile();
                     model.MapId = key;
-                    var query = LambdaRead.Query<DataModel.Oracle.Data_MapFile>(a => a.MapId == key, null, dbKey);
+                    var query = LambdaRead.Query<DataModel.Oracle.Data_MapFile>(a => a.MapId == key, null);
 
-                    if (query.ToCount() == 0)
+                    if (query.ToCount(db) == 0)
                     {
                         model.FileName = info.Name;
                         model.FilePath = info.FullName;
@@ -969,9 +1019,9 @@ namespace Data
                 {
                     var model = new DataModel.SqlServer.Data_MapFile();
                     model.MapId = key;
-                    var query = LambdaRead.Query<DataModel.SqlServer.Data_MapFile>(a => a.MapId == key, null, dbKey);
+                    var query = LambdaRead.Query<DataModel.SqlServer.Data_MapFile>(a => a.MapId == key, null);
 
-                    if (query.ToCount() == 0)
+                    if (query.ToCount(db) == 0)
                     {
                         model.FileName = info.Name;
                         model.FilePath = info.FullName;
@@ -990,3 +1040,4 @@ namespace Data
         #endregion
     }
 }
+

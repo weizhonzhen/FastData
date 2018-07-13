@@ -123,7 +123,7 @@ namespace Data
         /// <param name="IsTrans">是否事务</param>
         /// <param name="notAddField">不需要增加的字段</param>
         /// <returns></returns>
-        public static async Task<WriteReturn> AddAsy<T>(T model DataContext db = null, string key=null) where T : class,new()
+        public static async Task<WriteReturn> AddAsy<T>(T model, DataContext db = null, string key=null) where T : class,new()
         {
             return await Task.Factory.StartNew(() =>
             {
