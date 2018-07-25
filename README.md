@@ -61,7 +61,7 @@ LambdaMap.InstanceMap(db);
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <configSections>
-    <section name="MapConfig" type="Data.Config.MapConfig,Data"/>
+    <section name="MapConfig" type="Fast.Data.Config.MapConfig,Data"/>
   </configSections>
 
   <MapConfig>
