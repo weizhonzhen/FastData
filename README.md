@@ -14,8 +14,8 @@ LambdaMap.InstanceMap(db);
 
 //web.config
 <configSections>
-    <section name="RedisConfig" type="Redis.Config.RedisConfig" />
-    <section name="DataConfig" type="Data.Config.DataConfig,Data" />
+    <section name="RedisConfig" type="Fast.Redis.Config.RedisConfig" />
+    <section name="DataConfig" type="Fast.Data.Config.DataConfig,Data" />
 </configSections>
 
   <RedisConfig WriteServerList="127.0.0.1:6379" ReadServerList="127.0.0.1:6379" MaxWritePoolSize="10" MaxReadPoolSize="50" />
