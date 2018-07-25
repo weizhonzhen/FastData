@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9347DC38-9B48-4581-9974-E6D6363BED40}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Fast.Data</RootNamespace>
+    <AssemblyName>Fast.Data</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>52bb2e23</NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Fast.Data.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base\BaseCodeDom.cs" />
+    <Compile Include="Base\BaseContext.cs" />
+    <Compile Include="Base\BaseDataReader.cs" />
+    <Compile Include="Base\BaseExecute.cs" />
+    <Compile Include="Base\BaseField.cs" />
+    <Compile Include="Check\CheckModel.cs" />
+    <Compile Include="Base\Config.cs" />
+    <Compile Include="Base\Parameter.cs" />
+    <Compile Include="Check\BaseTable.cs" />
+    <Compile Include="Config\DataConfig\CollectionConfig.cs" />
+    <Compile Include="Config\DataConfig\DataConfig.cs" />
+    <Compile Include="Config\DataConfig\ElementConfig.cs" />
+    <Compile Include="Config\MapConfig\MapCollection.cs" />
+    <Compile Include="Config\MapConfig\MapConfig.cs" />
+    <Compile Include="Config\MapConfig\MapElement.cs" />
+    <Compile Include="Base\CommandParam.cs" />
+    <Compile Include="Context\DataContext.cs" />
+    <Compile Include="DataModel\MySql\Data_MapFile.cs" />
+    <Compile Include="DataModel\Oracle\Data_MapFile.cs" />
+    <Compile Include="DataModel\SqlServer\Data_MapFile.cs" />
+    <Compile Include="CacheModel\ColumnModel.cs" />
+    <Compile Include="FastMap.cs" />
+    <Compile Include="FastRead.cs" />
+    <Compile Include="FastWrite.cs" />
+    <Compile Include="Model\ColumnComments.cs" />
+    <Compile Include="Model\ColumnType.cs" />
+    <Compile Include="Model\CompareModel.cs" />
+    <Compile Include="Model\ConfigModel.cs" />
+    <Compile Include="Model\DataReturn.cs" />
+    <Compile Include="Model\DataQuery.cs" />
+    <Compile Include="Model\FieldModel.cs" />
+    <Compile Include="CacheModel\MapConfigModel.cs" />
+    <Compile Include="CacheModel\MapXmlModel.cs" />
+    <Compile Include="Model\OptionModel.cs" />
+    <Compile Include="CacheModel\PropertyModel.cs" />
+    <Compile Include="CacheModel\TableModel.cs" />
+    <Compile Include="Model\VisitModel.cs" />
+    <Compile Include="Property\ColumnAttribute.cs" />
+    <Compile Include="Property\DynamicGet.cs" />
+    <Compile Include="Property\DynamicSet.cs" />
+    <Compile Include="Property\PropertyCache.cs" />
+    <Compile Include="Property\TableAttribute.cs" />
+    <Compile Include="Type\DataDbType.cs" />
+    <Compile Include="Base\DbLog.cs" />
+    <Compile Include="Base\BaseModel.cs" />
+    <Compile Include="Base\ParameterToSql.cs" />
+    <Compile Include="Base\VisitExpression.cs" />
+    <Compile Include="Model\OracleColumn.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Fast.Redis\Fast.Redis.csproj">
+      <Project>{0be95cbf-5b8b-4e53-bf3f-73b22f597247}</Project>
+      <Name>Fast.Redis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Fast.Untility\Fast.Untility.csproj">
+      <Project>{209cd228-0837-467d-b869-0db31af04362}</Project>
+      <Name>Fast.Untility</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
