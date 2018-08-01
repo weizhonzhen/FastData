@@ -15,7 +15,7 @@ FastMap.InstanceMap(db);
 //web.config
 <configSections>
     <section name="RedisConfig" type="Fast.Redis.Config.RedisConfig" />
-    <section name="DataConfig" type="Fast.Data.Config.DataConfig,Data" />
+    <section name="DataConfig" type="Fast.Data.Config.DataConfig,Fast.Data" />
 </configSections>
 
   <RedisConfig WriteServerList="127.0.0.1:6379" ReadServerList="127.0.0.1:6379" MaxWritePoolSize="10" MaxReadPoolSize="50" />
@@ -61,7 +61,7 @@ FastMap.InstanceMap(db);
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <configSections>
-    <section name="MapConfig" type="Fast.Data.Config.MapConfig,Data"/>
+    <section name="MapConfig" type="Fast.Data.Config.MapConfig,Fast.Data"/>
   </configSections>
 
   <MapConfig>

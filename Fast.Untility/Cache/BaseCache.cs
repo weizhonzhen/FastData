@@ -1,165 +1,119 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web;
+﻿using System.Runtime.Caching;
+using System;
 
 namespace Fast.Untility.Cache
 {
     /// <summary>
-    /// 标签：2015.7.13，魏中针
-    /// 说明：缓存操作类
+    /// 缓存
     /// </summary>
     public static class BaseCache
     {
-        #region 获取值
+        public static ObjectCache cache = new MemoryCache(Guid.NewGuid().ToString());
+
         /// <summary>
-        /// 获取值
+        /// 设置缓存
         /// </summary>
-        public static string Get(string key)
+        /// <param name="key">键</param>
+        /// <param name="value">值</param>
+        /// <param name="regionName">区域名</param>
+        /// <param name="Hours">过期小时</param>
+        public static void Set(string key, string value, string regionName, int Hours = 24 * 30 * 12)
         {
             if (!string.IsNullOrEmpty(key))
             {
-                var result = HttpRuntime.Cache.Get(key);
-                return result == null ? "" : result.ToString();
+                cache.Remove(key, regionName);
+                var policy = new CacheItemPolicy();
+                policy.AbsoluteExpiration = DateTime.Now.AddHours(Hours);
+                cache.Set(key, value, policy, regionName);
             }
-            else
-                return null;
         }
-        #endregion
-
-        #region 设置值
+                
         /// <summary>
-        /// 设置值
+        /// 设置缓存
         /// </summary>
-        public static bool Set(string Name, string Value, int Hours = 24*30*12)
+        /// <param name="key">键</param>
+        /// <param name="value">值</param>
+        /// <param name="regionName">区域名</param>
+        /// <param name="Hours">过期小时</param>
+        public static void Set<T>(string key,T value,string regionName, int Hours = 24 * 30 * 12) where T : class, new()
         {
-            if (!string.IsNullOrEmpty(Name))
+            if (!string.IsNullOrEmpty(key))
             {
-                Clear(Name);
-                HttpRuntime.Cache.Insert(Name, Value, null, DateTime.Now.AddHours(Hours), System.Web.Caching.Cache.NoSlidingExpiration);
-                return true;
+                cache.Remove(key, regionName);
+                var policy = new CacheItemPolicy();
+                policy.AbsoluteExpiration = DateTime.Now.AddHours(Hours);
+                cache.Set(key, value, policy, regionName);
             }
-            else
-                return false;
         }
-        #endregion
 
-        #region 增加值
         /// <summary>
-        /// 增加值
+        /// 获取缓存
         /// </summary>
-        public static void Add<T>(string key, T Value) where T : class,new()
-        {
-            var list = Get<List<T>>(key);
-            list.Add(Value);
-            Set<List<T>>(key, list);
-        }
-        #endregion
-
-        #region 删除值
-        /// <summary>
-        /// 删除值
-        /// </summary>
-        public static void Remove<T>(string key, T Value) where T : class,new()
-        {
-            var list = Get<List<T>>(key);
-            list.Remove(Value);
-            Set<List<T>>(key, list);
-        }
-        #endregion
-
-        #region 获取值
-        /// <summary>
-        /// 获取值
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public static T Get<T>(string key) where T : class,new()
+        /// <param name="key">键</param>
+        /// <param name="regionName">区域名</param>
+        public static object Get(string key, string regionName)
         {
             try
             {
-                var result = new T();
-                object obj = HttpRuntime.Cache.Get(key);
-                if (obj != null)
-                    result = (T)((object)obj);
-                return result;
+                if (!string.IsNullOrEmpty(key))
+                   return cache.Get(key, regionName);
+                else
+                    return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 获取缓存
+        /// </summary>
+        /// <param name="key">键</param>
+        /// <param name="regionName">区域名</param>
+        public static T Get<T>(string key, string regionName) where T : class, new()
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(key))
+                {
+                    var result = new T();
+                    var obj = cache.Get(key, regionName);
+                    if (obj != null)
+                        result = (T)obj;
+                    return result;
+                }
+                else
+                    return new T();
             }
             catch
             {
                 return new T();
             }
         }
-        #endregion
 
-        #region 设置值
         /// <summary>
-        /// 设置值
+        /// 删除缓存
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="Name"></param>
-        /// <param name="Value"></param>
-        /// <param name="Seconds"></param>
-        /// <returns></returns>
-        public static bool Set<T>(string Name, T Value, int Hours = 24*30*12)
+        /// <param name="key">键</param>
+        /// <param name="regionName">区域名</param>
+        public static void Remove(string key, string regionName)
         {
-            if (!string.IsNullOrEmpty(Name))
-            {
-                Clear(Name);
-                HttpRuntime.Cache.Insert(Name, Value, null, DateTime.Now.AddHours(Hours), System.Web.Caching.Cache.NoSlidingExpiration);
-                return true;
-            }
-            else
-                return false;
+            if (!string.IsNullOrEmpty(key))
+                cache.Remove(key, regionName);
         }
-        #endregion
 
-        #region 是否存在
         /// <summary>
         /// 是否存在
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public static bool Exists(string key)
+        /// <param name="key">键</param>
+        /// <param name="regionName">区域名</param>
+        public static bool Exists(string key,string regionName)
         {
             if (!string.IsNullOrEmpty(key))
-            {
-                return HttpRuntime.Cache.Get(key) != null;
-            }
+                return cache.Contains(key, regionName);
             else
                 return false;
         }
-        #endregion
-
-        #region 清空
-        /// <summary>
-        /// 清空
-        /// </summary>
-        /// <param name="Name"></param>
-        public static bool Clear(string key)
-        {
-
-            if (!string.IsNullOrEmpty(key))
-            {
-                HttpRuntime.Cache.Remove(key);
-                return true;
-            }
-            else
-                return false;
-        }
-        #endregion
-
-        #region 清空所有缓存
-        /// <summary>
-        /// 清空所有缓存
-        /// </summary>
-        public static void ClearAll()
-        {
-            var cache = HttpRuntime.Cache.GetEnumerator();
-            while (cache.MoveNext())
-            {
-                HttpRuntime.Cache.Remove(cache.Key.ToString());
-            }
-        }
-        #endregion
     }
 }

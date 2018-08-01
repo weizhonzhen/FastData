@@ -86,19 +86,19 @@ namespace Fast.Untility.Base
 
             if (IsCache)
             {
-                if (BaseCache.Exists(key))
-                    return BaseCache.Get<List<PropertyInfo>>(key);
+                if (BaseWebCache.Exists(key))
+                    return BaseWebCache.Get<List<PropertyInfo>>(key);
                 else
                 {
                     var info = typeof(T).GetProperties().ToList();
 
-                    BaseCache.Set<List<PropertyInfo>>(key, info);
+                    BaseWebCache.Set<List<PropertyInfo>>(key, info);
                     return info;
                 }
             }
             else
             {
-                BaseCache.Clear(key);
+                BaseWebCache.Clear(key);
                 return typeof(T).GetProperties().ToList();
             }
         }
