@@ -1,8 +1,11 @@
-﻿namespace Fast.Model
+﻿using System;
+
+namespace Fast.Model
 {
     /// <summary>
     /// 配置连接实体
     /// </summary>
+    [Serializable]
     public sealed class ConfigModel
     {
         /// <summary>

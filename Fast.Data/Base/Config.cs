@@ -33,6 +33,6 @@
         /// <summary>
         /// config
         /// </summary>
-        public static readonly int Config = 0;
+        public static readonly int Config = 1;
     }
 }

@@ -1,4 +1,5 @@
-﻿namespace Fast.CacheModel
+﻿using System;
+namespace Fast.CacheModel
 {
     internal class PropertyModel
     {

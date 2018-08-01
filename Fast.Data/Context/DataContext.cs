@@ -9,7 +9,6 @@ using Fast.Untility.Base;
 using Fast.Base;
 using Fast.Model;
 using Fast.Type;
-using Fast.Redis;
 using Fast.Config;
 using System.Linq.Expressions;
 

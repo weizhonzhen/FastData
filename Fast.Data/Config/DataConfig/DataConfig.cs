@@ -3,11 +3,11 @@ using System.Linq;
 using System.Configuration;
 using Fast.Type;
 using Fast.Model;
-using Fast.Redis;
 using Fast.Untility.Base;
 using Fast.Base;
 using System;
 using System.IO;
+using Fast.Redis;
 
 namespace Fast.Config
 {
@@ -124,7 +124,7 @@ namespace Fast.Config
 
                 if (IsReadRedis)
                 {
-                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).ToList();
+                    var cacheList = RedisInfo.Get<List<ConfigModel>>(cacheKey, RedisDb.Config);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -155,8 +155,8 @@ namespace Fast.Config
                         else
                             result = list.Find(a => a.Key == key);
                     }
-
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list, 8640, RedisDb.Config);
+                    
+                    RedisInfo.Set<List<ConfigModel>>(cacheKey, list, RedisDb.Config);
                 }
             }
             #endregion
@@ -168,7 +168,7 @@ namespace Fast.Config
 
                 if (IsReadRedis)
                 {
-                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).ToList();
+                    var cacheList = RedisInfo.Get<List<ConfigModel>>(cacheKey, RedisDb.Config);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -200,7 +200,7 @@ namespace Fast.Config
                     else
                         result = list.Find(a => a.Key == key);
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list, 8640, RedisDb.Config);
+                    RedisInfo.Set<List<ConfigModel>>(cacheKey, list, RedisDb.Config);
                 }
             }
             #endregion
@@ -212,7 +212,7 @@ namespace Fast.Config
 
                 if (IsReadRedis)
                 {
-                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).ToList();
+                    var cacheList = RedisInfo.Get<List<ConfigModel>>(cacheKey, RedisDb.Config);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -244,7 +244,7 @@ namespace Fast.Config
                     else
                         result = list.Find(a => a.Key == key);
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list, 8640, RedisDb.Config);
+                    RedisInfo.Set<List<ConfigModel>>(cacheKey, list, RedisDb.Config);
                 }
             }
             #endregion
@@ -256,7 +256,7 @@ namespace Fast.Config
 
                 if (IsReadRedis)
                 {
-                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).ToList();
+                    var cacheList = RedisInfo.Get<List<ConfigModel>>(cacheKey, RedisDb.Config);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -288,7 +288,7 @@ namespace Fast.Config
                     else
                         result = list.Find(a => a.Key == key);
 
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list, 8640, RedisDb.Config);
+                    RedisInfo.Set<List<ConfigModel>>(cacheKey, list, RedisDb.Config);
                 }
             }
             #endregion
@@ -300,7 +300,7 @@ namespace Fast.Config
 
                 if (IsReadRedis)
                 {
-                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).ToList();
+                    var cacheList = RedisInfo.Get<List<ConfigModel>>(cacheKey, RedisDb.Config);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -331,7 +331,7 @@ namespace Fast.Config
                         result = list.First();
                     else
                         result = list.Find(a => a.Key == key);
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list, 8640, RedisDb.Config);
+                    RedisInfo.Set<List<ConfigModel>>(cacheKey, list, RedisDb.Config);
                 }
             }
             #endregion
@@ -343,7 +343,7 @@ namespace Fast.Config
 
                 if (IsReadRedis)
                 {
-                    var cacheList = RedisInfo.GetItem<List<ConfigModel>>(cacheKey, RedisDb.Config).ToList();
+                    var cacheList = RedisInfo.Get<List<ConfigModel>>(cacheKey, RedisDb.Config);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -374,7 +374,7 @@ namespace Fast.Config
                         result = list.First();
                     else
                         result = list.Find(a => a.Key == key);
-                    RedisInfo.SetItem<List<ConfigModel>>(cacheKey, list, 8640, RedisDb.Config);
+                    RedisInfo.Set<List<ConfigModel>>(cacheKey, list, RedisDb.Config);
                 }
             }
             #endregion
@@ -395,15 +395,15 @@ namespace Fast.Config
                 var info = new FileInfo(fileName);
                 var fileKey = "DataConfig.File";
 
-                if (RedisInfo.Exists(fileKey))
+                if (RedisInfo.Exists(fileKey, RedisDb.Config))
                 {
-                    if ((RedisInfo.GetItem(fileKey, RedisDb.Config).ToDate() - info.LastWriteTime).Minutes != 0)
+                    if ((RedisInfo.Get(fileKey, RedisDb.Config).ToDate() - info.LastWriteTime).Minutes != 0)
                         return false;
                     else
                         return true;
                 }
                 else
-                    RedisInfo.SetItem(fileKey, info.LastWriteTime.ToDate("yyyy-MM-dd HH:mm:ss"), 8640, RedisDb.Config);
+                    RedisInfo.Set(fileKey, info.LastWriteTime.ToDate("yyyy-MM-dd HH:mm:ss"), RedisDb.Config);
                 return false;
             }
         }

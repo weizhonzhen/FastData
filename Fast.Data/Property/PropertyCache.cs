@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Fast.Redis;
 using Fast.CacheModel;
 using Fast.Base;
+using Fast.Redis;
 
 namespace Fast.Property
 {
@@ -27,7 +27,7 @@ namespace Fast.Property
             if (IsCache)
             {
                 if (RedisInfo.Exists(key, RedisDb.Properties))
-                    return RedisInfo.GetItem<List<PropertyModel>>(key,RedisDb.Properties);
+                    return RedisInfo.Get<List<PropertyModel>>(key,RedisDb.Properties);
                 else
                 {
                     typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList().ForEach(a =>
@@ -38,12 +38,12 @@ namespace Fast.Property
                             list.Add(temp);
                         });
 
-                    RedisInfo.SetItem<List<PropertyModel>>(key, list,8640, RedisDb.Properties);
+                    RedisInfo.Set<List<PropertyModel>>(key, list,RedisDb.Properties);
                 }
             }
             else
             {
-                RedisInfo.RemoveItem(key, RedisDb.Properties);
+                RedisInfo.Remove(key, RedisDb.Properties);
                 typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList().ForEach(a =>
                 {
                     var temp = new PropertyModel();

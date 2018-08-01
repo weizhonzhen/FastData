@@ -13,11 +13,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Xml;
 using Fast.Untility.Base;
-using Fast.Redis;
 using Fast.CacheModel;
 using Fast.Check;
 using System.Reflection;
 using Fast.Context;
+using Fast.Redis;
 
 namespace Fast
 {
@@ -57,7 +57,7 @@ namespace Fast
                                     cacheList.Add(model);
                                 }
 
-                                RedisInfo.SetItem<List<PropertyModel>>(key, cacheList, 8640, RedisDb.Properties);
+                                RedisInfo.Set<List<PropertyModel>>(key, cacheList, RedisDb.Properties);
                             }
                         });
                     }
@@ -138,19 +138,19 @@ namespace Fast
                     temp.FileKey = ReadXml(item, config);
                     temp.FileName = info.FullName;
                     if (SaveXml(key, info, config, db))
-                        RedisInfo.SetItem<MapXmlModel>(key, temp,8640, RedisDb.Xml);
+                        RedisInfo.Set<MapXmlModel>(key, temp,RedisDb.Xml);
                 }
-                else if ((RedisInfo.GetItem<MapXmlModel>(key,RedisDb.Xml).LastWrite - info.LastWriteTime).Minutes != 0)
+                else if ((RedisInfo.Get<MapXmlModel>(key,RedisDb.Xml).LastWrite - info.LastWriteTime).Minutes != 0)
                 {
-                    foreach (var temp in RedisInfo.GetItem<MapXmlModel>(key, RedisDb.Xml).FileKey)
-                        RedisInfo.RemoveItem(temp, RedisDb.Xml);
+                    foreach (var temp in RedisInfo.Get<MapXmlModel>(key, RedisDb.Xml).FileKey)
+                        RedisInfo.Remove(temp, RedisDb.Xml);
 
                     var model = new MapXmlModel();
                     model.LastWrite = info.LastWriteTime;
                     model.FileKey = ReadXml(item, config);
                     model.FileName = info.FullName;
                     if (SaveXml(key, info, config, db))
-                        RedisInfo.SetItem<MapXmlModel>(key, model,8640, RedisDb.Xml);
+                        RedisInfo.Set<MapXmlModel>(key, model,RedisDb.Xml);
                 }
             }
 
@@ -527,7 +527,7 @@ namespace Fast
             GetXmlList(path, "sqlMap", ref key, ref sql,config);
 
             for (var i = 0; i < key.Count; i++)
-                RedisInfo.SetItem(key[i].ToLower(), sql[i], 8640, RedisDb.Xml);
+                RedisInfo.Set(key[i].ToLower(), sql[i], RedisDb.Xml);
 
             return key;
         }
@@ -701,12 +701,12 @@ namespace Fast
             if (db != null) { flag = db.config.Flag; }
             if (key != null) { flag = DataConfig.GetConfig(key).Flag; }
 
-            for (var i = 0; i <= RedisInfo.GetItem(name.ToLower(), RedisDb.Xml).ToInt(0); i++)
+            for (var i = 0; i <= RedisInfo.Get(name.ToLower(), RedisDb.Xml).ToInt(0); i++)
             {
                 #region 文本
                 var txtKey = string.Format("{0}.{1}", name.ToLower(), i);
                 if (RedisInfo.Exists(txtKey, RedisDb.Xml))
-                    sql.Append(RedisInfo.GetItem(txtKey, RedisDb.Xml));
+                    sql.Append(RedisInfo.Get(txtKey, RedisDb.Xml));
                 #endregion
 
                 #region 动态
@@ -725,9 +725,9 @@ namespace Fast
                             {
                                 var flagParam= string.Format("{0}{1}", flag, temp.ParameterName.ToLower());
                                 var tempKey = string.Format("#{0}#", temp.ParameterName.ToLower());
-                                var paramSql = RedisInfo.GetItem(paramKey, RedisDb.Xml).ToLower();
-                                var condition = RedisInfo.GetItem(conditionKey).ToStr().ToLower();
-                                var conditionValue = RedisInfo.GetItem(conditionValueKey).ToStr().ToLower();
+                                var paramSql = RedisInfo.Get(paramKey, RedisDb.Xml).ToLower();
+                                var condition = RedisInfo.Get(conditionKey, RedisDb.Xml).ToStr().ToLower();
+                                var conditionValue = RedisInfo.Get(conditionValueKey, RedisDb.Xml).ToStr().ToLower();
                                 switch (condition)
                                 {
                                     case "isEqual":
@@ -742,10 +742,10 @@ namespace Fast
                                                 else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                    tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                                 }
                                                 else
-                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                    tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                             }
                                             else
                                                 tempParam.Remove(temp);
@@ -763,10 +763,10 @@ namespace Fast
                                                 else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                    tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                                 }
                                                 else
-                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                    tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                             }
                                             else
                                                 tempParam.Remove(temp);
@@ -784,10 +784,10 @@ namespace Fast
                                                 else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                    tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                                 }
                                                 else
-                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                    tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                             }
                                             else
                                                 tempParam.Remove(temp);
@@ -805,10 +805,10 @@ namespace Fast
                                                 else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                    tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                                 }
                                                 else
-                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                    tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                             }
                                             else
                                                 tempParam.Remove(temp);
@@ -826,10 +826,10 @@ namespace Fast
                                                 else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                    tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                                 }
                                                 else
-                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                    tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                             }
                                             else
                                                 tempParam.Remove(temp);
@@ -847,10 +847,10 @@ namespace Fast
                                                 else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                    tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                                 }
                                                 else
-                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                    tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                             }
                                             else
                                                 tempParam.Remove(temp);
@@ -869,10 +869,10 @@ namespace Fast
                                                 else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                    tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                                 }
                                                 else
-                                                    tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                    tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                             }
                                             else
                                                 tempParam.Remove(temp);
@@ -881,13 +881,13 @@ namespace Fast
                                     case "choose":
                                         {
                                             var isSuccess = false;
-                                            for (int j = 0; j < RedisInfo.GetItem(paramKey, RedisDb.Xml).ToStr().ToInt(0); j++)
+                                            for (int j = 0; j < RedisInfo.Get(paramKey, RedisDb.Xml).ToStr().ToInt(0); j++)
                                             {
                                                 conditionKey = string.Format("{0}.choose.{1}", paramKey, j);
-                                                condition = RedisInfo.GetItem(conditionKey).ToStr().ToLower();
+                                                condition = RedisInfo.Get(conditionKey, RedisDb.Xml).ToStr().ToLower();
 
                                                 conditionValueKey = string.Format("{0}.choose.condition.{1}", paramKey, j);
-                                                conditionValue = RedisInfo.GetItem(conditionValueKey).ToStr().ToLower();
+                                                conditionValue = RedisInfo.Get(conditionValueKey, RedisDb.Xml).ToStr().ToLower();
                                                 conditionValue = conditionValue.Replace(temp.ParameterName.ToLower(), temp.Value.ToStr());
                                                 if (BaseCodeDom.GetResult(conditionValue))
                                                 {
@@ -924,10 +924,10 @@ namespace Fast
                                             else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                             {
                                                 tempParam.Remove(temp);
-                                                tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
                                             }
                                             else
-                                                tempSql.Append(RedisInfo.GetItem(paramKey, RedisDb.Xml));
+                                                tempSql.Append(RedisInfo.Get(paramKey, RedisDb.Xml));
 
                                             break;
                                         }
@@ -937,7 +937,7 @@ namespace Fast
 
                         if (tempSql.ToString() != "")
                         {
-                            sql.Append(RedisInfo.GetItem(dynKey, RedisDb.Xml));
+                            sql.Append(RedisInfo.Get(dynKey, RedisDb.Xml));
                             sql.Append(tempSql.ToString());
                         }
                     }
