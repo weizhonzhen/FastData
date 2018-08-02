@@ -122,7 +122,7 @@ namespace Fast.Config
             {
                 var cacheKey = "DataConfig.DB2";
 
-                if (IsReadRedis)
+                if (IsReadCache)
                 {
                     var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
 
@@ -166,7 +166,7 @@ namespace Fast.Config
             {
                 var cacheKey = "DataConfig.Oracle";
 
-                if (IsReadRedis)
+                if (IsReadCache)
                 {
                     var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
 
@@ -210,7 +210,7 @@ namespace Fast.Config
             {
                 var cacheKey = "DataConfig.MySql";
 
-                if (IsReadRedis)
+                if (IsReadCache)
                 {
                     var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
 
@@ -254,7 +254,7 @@ namespace Fast.Config
             {
                 var cacheKey = "DataConfig.SqlServer";
 
-                if (IsReadRedis)
+                if (IsReadCache)
                 {
                     var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
 
@@ -298,7 +298,7 @@ namespace Fast.Config
             {
                 var cacheKey = "DataConfig.SQLite";
 
-                if (IsReadRedis)
+                if (IsReadCache)
                 {
                     var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
 
@@ -341,7 +341,7 @@ namespace Fast.Config
             {
                 var cacheKey = "DataConfig.SQLite";
 
-                if (IsReadRedis)
+                if (IsReadCache)
                 {
                     var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
 
@@ -383,11 +383,11 @@ namespace Fast.Config
         }
         #endregion
 
-        #region 是否从redis读取
+        #region 是否从缓存读取
         /// <summary>
-        /// 是否从redis读取
+        /// 是否从缓存读取
         /// </summary>
-        private static bool IsReadRedis
+        private static bool IsReadCache
         {
             get
             {
