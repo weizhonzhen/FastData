@@ -1,5 +1,6 @@
 ﻿using System.Runtime.Caching;
 using System;
+using Fast.Untility.Base;
 
 namespace Fast.Untility.Cache
 {
@@ -21,13 +22,13 @@ namespace Fast.Untility.Cache
         {
             if (!string.IsNullOrEmpty(key))
             {
-                cache.Remove(key, regionName);
+                cache.Remove(key);
                 var policy = new CacheItemPolicy();
                 policy.AbsoluteExpiration = DateTime.Now.AddHours(Hours);
-                cache.Set(key, value, policy, regionName);
+                cache.Set(key, value, policy);
             }
         }
-                
+
         /// <summary>
         /// 设置缓存
         /// </summary>
@@ -35,14 +36,14 @@ namespace Fast.Untility.Cache
         /// <param name="value">值</param>
         /// <param name="regionName">区域名</param>
         /// <param name="Hours">过期小时</param>
-        public static void Set<T>(string key,T value,string regionName, int Hours = 24 * 30 * 12) where T : class, new()
+        public static void Set<T>(string key, T value, string regionName, int Hours = 24 * 30 * 12) where T : class, new()
         {
             if (!string.IsNullOrEmpty(key))
             {
-                cache.Remove(key, regionName);
+                cache.Remove(key);
                 var policy = new CacheItemPolicy();
                 policy.AbsoluteExpiration = DateTime.Now.AddHours(Hours);
-                cache.Set(key, value, policy, regionName);
+                cache.Set(key, value, policy);
             }
         }
 
@@ -51,12 +52,12 @@ namespace Fast.Untility.Cache
         /// </summary>
         /// <param name="key">键</param>
         /// <param name="regionName">区域名</param>
-        public static object Get(string key, string regionName)
+        public static string Get(string key, string regionName)
         {
             try
             {
                 if (!string.IsNullOrEmpty(key))
-                   return cache.Get(key, regionName);
+                    return cache.Get(key).ToStr();
                 else
                     return null;
             }
@@ -78,7 +79,7 @@ namespace Fast.Untility.Cache
                 if (!string.IsNullOrEmpty(key))
                 {
                     var result = new T();
-                    var obj = cache.Get(key, regionName);
+                    var obj = cache.Get(key);
                     if (obj != null)
                         result = (T)obj;
                     return result;
@@ -100,7 +101,7 @@ namespace Fast.Untility.Cache
         public static void Remove(string key, string regionName)
         {
             if (!string.IsNullOrEmpty(key))
-                cache.Remove(key, regionName);
+                cache.Remove(key);
         }
 
         /// <summary>
@@ -108,10 +109,10 @@ namespace Fast.Untility.Cache
         /// </summary>
         /// <param name="key">键</param>
         /// <param name="regionName">区域名</param>
-        public static bool Exists(string key,string regionName)
+        public static bool Exists(string key, string regionName)
         {
             if (!string.IsNullOrEmpty(key))
-                return cache.Contains(key, regionName);
+                return cache.Contains(key);
             else
                 return false;
         }

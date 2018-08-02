@@ -23,16 +23,16 @@
         /// <summary>
         /// 属性
         /// </summary>
-        public static readonly int Properties = 1;
+        public static readonly string Properties = "Properties";
 
         /// <summary>
         /// map xml
         /// </summary>
-        public static readonly int Xml = 0;
+        public static readonly string Xml = "Xml";
 
         /// <summary>
         /// config
         /// </summary>
-        public static readonly int Config = 1;
+        public static readonly string Config = "Config";
     }
 }

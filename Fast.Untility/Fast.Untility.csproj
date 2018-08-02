@@ -117,7 +117,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Cache\BaseWebCache.cs" />
-    <Compile Include="Cache\RaptorDBCache.cs" />
     <Compile Include="Page\PageGet.cs" />
     <Compile Include="Page\PageList.cs" />
     <Compile Include="Page\PageModel.cs" />

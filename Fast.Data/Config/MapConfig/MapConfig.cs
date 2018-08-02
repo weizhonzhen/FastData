@@ -4,7 +4,7 @@ using System.Configuration;
 using Fast.Untility.Base;
 using Fast.Base;
 using Fast.CacheModel;
-using Fast.Redis;
+using Fast.Untility.Cache;
 
 namespace Fast.Config
 {
@@ -42,20 +42,20 @@ namespace Fast.Config
                 exeConfig.ExeConfigFilename = string.Format("{0}SqlMap.config", AppDomain.CurrentDomain.BaseDirectory);
                 var info = new FileInfo(exeConfig.ExeConfigFilename);
                 
-                if (!RedisInfo.Exists(key, RedisDb.Config))
+                if (!BaseCache.Exists(key, RedisDb.Config))
                 {
                     var temp = getModel(exeConfig, info);
-                    RedisInfo.Set<MapConfigModel>(key, temp,RedisDb.Config);
+                    BaseCache.Set<MapConfigModel>(key, temp,RedisDb.Config);
                     return temp;
                 }
-                else if (RedisInfo.Get<MapConfigModel>(key, RedisDb.Config).LastWrite != info.LastWriteTime)
+                else if (BaseCache.Get<MapConfigModel>(key, RedisDb.Config).LastWrite != info.LastWriteTime)
                 {
                     var temp = getModel(exeConfig, info);
-                    RedisInfo.Set<MapConfigModel>(key, temp, RedisDb.Config);
+                    BaseCache.Set<MapConfigModel>(key, temp, RedisDb.Config);
                     return temp;
                 }
                 else
-                    return RedisInfo.Get<MapConfigModel>(key,RedisDb.Config);
+                    return BaseCache.Get<MapConfigModel>(key,RedisDb.Config);
             }
             catch(Exception ex)
             {

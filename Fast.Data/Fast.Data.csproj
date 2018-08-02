@@ -109,10 +109,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Fast.Redis\Fast.Redis.csproj">
-      <Project>{0be95cbf-5b8b-4e53-bf3f-73b22f597247}</Project>
-      <Name>Fast.Redis</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Fast.Untility\Fast.Untility.csproj">
       <Project>{209cd228-0837-467d-b869-0db31af04362}</Project>
       <Name>Fast.Untility</Name>
