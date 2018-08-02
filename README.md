@@ -14,11 +14,8 @@ FastMap.InstanceMap(db);
 
 //web.config
 <configSections>
-    <section name="RedisConfig" type="Fast.Redis.Config.RedisConfig" />
     <section name="DataConfig" type="Fast.Data.Config.DataConfig,Fast.Data" />
 </configSections>
-
-  <RedisConfig WriteServerList="127.0.0.1:6379" ReadServerList="127.0.0.1:6379" MaxWritePoolSize="10" MaxReadPoolSize="50" />
 
   <DataConfig>
     <Oracle>
