@@ -17,22 +17,4 @@
         /// </summary>
         public static readonly string DbFirst = "DbFirst";
     }
-
-    internal static class RedisDb
-    {
-        /// <summary>
-        /// 属性
-        /// </summary>
-        public static readonly string Properties = "Properties";
-
-        /// <summary>
-        /// map xml
-        /// </summary>
-        public static readonly string Xml = "Xml";
-
-        /// <summary>
-        /// config
-        /// </summary>
-        public static readonly string Config = "Config";
-    }
 }

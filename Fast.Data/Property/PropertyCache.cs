@@ -26,8 +26,8 @@ namespace Fast.Property
 
             if (IsCache)
             {
-                if (BaseCache.Exists(key, RedisDb.Properties))
-                    return BaseCache.Get<List<PropertyModel>>(key,RedisDb.Properties);
+                if (BaseCache.Exists(key))
+                    return BaseCache.Get<List<PropertyModel>>(key);
                 else
                 {
                     typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList().ForEach(a =>
@@ -38,12 +38,12 @@ namespace Fast.Property
                             list.Add(temp);
                         });
 
-                    BaseCache.Set<List<PropertyModel>>(key, list,RedisDb.Properties);
+                    BaseCache.Set<List<PropertyModel>>(key, list);
                 }
             }
             else
             {
-                BaseCache.Remove(key, RedisDb.Properties);
+                BaseCache.Remove(key);
                 typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList().ForEach(a =>
                 {
                     var temp = new PropertyModel();

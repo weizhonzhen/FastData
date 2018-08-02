@@ -42,20 +42,20 @@ namespace Fast.Config
                 exeConfig.ExeConfigFilename = string.Format("{0}SqlMap.config", AppDomain.CurrentDomain.BaseDirectory);
                 var info = new FileInfo(exeConfig.ExeConfigFilename);
                 
-                if (!BaseCache.Exists(key, RedisDb.Config))
+                if (!BaseCache.Exists(key))
                 {
                     var temp = getModel(exeConfig, info);
-                    BaseCache.Set<MapConfigModel>(key, temp,RedisDb.Config);
+                    BaseCache.Set<MapConfigModel>(key, temp);
                     return temp;
                 }
-                else if (BaseCache.Get<MapConfigModel>(key, RedisDb.Config).LastWrite != info.LastWriteTime)
+                else if (BaseCache.Get<MapConfigModel>(key).LastWrite != info.LastWriteTime)
                 {
                     var temp = getModel(exeConfig, info);
-                    BaseCache.Set<MapConfigModel>(key, temp, RedisDb.Config);
+                    BaseCache.Set<MapConfigModel>(key, temp);
                     return temp;
                 }
                 else
-                    return BaseCache.Get<MapConfigModel>(key,RedisDb.Config);
+                    return BaseCache.Get<MapConfigModel>(key);
             }
             catch(Exception ex)
             {

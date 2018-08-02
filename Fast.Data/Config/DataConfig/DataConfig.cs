@@ -124,7 +124,7 @@ namespace Fast.Config
 
                 if (IsReadRedis)
                 {
-                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey, RedisDb.Config);
+                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -156,7 +156,7 @@ namespace Fast.Config
                             result = list.Find(a => a.Key == key);
                     }
                     
-                    BaseCache.Set<List<ConfigModel>>(cacheKey, list, RedisDb.Config);
+                    BaseCache.Set<List<ConfigModel>>(cacheKey, list);
                 }
             }
             #endregion
@@ -168,7 +168,7 @@ namespace Fast.Config
 
                 if (IsReadRedis)
                 {
-                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey, RedisDb.Config);
+                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -200,7 +200,7 @@ namespace Fast.Config
                     else
                         result = list.Find(a => a.Key == key);
 
-                    BaseCache.Set<List<ConfigModel>>(cacheKey, list, RedisDb.Config);
+                    BaseCache.Set<List<ConfigModel>>(cacheKey, list);
                 }
             }
             #endregion
@@ -212,7 +212,7 @@ namespace Fast.Config
 
                 if (IsReadRedis)
                 {
-                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey, RedisDb.Config);
+                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -244,7 +244,7 @@ namespace Fast.Config
                     else
                         result = list.Find(a => a.Key == key);
 
-                    BaseCache.Set<List<ConfigModel>>(cacheKey, list, RedisDb.Config);
+                    BaseCache.Set<List<ConfigModel>>(cacheKey, list);
                 }
             }
             #endregion
@@ -256,7 +256,7 @@ namespace Fast.Config
 
                 if (IsReadRedis)
                 {
-                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey, RedisDb.Config);
+                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -288,7 +288,7 @@ namespace Fast.Config
                     else
                         result = list.Find(a => a.Key == key);
 
-                    BaseCache.Set<List<ConfigModel>>(cacheKey, list, RedisDb.Config);
+                    BaseCache.Set<List<ConfigModel>>(cacheKey, list);
                 }
             }
             #endregion
@@ -300,7 +300,7 @@ namespace Fast.Config
 
                 if (IsReadRedis)
                 {
-                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey, RedisDb.Config);
+                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -331,7 +331,7 @@ namespace Fast.Config
                         result = list.First();
                     else
                         result = list.Find(a => a.Key == key);
-                    BaseCache.Set<List<ConfigModel>>(cacheKey, list, RedisDb.Config);
+                    BaseCache.Set<List<ConfigModel>>(cacheKey, list);
                 }
             }
             #endregion
@@ -343,7 +343,7 @@ namespace Fast.Config
 
                 if (IsReadRedis)
                 {
-                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey, RedisDb.Config);
+                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -374,7 +374,7 @@ namespace Fast.Config
                         result = list.First();
                     else
                         result = list.Find(a => a.Key == key);
-                    BaseCache.Set<List<ConfigModel>>(cacheKey, list, RedisDb.Config);
+                    BaseCache.Set<List<ConfigModel>>(cacheKey, list);
                 }
             }
             #endregion
@@ -395,15 +395,15 @@ namespace Fast.Config
                 var info = new FileInfo(fileName);
                 var fileKey = "DataConfig.File";
 
-                if (BaseCache.Exists(fileKey, RedisDb.Config))
+                if (BaseCache.Exists(fileKey))
                 {
-                    if ((BaseCache.Get(fileKey, RedisDb.Config).ToDate() - info.LastWriteTime).Minutes != 0)
+                    if ((BaseCache.Get(fileKey).ToDate() - info.LastWriteTime).Minutes != 0)
                         return false;
                     else
                         return true;
                 }
                 else
-                    BaseCache.Set(fileKey, info.LastWriteTime.ToDate("yyyy-MM-dd HH:mm:ss"), RedisDb.Config);
+                    BaseCache.Set(fileKey, info.LastWriteTime.ToDate("yyyy-MM-dd HH:mm:ss"));
                 return false;
             }
         }
