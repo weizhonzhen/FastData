@@ -109,7 +109,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Fast.Untility\FastUntility.csproj">
+    <ProjectReference Include="..\FastUntility\FastUntility.csproj">
       <Project>{209cd228-0837-467d-b869-0db31af04362}</Project>
       <Name>FastUntility</Name>
     </ProjectReference>
