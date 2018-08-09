@@ -14,7 +14,7 @@ FastMap.InstanceMap(db);
 
 //web.config
 <configSections>
-    <section name="DataConfig" type="Fast.Data.Config.DataConfig,Fast.Data" />
+    <section name="DataConfig" type="FastData.Config.DataConfig,FastData" />
 </configSections>
 
   <DataConfig>
@@ -58,7 +58,7 @@ FastMap.InstanceMap(db);
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <configSections>
-    <section name="MapConfig" type="Fast.Data.Config.MapConfig,Fast.Data"/>
+    <section name="MapConfig" type="FastData.Config.MapConfig,FastData"/>
   </configSections>
 
   <MapConfig>
