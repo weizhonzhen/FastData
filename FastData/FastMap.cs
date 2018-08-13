@@ -35,8 +35,6 @@ namespace FastData
         public static void InstanceProperties(Assembly[] list, string nameSpace, string dll)
         {
             var config = DataConfig.GetConfig();
-            var query = new DataQuery();
-            query.Config = config;
 
             foreach (var item in list)
             {
