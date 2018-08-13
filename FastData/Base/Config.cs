@@ -20,7 +20,7 @@
 
     internal static class CacheType
     {
-        public static readonly string WebKey = "web";
-        public static readonly string RedisKey = "redis";
+        public static readonly string Web = "web";
+        public static readonly string Redis = "redis";
     }
 }

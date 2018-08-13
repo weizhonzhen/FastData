@@ -124,7 +124,7 @@ namespace FastData.Config
                 
                 if (IsReadCache)
                 {
-                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.WebKey, cacheKey);
+                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -157,7 +157,7 @@ namespace FastData.Config
                             result = list.Find(a => a.Key == key);
                     }
                     
-                    DbCache.Set<List<ConfigModel>>(CacheType.WebKey,cacheKey, list);
+                    DbCache.Set<List<ConfigModel>>(CacheType.Web,cacheKey, list);
                 }
             }
             #endregion
@@ -169,7 +169,7 @@ namespace FastData.Config
 
                 if (IsReadCache)
                 {
-                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.WebKey, cacheKey);
+                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -202,7 +202,7 @@ namespace FastData.Config
                     else
                         result = list.Find(a => a.Key == key);
 
-                    DbCache.Set<List<ConfigModel>>(CacheType.WebKey, cacheKey, list);
+                    DbCache.Set<List<ConfigModel>>(CacheType.Web, cacheKey, list);
                 }
             }
             #endregion
@@ -214,7 +214,7 @@ namespace FastData.Config
 
                 if (IsReadCache)
                 {
-                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.WebKey, cacheKey);
+                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -247,7 +247,7 @@ namespace FastData.Config
                     else
                         result = list.Find(a => a.Key == key);
 
-                    DbCache.Set<List<ConfigModel>>(CacheType.WebKey, cacheKey, list);
+                    DbCache.Set<List<ConfigModel>>(CacheType.Web, cacheKey, list);
                 }
             }
             #endregion
@@ -259,7 +259,7 @@ namespace FastData.Config
 
                 if (IsReadCache)
                 {
-                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.WebKey, cacheKey);
+                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -292,7 +292,7 @@ namespace FastData.Config
                     else
                         result = list.Find(a => a.Key == key);
 
-                    DbCache.Set<List<ConfigModel>>(CacheType.WebKey, cacheKey, list);
+                    DbCache.Set<List<ConfigModel>>(CacheType.Web, cacheKey, list);
                 }
             }
             #endregion
@@ -304,7 +304,7 @@ namespace FastData.Config
 
                 if (IsReadCache)
                 {
-                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.WebKey, cacheKey);
+                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -336,7 +336,7 @@ namespace FastData.Config
                         result = list.First();
                     else
                         result = list.Find(a => a.Key == key);
-                    DbCache.Set<List<ConfigModel>>(CacheType.WebKey, cacheKey, list);
+                    DbCache.Set<List<ConfigModel>>(CacheType.Web, cacheKey, list);
                 }
             }
             #endregion
@@ -348,7 +348,7 @@ namespace FastData.Config
 
                 if (IsReadCache)
                 {
-                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.WebKey, cacheKey);
+                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -380,7 +380,7 @@ namespace FastData.Config
                         result = list.First();
                     else
                         result = list.Find(a => a.Key == key);
-                    DbCache.Set<List<ConfigModel>>(CacheType.WebKey, cacheKey, list);
+                    DbCache.Set<List<ConfigModel>>(CacheType.Web, cacheKey, list);
                 }
             }
             #endregion
@@ -401,15 +401,15 @@ namespace FastData.Config
                 var info = new FileInfo(fileName);
                 var fileKey = "DataConfig.File";
 
-                if (DbCache.Exists(CacheType.WebKey, fileKey))
+                if (DbCache.Exists(CacheType.Web, fileKey))
                 {
-                    if ((DbCache.Get(CacheType.WebKey, fileKey).ToDate() - info.LastWriteTime).Minutes != 0)
+                    if ((DbCache.Get(CacheType.Web, fileKey).ToDate() - info.LastWriteTime).Minutes != 0)
                         return false;
                     else
                         return true;
                 }
                 else
-                    DbCache.Set(CacheType.WebKey, fileKey, info.LastWriteTime.ToDate("yyyy-MM-dd HH:mm:ss"));
+                    DbCache.Set(CacheType.Web, fileKey, info.LastWriteTime.ToDate("yyyy-MM-dd HH:mm:ss"));
                 return false;
             }
         }
