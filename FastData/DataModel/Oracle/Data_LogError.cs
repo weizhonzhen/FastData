@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Data.Property;
+using FastData.Property;
 
-namespace Data.DataModel.Oracle
+namespace FastData.DataModel.Oracle
 {
     /// <summary>
     /// 出错日志
@@ -31,6 +27,12 @@ namespace Data.DataModel.Oracle
         /// </summary>
         [Column(Comments = "出错对象", DataType = "Char", IsNull = true, Length = 32)]
         public string Type { get; set; }
+        
+        /// <summary>
+        /// sql语句
+        /// </summary>
+        [Column(Comments = "sql语句", DataType = "Clob", IsNull = false)]
+        public string Sql { get; set; }
 
         /// <summary>
         /// 出错内容

@@ -61,7 +61,10 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "LambdaWhere<T>", "");
+                    if (config.SqlErrorType.ToLower() == "db")
+                        DbLogTable.LogException<T>(config, ex, "LambdaWhere<T>", "");
+                    else
+                        DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "LambdaWhere<T>", "");
                 });
                 return result;
             }
@@ -116,7 +119,10 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    DbLog.LogException(config.IsOutError, config.DbType, ex, "LambdaWhere<T1, T2>", "");
+                    if (config.SqlErrorType.ToLower() == "db")
+                        DbLogTable.LogException(config, ex, "LambdaWhere<T1, T2>", "");
+                    else
+                        DbLog.LogException(config.IsOutError, config.DbType, ex, "LambdaWhere<T1, T2>", "");
                 });
                 return result;
             }

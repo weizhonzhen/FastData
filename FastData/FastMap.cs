@@ -17,7 +17,6 @@ using FastData.CacheModel;
 using FastData.Check;
 using System.Reflection;
 using FastData.Context;
-using FastUntility.Cache;
 
 namespace FastData
 {
@@ -35,6 +34,10 @@ namespace FastData
         /// <param name="dll">dll名称</param>
         public static void InstanceProperties(Assembly[] list, string nameSpace, string dll)
         {
+            var config = DataConfig.GetConfig();
+            var query = new DataQuery();
+            query.Config = config;
+
             foreach (var item in list)
             {
                 if (item.ManifestModule.Name == dll)
@@ -57,7 +60,7 @@ namespace FastData
                                     cacheList.Add(model);
                                 }
 
-                                BaseCache.Set<List<PropertyModel>>(key, cacheList);
+                                DbCache.Set<List<PropertyModel>>(config.CacheType,key, cacheList);
                             }
                         });
                     }
@@ -87,30 +90,9 @@ namespace FastData
                     {
                         var typeInfo = (temp as TypeInfo);
                         if (typeInfo.Namespace.Contains(nameSpace))
-                            BaseTable.Check(query, temp.Name, temp.Namespace, typeInfo.DeclaredProperties.ToList(), typeInfo.GetCustomAttributes().ToList());
+                            BaseTable.Check(query, temp.Name, typeInfo.DeclaredProperties.ToList(), typeInfo.GetCustomAttributes().ToList());
                     }
                 }
-            }
-
-            if (query.Config.DbType == DataDbType.Oracle)
-            {
-                var listInfo = typeof(FastData.DataModel.Oracle.Data_MapFile).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
-                var listAttribute = typeof(FastData.DataModel.Oracle.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();                
-                BaseTable.Check(query, "Data_MapFile", "FastData.DataModel.Oracle", listInfo, listAttribute);
-            }
-
-            if (query.Config.DbType == DataDbType.MySql)
-            {
-                var listInfo = typeof(FastData.DataModel.MySql.Data_MapFile).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
-                var listAttribute = typeof(FastData.DataModel.MySql.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();
-                BaseTable.Check(query, "Data_MapFile", "FastData.DataModel.MySql", listInfo, listAttribute);
-            }
-
-            if (query.Config.DbType == DataDbType.SqlServer)
-            {
-                var listInfo = typeof(FastData.DataModel.SqlServer.Data_MapFile).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
-                var listAttribute = typeof(FastData.DataModel.SqlServer.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();
-                BaseTable.Check(query, "Data_MapFile", "FastData.DataModel.SqlServer", listInfo, listAttribute);
             }
         }
         #endregion
@@ -125,32 +107,81 @@ namespace FastData
             var list = MapConfig.GetConfig();
             var config = DataConfig.GetConfig(dbKey);
             var db = new DataContext(dbKey, config);
+            var query = new DataQuery { Config = config, Key = dbKey };
+
+            if (config.IsMapSave)
+            {
+                if (query.Config.DbType == DataDbType.Oracle)
+                {
+                    var listInfo = typeof(FastData.DataModel.Oracle.Data_MapFile).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
+                    var listAttribute = typeof(FastData.DataModel.Oracle.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();
+                    BaseTable.Check(query, "Data_MapFile", listInfo, listAttribute);
+                }
+
+                if (query.Config.DbType == DataDbType.MySql)
+                {
+                    var listInfo = typeof(FastData.DataModel.MySql.Data_MapFile).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
+                    var listAttribute = typeof(FastData.DataModel.MySql.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();
+                    BaseTable.Check(query, "Data_MapFile", listInfo, listAttribute);
+                }
+
+                if (query.Config.DbType == DataDbType.SqlServer)
+                {
+                    var listInfo = typeof(FastData.DataModel.SqlServer.Data_MapFile).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
+                    var listAttribute = typeof(FastData.DataModel.SqlServer.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();
+                    BaseTable.Check(query, "Data_MapFile", listInfo, listAttribute);
+                }
+            }
+            
+            if (config.SqlErrorType.ToLower() == "db")
+            {
+                if (query.Config.DbType == DataDbType.Oracle)
+                {
+                    var listInfo = typeof(FastData.DataModel.Oracle.Data_LogError).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
+                    var listAttribute = typeof(FastData.DataModel.Oracle.Data_LogError).GetTypeInfo().GetCustomAttributes().ToList();
+                    BaseTable.Check(query, "Data_LogError", listInfo, listAttribute);
+                }
+
+                if (query.Config.DbType == DataDbType.MySql)
+                {
+                    var listInfo = typeof(FastData.DataModel.MySql.Data_LogError).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
+                    var listAttribute = typeof(FastData.DataModel.MySql.Data_LogError).GetTypeInfo().GetCustomAttributes().ToList();
+                    BaseTable.Check(query, "Data_LogError", listInfo, listAttribute);
+                }
+
+                if (query.Config.DbType == DataDbType.SqlServer)
+                {
+                    var listInfo = typeof(FastData.DataModel.SqlServer.Data_LogError).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
+                    var listAttribute = typeof(FastData.DataModel.SqlServer.Data_LogError).GetTypeInfo().GetCustomAttributes().ToList();
+                    BaseTable.Check(query, "Data_LogError", listInfo, listAttribute);
+                }
+            }
 
             foreach (var item in list.Path)
             {
                 var info = new FileInfo(item);
                 var key = BaseSymmetric.md5(32, info.FullName);
 
-                if (!BaseCache.Exists(key))
+                if (!DbCache.Exists(config.CacheType,key))
                 {
                     var temp = new MapXmlModel();
                     temp.LastWrite = info.LastWriteTime;
                     temp.FileKey = ReadXml(item, config);
                     temp.FileName = info.FullName;
                     if (SaveXml(key, info, config, db))
-                        BaseCache.Set<MapXmlModel>(key, temp);
+                        DbCache.Set<MapXmlModel>(config.CacheType, key, temp);
                 }
-                else if ((BaseCache.Get<MapXmlModel>(key).LastWrite - info.LastWriteTime).Minutes != 0)
+                else if ((DbCache.Get<MapXmlModel>(config.CacheType, key).LastWrite - info.LastWriteTime).Minutes != 0)
                 {
-                    foreach (var temp in BaseCache.Get<MapXmlModel>(key).FileKey)
-                        BaseCache.Remove(temp);
+                    foreach (var temp in DbCache.Get<MapXmlModel>(config.CacheType, key).FileKey)
+                        DbCache.Remove(config.CacheType, temp);
 
                     var model = new MapXmlModel();
                     model.LastWrite = info.LastWriteTime;
                     model.FileKey = ReadXml(item, config);
                     model.FileName = info.FullName;
                     if (SaveXml(key, info, config, db))
-                        BaseCache.Set<MapXmlModel>(key, model);
+                        DbCache.Set<MapXmlModel>(config.CacheType, key, model);
                 }
             }
 
@@ -169,7 +200,7 @@ namespace FastData
             else
                 InstanceMap(key);
 
-            if (BaseCache.Exists(name.ToLower()))
+            if (DbCache.Exists(db.config.CacheType, name.ToLower()))
             {
                 var sql = GetMapSql(name, ref param,db,key);
                 return FastRead.ExecuteSql<T>(sql, param,db,key);
@@ -227,7 +258,7 @@ namespace FastData
             else
                 InstanceMap(key);
 
-            if (BaseCache.Exists(name.ToLower()))
+            if (DbCache.Exists(db.config.CacheType, name.ToLower()))
             {
                 var sql = GetMapSql(name, ref param,db,key);
                 
@@ -286,7 +317,7 @@ namespace FastData
             else
                 InstanceMap(key);
 
-            if (BaseCache.Exists(name.ToLower()))
+            if (DbCache.Exists(db.config.CacheType, name.ToLower()))
             {
                 var sql = GetMapSql(name, ref param,db,key);
 
@@ -377,7 +408,7 @@ namespace FastData
             else
                 InstanceMap(key);
 
-            if (BaseCache.Exists(name.ToLower()))
+            if (DbCache.Exists(db.config.CacheType, name.ToLower()))
             {
                 var sql = GetMapSql(name, ref param,db,key);
 
@@ -468,7 +499,7 @@ namespace FastData
             else
                 InstanceMap(key);
 
-            if (BaseCache.Exists(name.ToLower()))
+            if (DbCache.Exists(db.config.CacheType, name.ToLower()))
             {
                 var sql = GetMapSql(name, ref param,db,key);
 
@@ -527,7 +558,7 @@ namespace FastData
             GetXmlList(path, "sqlMap", ref key, ref sql,config);
 
             for (var i = 0; i < key.Count; i++)
-                BaseCache.Set(key[i].ToLower(), sql[i]);
+                DbCache.Set(config.CacheType, key[i].ToLower(), sql[i]);
 
             return key;
         }
@@ -680,7 +711,10 @@ namespace FastData
             {
                 Task.Factory.StartNew(() =>
                 {
-                    DbLog.LogException(true, "InstanceMap", ex, "GetXmlList", "");
+                    if (config.SqlErrorType.ToLower() == "db")
+                        DbLogTable.LogException(config, ex, "GetXmlList","");
+                    else
+                        DbLog.LogException(true, "InstanceMap", ex, "GetXmlList", "");
                 });
             }
         }
@@ -698,20 +732,29 @@ namespace FastData
             var tempParam = param.ToList();
             var sql = new StringBuilder();
             var flag = "";
-            if (db != null) { flag = db.config.Flag; }
-            if (key != null) { flag = DataConfig.GetConfig(key).Flag; }
+            var cacheType = "";
+            if (db != null)
+            {
+                flag = db.config.Flag;
+                cacheType = db.config.CacheType;
+            }
+            else if (key != null)
+            {
+                flag = DataConfig.GetConfig(key).Flag;
+                cacheType = DataConfig.GetConfig(key).CacheType;
+            }
 
-            for (var i = 0; i <= BaseCache.Get(name.ToLower()).ToInt(0); i++)
+            for (var i = 0; i <= DbCache.Get(cacheType, name.ToLower()).ToInt(0); i++)
             {
                 #region 文本
                 var txtKey = string.Format("{0}.{1}", name.ToLower(), i);
-                if (BaseCache.Exists(txtKey))
-                    sql.Append(BaseCache.Get(txtKey));
+                if (DbCache.Exists(cacheType, txtKey))
+                    sql.Append(DbCache.Get(cacheType, txtKey));
                 #endregion
 
                 #region 动态
                 var dynKey = string.Format("{0}.format.{1}", name.ToLower(), i);
-                if (BaseCache.Exists(dynKey))
+                if (DbCache.Exists(cacheType, dynKey))
                 {
                     if (param != null)
                     {
@@ -721,13 +764,13 @@ namespace FastData
                             var paramKey = string.Format("{0}.{1}.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
                             var conditionKey = string.Format("{0}.{1}.condition.{2}", name.ToLower(), temp.ParameterName.ToLower(),i);
                             var conditionValueKey = string.Format("{0}.{1}.condition.value.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
-                            if (BaseCache.Exists(paramKey))
+                            if (DbCache.Exists(DataConfig.GetConfig(key).CacheType, paramKey))
                             {
                                 var flagParam= string.Format("{0}{1}", flag, temp.ParameterName.ToLower());
                                 var tempKey = string.Format("#{0}#", temp.ParameterName.ToLower());
-                                var paramSql = BaseCache.Get(paramKey).ToLower();
-                                var condition = BaseCache.Get(conditionKey).ToStr().ToLower();
-                                var conditionValue = BaseCache.Get(conditionValueKey).ToStr().ToLower();
+                                var paramSql = DbCache.Get(cacheType, paramKey).ToLower();
+                                var condition = DbCache.Get(cacheType, conditionKey).ToStr().ToLower();
+                                var conditionValue = DbCache.Get(cacheType, conditionValueKey).ToStr().ToLower();
                                 switch (condition)
                                 {
                                     case "isEqual":
@@ -742,10 +785,10 @@ namespace FastData
                                                 else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(BaseCache.Get(paramKey));
+                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
                                                 }
                                                 else
-                                                    tempSql.Append(BaseCache.Get(paramKey));
+                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
                                             }
                                             else
                                                 tempParam.Remove(temp);
@@ -763,10 +806,10 @@ namespace FastData
                                                 else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(BaseCache.Get(paramKey));
+                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
                                                 }
                                                 else
-                                                    tempSql.Append(BaseCache.Get(paramKey));
+                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
                                             }
                                             else
                                                 tempParam.Remove(temp);
@@ -784,10 +827,10 @@ namespace FastData
                                                 else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(BaseCache.Get(paramKey));
+                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
                                                 }
                                                 else
-                                                    tempSql.Append(BaseCache.Get(paramKey));
+                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
                                             }
                                             else
                                                 tempParam.Remove(temp);
@@ -805,10 +848,10 @@ namespace FastData
                                                 else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(BaseCache.Get(paramKey));
+                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
                                                 }
                                                 else
-                                                    tempSql.Append(BaseCache.Get(paramKey));
+                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
                                             }
                                             else
                                                 tempParam.Remove(temp);
@@ -826,10 +869,10 @@ namespace FastData
                                                 else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(BaseCache.Get(paramKey));
+                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
                                                 }
                                                 else
-                                                    tempSql.Append(BaseCache.Get(paramKey));
+                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
                                             }
                                             else
                                                 tempParam.Remove(temp);
@@ -847,10 +890,10 @@ namespace FastData
                                                 else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(BaseCache.Get(paramKey));
+                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
                                                 }
                                                 else
-                                                    tempSql.Append(BaseCache.Get(paramKey));
+                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
                                             }
                                             else
                                                 tempParam.Remove(temp);
@@ -869,10 +912,10 @@ namespace FastData
                                                 else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
-                                                    tempSql.Append(BaseCache.Get(paramKey));
+                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
                                                 }
                                                 else
-                                                    tempSql.Append(BaseCache.Get(paramKey));
+                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
                                             }
                                             else
                                                 tempParam.Remove(temp);
@@ -881,13 +924,13 @@ namespace FastData
                                     case "choose":
                                         {
                                             var isSuccess = false;
-                                            for (int j = 0; j < BaseCache.Get(paramKey).ToStr().ToInt(0); j++)
+                                            for (int j = 0; j < DbCache.Get(cacheType, paramKey).ToStr().ToInt(0); j++)
                                             {
                                                 conditionKey = string.Format("{0}.choose.{1}", paramKey, j);
-                                                condition = BaseCache.Get(conditionKey).ToStr().ToLower();
+                                                condition = DbCache.Get(cacheType, conditionKey).ToStr().ToLower();
 
                                                 conditionValueKey = string.Format("{0}.choose.condition.{1}", paramKey, j);
-                                                conditionValue = BaseCache.Get(conditionValueKey).ToStr().ToLower();
+                                                conditionValue = DbCache.Get(cacheType, conditionValueKey).ToStr().ToLower();
                                                 conditionValue = conditionValue.Replace(temp.ParameterName.ToLower(), temp.Value.ToStr());
                                                 if (BaseCodeDom.GetResult(conditionValue))
                                                 {
@@ -924,10 +967,10 @@ namespace FastData
                                             else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
                                             {
                                                 tempParam.Remove(temp);
-                                                tempSql.Append(BaseCache.Get(paramKey));
+                                                tempSql.Append(DbCache.Get(cacheType, paramKey));
                                             }
                                             else
-                                                tempSql.Append(BaseCache.Get(paramKey));
+                                                tempSql.Append(DbCache.Get(cacheType, paramKey));
 
                                             break;
                                         }
@@ -937,7 +980,7 @@ namespace FastData
 
                         if (tempSql.ToString() != "")
                         {
-                            sql.Append(BaseCache.Get(dynKey));
+                            sql.Append(DbCache.Get(cacheType, dynKey));
                             sql.Append(tempSql.ToString());
                         }
                     }

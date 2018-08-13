@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Data.Property;
+using FastData.Property;
 
-namespace Data.DataModel.MySql
+namespace FastData.DataModel.MySql
 {
     /// <summary>
     /// sql日志

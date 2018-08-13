@@ -42,20 +42,20 @@ namespace FastData.Config
                 exeConfig.ExeConfigFilename = string.Format("{0}SqlMap.config", AppDomain.CurrentDomain.BaseDirectory);
                 var info = new FileInfo(exeConfig.ExeConfigFilename);
                 
-                if (!BaseCache.Exists(key))
+                if (!DbCache.Exists(CacheType.WebKey, key))
                 {
                     var temp = getModel(exeConfig, info);
-                    BaseCache.Set<MapConfigModel>(key, temp);
+                    DbCache.Set<MapConfigModel>(CacheType.WebKey, key, temp);
                     return temp;
                 }
-                else if (BaseCache.Get<MapConfigModel>(key).LastWrite != info.LastWriteTime)
+                else if (DbCache.Get<MapConfigModel>(CacheType.WebKey, key).LastWrite != info.LastWriteTime)
                 {
                     var temp = getModel(exeConfig, info);
-                    BaseCache.Set<MapConfigModel>(key, temp);
+                    DbCache.Set<MapConfigModel>(CacheType.WebKey, key, temp);
                     return temp;
                 }
                 else
-                    return BaseCache.Get<MapConfigModel>(key);
+                    return DbCache.Get<MapConfigModel>(CacheType.WebKey, key);
             }
             catch(Exception ex)
             {

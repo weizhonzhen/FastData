@@ -1,5 +1,5 @@
-﻿using FastData.Property;
-using System;
+﻿using System;
+using FastData.Property;
 
 namespace FastData.DataModel.SqlServer
 {

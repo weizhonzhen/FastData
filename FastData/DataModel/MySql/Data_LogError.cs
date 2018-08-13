@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Data.Property;
+using FastData.Property;
 
-namespace Data.DataModel.MySql
+namespace FastData.DataModel.MySql
 {
     /// <summary>
     /// 出错日志
@@ -37,6 +33,12 @@ namespace Data.DataModel.MySql
         /// </summary>
         [Column(Comments = "出错内容", DataType = "Text", IsNull = false)]
         public string Content { get; set; }
+
+        /// <summary>
+        /// sql语句
+        /// </summary>
+        [Column(Comments = "sql语句", DataType = "Text", IsNull = false)]
+        public string Sql { get; set; }
 
         /// <summary>
         /// 增加时间

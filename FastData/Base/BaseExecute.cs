@@ -209,7 +209,10 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    DbLog.LogException(true, item.Config.DbType, ex, "ToPageDataReader", "");
+                    if (item.Config.SqlErrorType.ToLower() == "db")
+                        DbLogTable.LogException(item.Config, ex, "ToPageDataReader", "");
+                    else
+                        DbLog.LogException(true, item.Config.DbType, ex, "ToPageDataReader", "");
                 });
                 return null;
             }
@@ -254,7 +257,10 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    DbLog.LogException(true, item.Config.DbType, ex, "ToPageCount", "");
+                    if (item.Config.SqlErrorType.ToLower() == "db")
+                        DbLogTable.LogException(item.Config, ex, "ToPageCount", "");
+                    else
+                        DbLog.LogException(true, item.Config.DbType, ex, "ToPageCount", "");
                 });
 
                 return 0;
@@ -288,7 +294,10 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    DbLog.LogException(config.IsOutError,config.DbType, ex, "ToPageCountSql", "");
+                    if (config.SqlErrorType.ToLower() == "db")
+                        DbLogTable.LogException(config, ex, "ToPageCountSql", "");
+                    else
+                        DbLog.LogException(config.IsOutError,config.DbType, ex, "ToPageCountSql", "");
                 });
                 return 0;
             }
@@ -346,7 +355,10 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    DbLog.LogException(config.IsOutError, config.DbType, ex, "ToPageDataReaderSql", "");
+                    if (config.SqlErrorType.ToLower() == "db")
+                        DbLogTable.LogException(config, ex, "ToPageDataReaderSql", "");
+                    else
+                        DbLog.LogException(config.IsOutError, config.DbType, ex, "ToPageDataReaderSql", "");
                 });
                 return null;
             }

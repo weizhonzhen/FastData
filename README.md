@@ -19,16 +19,16 @@ FastMap.InstanceMap(db);
 
   <DataConfig>
     <Oracle>
-      <Add ConnStr="connstr" IsOutSql="true" IsOutError="true" DesignModel="DbFirst" IsEncrypt="false" Key="OraTestDb" />
-      <Add ConnStr="connstr" IsOutSql="true" IsOutError="true" DesignModel="CodeFirst" IsEncrypt="false" Key="OraDb" />
+      <Add ConnStr="connstr" IsOutSql="true" IsOutError="true" DesignModel="DbFirst" SqlErrorType="db" IsEncrypt="false" Key="OraTestDb" />
+      <Add ConnStr="connstr" IsOutSql="true" IsOutError="true" DesignModel="CodeFirst" SqlErrorType="file" IsEncrypt="false" Key="OraDb" />
     </Oracle>
     <MySql>
-      <Add ConnStr="connstr" IsOutSql="true" IsOutError="true" DesignModel="DbFirst" IsEncrypt="false" Key="MyTestDb" />
-      <Add ConnStr="connstr" IsOutSql="true" IsOutError="true" DesignModel="CodeFirst" IsEncrypt="false" Key="MyDb" />
+      <Add ConnStr="connstr" IsOutSql="true" IsOutError="true" DesignModel="DbFirst" SqlErrorType="db"  IsEncrypt="false" Key="MyTestDb" />
+      <Add ConnStr="connstr" IsOutSql="true" IsOutError="true" DesignModel="CodeFirst"  SqlErrorType="file" IsEncrypt="false" Key="MyDb" />
     </MySql>
    <SqlServer>
-      <Add ConnStr="connstr" IsOutSql="true" IsOutError="true" DesignModel="DbFirst" IsEncrypt="false" Key="SqlTestDb" />
-      <Add ConnStr="connstr" IsOutSql="true" IsOutError="true" DesignModel="CodeFirst" IsEncrypt="false" Key="SqlDb" />
+      <Add ConnStr="connstr" IsOutSql="true" IsOutError="true" DesignModel="DbFirst" SqlErrorType="db"  IsEncrypt="false" Key="SqlTestDb" />
+      <Add ConnStr="connstr" IsOutSql="true" IsOutError="true" DesignModel="CodeFirst"  SqlErrorType="file" IsEncrypt="false" Key="SqlDb" />
    </SqlServer>
  </DataConfig>
  

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData", "FastData\FastDa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastUntility", "FastUntility\FastUntility.csproj", "{209CD228-0837-467D-B869-0DB31AF04362}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastRedis", "FastRedis\FastRedis.csproj", "{0BE95CBF-5B8B-4E53-BF3F-73B22F597247}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{209CD228-0837-467D-B869-0DB31AF04362}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{209CD228-0837-467D-B869-0DB31AF04362}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{209CD228-0837-467D-B869-0DB31AF04362}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BE95CBF-5B8B-4E53-BF3F-73B22F597247}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BE95CBF-5B8B-4E53-BF3F-73B22F597247}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BE95CBF-5B8B-4E53-BF3F-73B22F597247}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BE95CBF-5B8B-4E53-BF3F-73B22F597247}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

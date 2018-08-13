@@ -28,6 +28,7 @@ namespace FastData.Config
         public string DbType {get;set;}
         #endregion
 
+        
         #region 连接串
         /// <summary>
         /// 连接串
@@ -140,7 +141,7 @@ namespace FastData.Config
         /// <summary>
         ///  map文件是否放数据库 
         /// </summary>
-        [ConfigurationProperty("IsMapSave", IsRequired = false, DefaultValue = "true")]
+        [ConfigurationProperty("IsMapSave", IsRequired = false, DefaultValue = "false")]
         public bool IsMapSave
         {
             get
@@ -186,6 +187,42 @@ namespace FastData.Config
             set
             {
                 base["DesignModel"] = value;
+            }
+        }
+        #endregion
+
+        #region sql error 存放类型file,db 
+        /// <summary>
+        ///  sql Error存放类型file,db  
+        /// </summary>
+        [ConfigurationProperty("SqlErrorType", IsRequired = false, DefaultValue = "db")]
+        public string SqlErrorType
+        {
+            get
+            {
+                return (string)base["SqlErrorType"];
+            }
+            set
+            {
+                base["SqlErrorType"] = value;
+            }
+        }
+        #endregion
+
+        #region 缓存类型
+        /// <summary>
+        ///  缓存类型  web,redis
+        /// </summary>
+        [ConfigurationProperty("CacheType", IsRequired = false, DefaultValue = "web")]
+        public string CacheType
+        {
+            get
+            {
+                return (string)base["CacheType"];
+            }
+            set
+            {
+                base["CacheType"] = value;
             }
         }
         #endregion

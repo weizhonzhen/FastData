@@ -71,6 +71,16 @@ namespace FastData.Model
         /// <summary>
         /// 设计模式
         /// </summary>
-        public string DesignModel { get; set; }        
+        public string DesignModel { get; set; }
+
+        /// <summary>
+        /// sql存放类型file,db 
+        /// </summary>
+        public string SqlErrorType { get; set; }
+
+        /// <summary>
+        /// 缓存类型 web,redis
+        /// </summary>
+        public string CacheType { get; set; }
     }
 }

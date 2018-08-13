@@ -22,7 +22,7 @@ namespace FastData.Check
         /// <summary>
         /// 验证表
         /// </summary>
-        public static void Check(DataQuery item, string tableName, string nameSpace, List<PropertyInfo> listInfo, List<Attribute> listAttribute)
+        public static void Check(DataQuery item, string tableName,  List<PropertyInfo> listInfo, List<Attribute> listAttribute)
         {
             try
             {
@@ -47,7 +47,7 @@ namespace FastData.Check
                                 {
                                     table.Column.Remove(temp);
                                     table.Column.Add(result.Item);
-                                    UpdateTable(item, result, nameSpace, tableName);
+                                    UpdateTable(item, result, tableName);
                                 }
                             }
                         }
@@ -64,13 +64,13 @@ namespace FastData.Check
                                 {
                                     table.Column.Remove(temp);
                                     table.Column.Add(result.Item);
-                                    UpdateTable(item, result, nameSpace, tableName);
+                                    UpdateTable(item, result, tableName);
                                 }
 
                                 if (result.IsDelete)
                                 {
                                     model.Remove(temp);
-                                    UpdateTable(item, result, nameSpace, tableName);
+                                    UpdateTable(item, result, tableName);
                                 }
                             }
 
@@ -96,7 +96,10 @@ namespace FastData.Check
             }
             catch (Exception ex)
             {
-                DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, string.Format("Check_{0}", tableName), "");
+                if (item.Config.SqlErrorType.ToLower() == "db")
+                    DbLogTable.LogException(item.Config, ex, string.Format("Check_{0}", tableName), "");
+                else
+                    DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, string.Format("Check_{0}", tableName), "");
             }
         }
         #endregion
@@ -153,7 +156,7 @@ namespace FastData.Check
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <param name="info"></param>
-        private static void UpdateTable(DataQuery item, CompareModel<ColumnModel> info, string nameSpace, string tableName)
+        private static void UpdateTable(DataQuery item, CompareModel<ColumnModel> info, string tableName)
         {
             var db = BaseContext.GetContext(item.Key);
 

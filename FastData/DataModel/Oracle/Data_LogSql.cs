@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Data.Property;
+using FastData.Property;
 
-namespace Data.DataModel.Oracle
+namespace FastData.DataModel.Oracle
 {
     /// <summary>
     /// sql日志

@@ -17,4 +17,10 @@
         /// </summary>
         public static readonly string DbFirst = "DbFirst";
     }
+
+    internal static class CacheType
+    {
+        public static readonly string WebKey = "web";
+        public static readonly string RedisKey = "redis";
+    }
 }

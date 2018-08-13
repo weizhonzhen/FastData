@@ -121,10 +121,10 @@ namespace FastData.Config
             if (config.DB2.Count != 0)
             {
                 var cacheKey = "DataConfig.DB2";
-
+                
                 if (IsReadCache)
                 {
-                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
+                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.WebKey, cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -148,6 +148,7 @@ namespace FastData.Config
                         item.DesignModel = (temp as ElementConfig).DesignModel;
                         item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         list.Add(item);
 
                         if (string.IsNullOrEmpty(key))
@@ -156,7 +157,7 @@ namespace FastData.Config
                             result = list.Find(a => a.Key == key);
                     }
                     
-                    BaseCache.Set<List<ConfigModel>>(cacheKey, list);
+                    DbCache.Set<List<ConfigModel>>(CacheType.WebKey,cacheKey, list);
                 }
             }
             #endregion
@@ -168,7 +169,7 @@ namespace FastData.Config
 
                 if (IsReadCache)
                 {
-                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
+                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.WebKey, cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -192,6 +193,7 @@ namespace FastData.Config
                         item.DesignModel = (temp as ElementConfig).DesignModel;
                         item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         list.Add(item);
                     }
 
@@ -200,7 +202,7 @@ namespace FastData.Config
                     else
                         result = list.Find(a => a.Key == key);
 
-                    BaseCache.Set<List<ConfigModel>>(cacheKey, list);
+                    DbCache.Set<List<ConfigModel>>(CacheType.WebKey, cacheKey, list);
                 }
             }
             #endregion
@@ -212,7 +214,7 @@ namespace FastData.Config
 
                 if (IsReadCache)
                 {
-                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
+                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.WebKey, cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -236,6 +238,7 @@ namespace FastData.Config
                         item.DesignModel = (temp as ElementConfig).DesignModel;
                         item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         list.Add(item);
                     }
 
@@ -244,7 +247,7 @@ namespace FastData.Config
                     else
                         result = list.Find(a => a.Key == key);
 
-                    BaseCache.Set<List<ConfigModel>>(cacheKey, list);
+                    DbCache.Set<List<ConfigModel>>(CacheType.WebKey, cacheKey, list);
                 }
             }
             #endregion
@@ -256,7 +259,7 @@ namespace FastData.Config
 
                 if (IsReadCache)
                 {
-                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
+                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.WebKey, cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -280,6 +283,7 @@ namespace FastData.Config
                         item.DesignModel = (temp as ElementConfig).DesignModel;
                         item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         list.Add(item);
                     }
 
@@ -288,7 +292,7 @@ namespace FastData.Config
                     else
                         result = list.Find(a => a.Key == key);
 
-                    BaseCache.Set<List<ConfigModel>>(cacheKey, list);
+                    DbCache.Set<List<ConfigModel>>(CacheType.WebKey, cacheKey, list);
                 }
             }
             #endregion
@@ -300,7 +304,7 @@ namespace FastData.Config
 
                 if (IsReadCache)
                 {
-                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
+                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.WebKey, cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -324,6 +328,7 @@ namespace FastData.Config
                         item.DesignModel = (temp as ElementConfig).DesignModel;
                         item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         list.Add(item);
                     }
 
@@ -331,7 +336,7 @@ namespace FastData.Config
                         result = list.First();
                     else
                         result = list.Find(a => a.Key == key);
-                    BaseCache.Set<List<ConfigModel>>(cacheKey, list);
+                    DbCache.Set<List<ConfigModel>>(CacheType.WebKey, cacheKey, list);
                 }
             }
             #endregion
@@ -343,7 +348,7 @@ namespace FastData.Config
 
                 if (IsReadCache)
                 {
-                    var cacheList = BaseCache.Get<List<ConfigModel>>(cacheKey);
+                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.WebKey, cacheKey);
 
                     if (string.IsNullOrEmpty(key))
                         result = cacheList.First();
@@ -367,6 +372,7 @@ namespace FastData.Config
                         item.DesignModel = (temp as ElementConfig).DesignModel;
                         item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         list.Add(item);
                     }
 
@@ -374,7 +380,7 @@ namespace FastData.Config
                         result = list.First();
                     else
                         result = list.Find(a => a.Key == key);
-                    BaseCache.Set<List<ConfigModel>>(cacheKey, list);
+                    DbCache.Set<List<ConfigModel>>(CacheType.WebKey, cacheKey, list);
                 }
             }
             #endregion
@@ -395,15 +401,15 @@ namespace FastData.Config
                 var info = new FileInfo(fileName);
                 var fileKey = "DataConfig.File";
 
-                if (BaseCache.Exists(fileKey))
+                if (DbCache.Exists(CacheType.WebKey, fileKey))
                 {
-                    if ((BaseCache.Get(fileKey).ToDate() - info.LastWriteTime).Minutes != 0)
+                    if ((DbCache.Get(CacheType.WebKey, fileKey).ToDate() - info.LastWriteTime).Minutes != 0)
                         return false;
                     else
                         return true;
                 }
                 else
-                    BaseCache.Set(fileKey, info.LastWriteTime.ToDate("yyyy-MM-dd HH:mm:ss"));
+                    DbCache.Set(CacheType.WebKey, fileKey, info.LastWriteTime.ToDate("yyyy-MM-dd HH:mm:ss"));
                 return false;
             }
         }
