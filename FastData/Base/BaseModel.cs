@@ -78,7 +78,7 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "UpdateToSql<T>", result.Sql);
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "UpdateToSql<T>", result.Sql);
@@ -138,7 +138,7 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "InsertToSql<T>", result.Sql);
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "InsertToSql<T>", result.Sql);

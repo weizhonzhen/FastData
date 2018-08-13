@@ -96,7 +96,7 @@ namespace FastData.Check
             }
             catch (Exception ex)
             {
-                if (item.Config.SqlErrorType.ToLower() == "db")
+                if (item.Config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException(item.Config, ex, string.Format("Check_{0}", tableName), "");
                 else
                     DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, string.Format("Check_{0}", tableName), "");

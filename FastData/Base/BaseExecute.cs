@@ -209,7 +209,7 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (item.Config.SqlErrorType.ToLower() == "db")
+                    if (item.Config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(item.Config, ex, "ToPageDataReader", "");
                     else
                         DbLog.LogException(true, item.Config.DbType, ex, "ToPageDataReader", "");
@@ -257,7 +257,7 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (item.Config.SqlErrorType.ToLower() == "db")
+                    if (item.Config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(item.Config, ex, "ToPageCount", "");
                     else
                         DbLog.LogException(true, item.Config.DbType, ex, "ToPageCount", "");
@@ -294,7 +294,7 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "ToPageCountSql", "");
                     else
                         DbLog.LogException(config.IsOutError,config.DbType, ex, "ToPageCountSql", "");
@@ -355,7 +355,7 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "ToPageDataReaderSql", "");
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "ToPageDataReaderSql", "");

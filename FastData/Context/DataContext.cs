@@ -54,7 +54,7 @@ namespace FastData.Context
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "DataContext", "");
                     else
                         DbLog.LogException(true,  this.config.DbType, ex, "DataContext", "");
@@ -135,7 +135,7 @@ namespace FastData.Context
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "GetList<T>", "");
                     else
                         DbLog.LogException<T>(item.Config.IsOutError, item.Config.DbType, ex, "GetList<T>", result.sql);
@@ -188,7 +188,7 @@ namespace FastData.Context
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "GetPage<T>", "");
                     else
                         DbLog.LogException<T>(item.Config.IsOutError, item.Config.DbType, ex, "GetPage<T>", result.sql);
@@ -239,7 +239,7 @@ namespace FastData.Context
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (item.Config.SqlErrorType.ToLower() == "db")
+                    if (item.Config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(item.Config, ex, "GetPage", result.Sql);
                     else
                         DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetPage", result.Sql);
@@ -291,7 +291,7 @@ namespace FastData.Context
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "GetPageSql", result.Sql);
                     else
                         DbLog.LogException(config.IsOutError,config.DbType, ex, "GetPageSql", result.Sql);
@@ -344,7 +344,7 @@ namespace FastData.Context
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "GetPageSql", result.sql);
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "GetPageSql", result.sql);
@@ -419,7 +419,7 @@ namespace FastData.Context
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "GetJson", result.Sql);
                     else
                         DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetJson", result.Sql);
@@ -480,7 +480,7 @@ namespace FastData.Context
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "GetCount", result.Sql);
                     else
                         DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetCount", result.Sql);
@@ -519,7 +519,7 @@ namespace FastData.Context
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "ExecuteSql<T>", "");
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "ExecuteSql<T>", result.sql);
@@ -567,7 +567,7 @@ namespace FastData.Context
                 result.writeReturn.IsError = true;
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "ExecuteSql", result.Sql);
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "ExecuteSql", result.Sql);
@@ -645,7 +645,7 @@ namespace FastData.Context
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "GetJson", result.Sql);
                     else
                         DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetJson", result.Sql);
@@ -694,7 +694,7 @@ namespace FastData.Context
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "Delete<T>", "");
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Delete<T>", result.sql);
@@ -760,7 +760,7 @@ namespace FastData.Context
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "Update<T>", "");
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Update<T>", result.sql);
@@ -818,7 +818,7 @@ namespace FastData.Context
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "Add<T>", "");
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Add<T>", result.sql);
@@ -915,7 +915,7 @@ namespace FastData.Context
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "AddList<T>", "");
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "AddList<T>", result.sql);
@@ -964,7 +964,7 @@ namespace FastData.Context
                     RollbackTrans();
 
                 Task.Factory.StartNew(() => {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "ExecuteSql", result.Sql);
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "ExecuteSql", result.Sql);

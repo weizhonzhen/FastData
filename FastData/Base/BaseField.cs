@@ -104,7 +104,7 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "QueryField<T>", "");
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "QueryField<T>", "");
@@ -206,7 +206,7 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "QueryField<T1,T2,T>", "");
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "QueryField<T1,T2,T>", "");
@@ -242,7 +242,7 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "GroupBy<T>", "");
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "GroupBy<T>", "");
@@ -281,7 +281,7 @@ namespace FastData.Base
             {
                 Task.Factory.StartNew(() =>
                 {
-                    if (config.SqlErrorType.ToLower() == "db")
+                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "OrderBy<T>", "");
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "OrderBy<T>", "");
