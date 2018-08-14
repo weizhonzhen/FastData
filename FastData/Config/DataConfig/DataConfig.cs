@@ -149,6 +149,7 @@ namespace FastData.Config
                         item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                        item.CacheType = (temp as ElementConfig).CacheType;
                         list.Add(item);
 
                         if (string.IsNullOrEmpty(key))
@@ -194,6 +195,7 @@ namespace FastData.Config
                         item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                        item.CacheType = (temp as ElementConfig).CacheType;
                         list.Add(item);
                     }
 
@@ -239,6 +241,7 @@ namespace FastData.Config
                         item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                        item.CacheType = (temp as ElementConfig).CacheType;
                         list.Add(item);
                     }
 
@@ -284,6 +287,7 @@ namespace FastData.Config
                         item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                        item.CacheType = (temp as ElementConfig).CacheType;
                         list.Add(item);
                     }
 
@@ -329,6 +333,7 @@ namespace FastData.Config
                         item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                        item.CacheType = (temp as ElementConfig).CacheType;
                         list.Add(item);
                     }
 
@@ -373,6 +378,7 @@ namespace FastData.Config
                         item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                        item.CacheType = (temp as ElementConfig).CacheType;
                         list.Add(item);
                     }
 

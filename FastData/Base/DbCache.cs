@@ -14,8 +14,7 @@ namespace FastData.Base
         {
             if (cacheType.ToLower() == CacheType.Web)
                 FastUntility.Cache.BaseCache.Set(key, value, Hours);
-
-            if (cacheType.ToLower() == CacheType.Redis)
+            else if (cacheType.ToLower() == CacheType.Redis)
                 FastRedis.RedisInfo.Set(key, value, Hours);
         }
 
@@ -26,8 +25,7 @@ namespace FastData.Base
         {
             if (cacheType.ToLower() == CacheType.Web)
                 FastUntility.Cache.BaseCache.Set<T>(key, value, Hours);
-
-            if (cacheType.ToLower() == CacheType.Redis)
+            else if (cacheType.ToLower() == CacheType.Redis)
                 FastRedis.RedisInfo.Set<T>(key, value, Hours);
         }
 
@@ -38,8 +36,7 @@ namespace FastData.Base
         {
             if (cacheType.ToLower() == CacheType.Web)
                return FastUntility.Cache.BaseCache.Get(key);
-
-            if (cacheType.ToLower() == CacheType.Redis)
+            else if (cacheType.ToLower() == CacheType.Redis)
                return FastRedis.RedisInfo.Get(key);
 
             return "";
@@ -52,8 +49,7 @@ namespace FastData.Base
         {
             if (cacheType.ToLower() == CacheType.Web)
                 return FastUntility.Cache.BaseCache.Get<T>(key);
-
-            if (cacheType.ToLower() == CacheType.Redis)
+            else if (cacheType.ToLower() == CacheType.Redis)
                 return FastRedis.RedisInfo.Get<T>(key);
 
             return new T();
@@ -66,8 +62,7 @@ namespace FastData.Base
         {
             if (cacheType.ToLower() == CacheType.Web)
                 FastUntility.Cache.BaseCache.Remove(key);
-
-            if (cacheType.ToLower() == CacheType.Redis)
+            else if (cacheType.ToLower() == CacheType.Redis)
                 FastRedis.RedisInfo.Remove(key);
         }
 
@@ -77,10 +72,9 @@ namespace FastData.Base
         public static bool Exists(string cacheType,  string key)
         {
             if (cacheType.ToLower() == CacheType.Web)
-                FastUntility.Cache.BaseCache.Exists(key);
-
-            if (cacheType.ToLower() == CacheType.Redis)
-                FastRedis.RedisInfo.Exists(key);
+                return FastUntility.Cache.BaseCache.Exists(key);
+            else if (cacheType.ToLower() == CacheType.Redis)
+                return FastRedis.RedisInfo.Exists(key);
 
             return false;
         }
