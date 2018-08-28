@@ -138,7 +138,7 @@ namespace FastData.Config
                         var item = new ConfigModel();
                         item.DbType = DataDbType.DB2;
                         item.Flag = "@";
-                        item.ProviderName = "IBM.FastData.DB2.iSeries";
+                        item.ProviderName = Provider.DB2;
                         item.ConnStr = (temp as ElementConfig).ConnStr;
                         item.IsOutError = (temp as ElementConfig).IsOutError;
                         item.IsOutSql = (temp as ElementConfig).IsOutSql;
@@ -184,7 +184,7 @@ namespace FastData.Config
                         var item = new ConfigModel();
                         item.DbType = DataDbType.Oracle;
                         item.Flag = ":";
-                        item.ProviderName = "Oracle.ManagedDataAccess.Client";
+                        item.ProviderName = Provider.Oracle;
                         item.ConnStr = (temp as ElementConfig).ConnStr;
                         item.IsOutError = (temp as ElementConfig).IsOutError;
                         item.IsOutSql = (temp as ElementConfig).IsOutSql;
@@ -230,7 +230,7 @@ namespace FastData.Config
                         var item = new ConfigModel();
                         item.DbType = DataDbType.MySql;
                         item.Flag = "?";
-                        item.ProviderName = "MySql.FastData.MySqlClient";
+                        item.ProviderName = Provider.MySql;
                         item.ConnStr = (temp as ElementConfig).ConnStr;
                         item.IsOutError = (temp as ElementConfig).IsOutError;
                         item.IsOutSql = (temp as ElementConfig).IsOutSql;
@@ -276,7 +276,7 @@ namespace FastData.Config
                         var item = new ConfigModel();
                         item.DbType = DataDbType.SqlServer;
                         item.Flag = "@";
-                        item.ProviderName = "System.Data.SqlClient";
+                        item.ProviderName = Provider.SqlServer;
                         item.ConnStr = (temp as ElementConfig).ConnStr;
                         item.IsOutError = (temp as ElementConfig).IsOutError;
                         item.IsOutSql = (temp as ElementConfig).IsOutSql;
@@ -322,7 +322,7 @@ namespace FastData.Config
                         var item = new ConfigModel();
                         item.DbType = DataDbType.SQLite;
                         item.Flag = "@";
-                        item.ProviderName = "System.Data.SQLite";
+                        item.ProviderName = Provider.SQLite;
                         item.ConnStr = (temp as ElementConfig).ConnStr;
                         item.IsOutError = (temp as ElementConfig).IsOutError;
                         item.IsOutSql = (temp as ElementConfig).IsOutSql;
@@ -367,7 +367,7 @@ namespace FastData.Config
                         var item = new ConfigModel();
                         item.DbType = DataDbType.PostgreSql;
                         item.Flag = ":";
-                        item.ProviderName = "Npgsql";
+                        item.ProviderName = Provider.PostgreSql;
                         item.ConnStr = (temp as ElementConfig).ConnStr;
                         item.IsOutError = (temp as ElementConfig).IsOutError;
                         item.IsOutSql = (temp as ElementConfig).IsOutSql;

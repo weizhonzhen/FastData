@@ -66,6 +66,7 @@
     <Compile Include="Base\BaseField.cs" />
     <Compile Include="Base\DbCache.cs" />
     <Compile Include="Base\DbLogTable.cs" />
+    <Compile Include="Base\Provider.cs" />
     <Compile Include="Check\CheckModel.cs" />
     <Compile Include="Base\Config.cs" />
     <Compile Include="Base\Parameter.cs" />
