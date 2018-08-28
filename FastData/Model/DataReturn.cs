@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using FastUntility.Page;
 
 namespace FastData.Model
@@ -92,6 +93,11 @@ namespace FastData.Model
         /// dic item
         /// </summary>
         public Dictionary<string, object> Dic { get; set; }
+
+        /// <summary>
+        /// data table
+        /// </summary>
+        public DataTable Table { get; set; }
 
         /// <summary>
         /// 分页
