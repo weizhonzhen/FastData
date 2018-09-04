@@ -74,10 +74,13 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceTable(Assembly[] list, string nameSpace, string dll, string dbKey = null)
+        public static void InstanceTable(Assembly[] list, string nameSpace, string dll, string dbKey = null, ConfigModel config = null)
         {
             var query = new DataQuery();
-            query.Config = DataConfig.GetConfig(dbKey);
+            if (config == null)
+                query.Config = DataConfig.GetConfig(dbKey);
+            else
+                query.Config = config;
             query.Key = dbKey;
             
             foreach (var item in list)
@@ -100,10 +103,11 @@ namespace FastData
         /// 初始化map 3
         /// </summary>
         /// <returns></returns>
-        public static void InstanceMap(string dbKey = null)
+        public static void InstanceMap(string dbKey = null,ConfigModel config=null)
         {
             var list = MapConfig.GetConfig();
-            var config = DataConfig.GetConfig(dbKey);
+            if (config == null)
+                config = DataConfig.GetConfig(dbKey);
             var db = new DataContext(dbKey, config);
             var query = new DataQuery { Config = config, Key = dbKey };
 
