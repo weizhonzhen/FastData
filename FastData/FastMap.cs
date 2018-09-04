@@ -74,13 +74,10 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceTable(Assembly[] list, string nameSpace, string dll, string dbKey = null, ConfigModel config = null)
+        public static void InstanceTable(Assembly[] list, string nameSpace, string dll, string dbKey = null)
         {
             var query = new DataQuery();
-            if (config == null)
-                query.Config = DataConfig.GetConfig(dbKey);
-            else
-                query.Config = config;
+            query.Config = DataConfig.GetConfig(dbKey);
             query.Key = dbKey;
             
             foreach (var item in list)
@@ -103,11 +100,10 @@ namespace FastData
         /// 初始化map 3
         /// </summary>
         /// <returns></returns>
-        public static void InstanceMap(string dbKey = null,ConfigModel config=null)
+        public static void InstanceMap(string dbKey = null)
         {
             var list = MapConfig.GetConfig();
-            if (config == null)
-                config = DataConfig.GetConfig(dbKey);
+            var config = DataConfig.GetConfig(dbKey);
             var db = new DataContext(dbKey, config);
             var query = new DataQuery { Config = config, Key = dbKey };
 
@@ -135,7 +131,7 @@ namespace FastData
                     BaseTable.Check(query, "Data_MapFile", listInfo, listAttribute);
                 }
             }
-            
+
             if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
             {
                 query.Config.DesignModel = FastData.Base.Config.CodeFirst;
@@ -166,7 +162,7 @@ namespace FastData
                 var info = new FileInfo(item);
                 var key = BaseSymmetric.md5(32, info.FullName);
 
-                if (!DbCache.Exists(config.CacheType,key))
+                if (!DbCache.Exists(config.CacheType, key))
                 {
                     var temp = new MapXmlModel();
                     temp.LastWrite = info.LastWriteTime;

@@ -61,13 +61,11 @@ namespace FastData
         /// <param name="field">字段</param>
         /// <param name="Key"></param>
         /// <returns></returns>
-        public static DataQuery Query<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> field = null,string key=null,ConfigModel config =null)
+        public static DataQuery Query<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> field = null, string key = null)
         {
             var result = new DataQuery();
-            if (config == null)
-                result.Config = DataConfig.GetConfig(key);
-            else
-                result.Config = config;
+            result.Config = DataConfig.GetConfig(key);
+
             result.Key = key;
 
             var taskField = Task.Factory.StartNew(delegate
