@@ -104,7 +104,7 @@ namespace FastData
         {
             var list = MapConfig.GetConfig();
             var config = DataConfig.GetConfig(dbKey);
-            var db = new DataContext(dbKey, config);
+            var db = new DataContext(dbKey);
             var query = new DataQuery { Config = config, Key = dbKey };
 
             if (config.IsMapSave)
