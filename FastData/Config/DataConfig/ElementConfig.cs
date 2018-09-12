@@ -51,7 +51,7 @@ namespace FastData.Config
         /// <summary>
         /// 是否输出SQL
         /// </summary>
-        [ConfigurationProperty("IsOutSql", IsRequired = true, DefaultValue = true)]
+        [ConfigurationProperty("IsOutSql", IsRequired = false, DefaultValue = true)]
         public bool IsOutSql
         {
             get
@@ -69,7 +69,7 @@ namespace FastData.Config
         /// <summary>
         /// 是否输入错误
         /// </summary>
-        [ConfigurationProperty("IsOutError", IsRequired = true, DefaultValue = true)]
+        [ConfigurationProperty("IsOutError", IsRequired = false, DefaultValue = true)]
         public bool IsOutError
         {
             get

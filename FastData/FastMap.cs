@@ -67,6 +67,40 @@ namespace FastData
         }
         #endregion
 
+        #region 初始化建日记表
+        /// <summary>
+        /// 初始化建日记表
+        /// </summary>
+        /// <param name="query"></param>
+        private static void CreateLogTable(DataQuery query)
+        {
+            if (query.Config.SqlErrorType.ToLower() == SqlErrorType.Db)
+            {
+                query.Config.DesignModel = FastData.Base.Config.CodeFirst;
+                if (query.Config.DbType == DataDbType.Oracle)
+                {
+                    var listInfo = typeof(FastData.DataModel.Oracle.Data_LogError).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
+                    var listAttribute = typeof(FastData.DataModel.Oracle.Data_LogError).GetTypeInfo().GetCustomAttributes().ToList();
+                    BaseTable.Check(query, "Data_LogError", listInfo, listAttribute);
+                }
+
+                if (query.Config.DbType == DataDbType.MySql)
+                {
+                    var listInfo = typeof(FastData.DataModel.MySql.Data_LogError).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
+                    var listAttribute = typeof(FastData.DataModel.MySql.Data_LogError).GetTypeInfo().GetCustomAttributes().ToList();
+                    BaseTable.Check(query, "Data_LogError", listInfo, listAttribute);
+                }
+
+                if (query.Config.DbType == DataDbType.SqlServer)
+                {
+                    var listInfo = typeof(FastData.DataModel.SqlServer.Data_LogError).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
+                    var listAttribute = typeof(FastData.DataModel.SqlServer.Data_LogError).GetTypeInfo().GetCustomAttributes().ToList();
+                    BaseTable.Check(query, "Data_LogError", listInfo, listAttribute);
+                }
+            }
+        }
+        #endregion
+
         #region 初始化code first 2
         /// <summary>
         /// 初始化code first 2
@@ -79,7 +113,9 @@ namespace FastData
             var query = new DataQuery();
             query.Config = DataConfig.GetConfig(dbKey);
             query.Key = dbKey;
-            
+
+            CreateLogTable(query);
+
             foreach (var item in list)
             {
                 if (item.ManifestModule.Name == dll)
@@ -132,30 +168,7 @@ namespace FastData
                 }
             }
 
-            if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-            {
-                query.Config.DesignModel = FastData.Base.Config.CodeFirst;
-                if (query.Config.DbType == DataDbType.Oracle)
-                {
-                    var listInfo = typeof(FastData.DataModel.Oracle.Data_LogError).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
-                    var listAttribute = typeof(FastData.DataModel.Oracle.Data_LogError).GetTypeInfo().GetCustomAttributes().ToList();
-                    BaseTable.Check(query, "Data_LogError", listInfo, listAttribute);
-                }
-
-                if (query.Config.DbType == DataDbType.MySql)
-                {
-                    var listInfo = typeof(FastData.DataModel.MySql.Data_LogError).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
-                    var listAttribute = typeof(FastData.DataModel.MySql.Data_LogError).GetTypeInfo().GetCustomAttributes().ToList();
-                    BaseTable.Check(query, "Data_LogError", listInfo, listAttribute);
-                }
-
-                if (query.Config.DbType == DataDbType.SqlServer)
-                {
-                    var listInfo = typeof(FastData.DataModel.SqlServer.Data_LogError).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
-                    var listAttribute = typeof(FastData.DataModel.SqlServer.Data_LogError).GetTypeInfo().GetCustomAttributes().ToList();
-                    BaseTable.Check(query, "Data_LogError", listInfo, listAttribute);
-                }
-            }
+            CreateLogTable(query);
 
             foreach (var item in list.Path)
             {
