@@ -116,9 +116,9 @@ namespace FastData.Base
                     var orderByLenght = item.Predicate[0].Where.IndexOf("order by");
                     sb.AppendFormat(@"select top {0} * from (select row_number()over({5})temprownumber,* 
                                         from (select tempcolumn=0,{3} from {1} where {4})t)tt where temprownumber>={2}"
-                                            , pModel.PageSize.ToString()
+                                            , pModel.PageSize
                                             , table
-                                            , (pModel.StarId - 1).ToString()
+                                            , pModel.StarId - 1
                                             , string.Join(",", item.Field)
                                             , orderByLenght == -1 ? item.Predicate[0].Where : item.Predicate[0].Where.Substring(0, orderByLenght)
                                             , orderByLenght == -1 ? "order by tempcolumn" : item.Predicate[0].Where.Substring(orderByLenght, item.Predicate[0].Where.Length - orderByLenght));
@@ -134,8 +134,8 @@ namespace FastData.Base
                                         , string.Join(",", item.Field)
                                         , table
                                         , item.Predicate[0].Where
-                                        , pModel.EndId.ToString()
-                                        , pModel.StarId.ToString());
+                                        , pModel.EndId
+                                        , pModel.StarId);
                     }
                     else
                     { 
@@ -144,8 +144,8 @@ namespace FastData.Base
                                     (select rownum rn,rid from 
                                     (select rowid rid from {3}) 
                                     where rownum<={0}) where rn>{1}) and {4}"
-                                        , pModel.EndId.ToString()
-                                        , (pModel.StarId - 1).ToString()
+                                        , pModel.EndId
+                                        , (pModel.StarId - 1)
                                         , string.Join(",", item.Field)
                                         , table
                                         , item.Predicate[0].Where);
@@ -168,8 +168,8 @@ namespace FastData.Base
                     #region DB2
                     var orderByLenght = item.Predicate[0].Where.IndexOf("order by");
                     sb.AppendFormat("select * from (select row_number() over ({5}) as row_number,{2} from {3} where {4}) a where a.row_number>{0} and row_number<{1} "
-                                       , pModel.StarId.ToString()
-                                       , pModel.EndId.ToString()
+                                       , pModel.StarId
+                                       , pModel.EndId
                                        , string.Join(",", item.Field)
                                        , table
                                        , item.Predicate[0].Where == "" ? "" : item.Predicate[0].Where
