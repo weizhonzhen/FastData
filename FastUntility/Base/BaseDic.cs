@@ -242,23 +242,25 @@ namespace System.Collections.Generic
             return "";
         }
 
-        public static void SetValue(this Dictionary<string, object> item, string key,object value)
+        public static Dictionary<string, object> SetValue(this Dictionary<string, object> item, string key,object value)
         {
-
             if (string.IsNullOrEmpty(key))
-                return ;
+                return item;
 
             if (item == null)
-                return ;
+                return item;
 
             foreach (var temp in item.Keys)
             {
                 if (temp.ToLower() == key.ToLower())
                 {
                     item[temp] = value;
-                    return;
+                    return item;
                 }
             }
+
+            item.Add(key, value);
+            return item;
         }
     }
 }
