@@ -49,8 +49,8 @@ namespace FastData.Base
                     temp.ParameterName = leftList[i] + i.ToString();
                     temp.Value = rightList[i];
 
-                    if (rightList[i].IsDate() && config.DbType == DataDbType.Oracle)
-                        result.Where = result.Where.Replace(string.Format(":{0}", temp.ParameterName), string.Format("to_date(:{0},'yyyy/MM/dd hh24:mi:ss')", temp.ParameterName));
+                    //if (rightList[i].IsDate() && config.DbType == DataDbType.Oracle)
+                        //result.Where = result.Where.Replace(string.Format(":{0}", temp.ParameterName), string.Format("to_date(:{0},'yyyy/MM/dd hh24:mi:ss')", temp.ParameterName));
 
                     result.Param.Add(temp);
                 }
@@ -81,11 +81,8 @@ namespace FastData.Base
         public static VisitModel LambdaWhere<T1, T2>(Expression<Func<T1, T2, bool>> item, ConfigModel config, bool isPage = false)
         {
             var result = new VisitModel();
-            var mysqlTake = "";
-            var oracleTake = "";
             int i = 0;
             string strType = "";
-            var num = 0;
 
             var leftList = new List<string>();
             var rightList = new List<string>();
@@ -107,8 +104,8 @@ namespace FastData.Base
                     temp.ParameterName = leftList[i] + i.ToString();
                     temp.Value = rightList[i];
 
-                    if (rightList[i].IsDate() && config.DbType == DataDbType.Oracle)
-                        result.Where = result.Where.Replace(string.Format(":{0}", temp.ParameterName), string.Format("to_date(:{0},'yyyy/MM/dd hh24:mi:ss')", temp.ParameterName));
+                    //if (rightList[i].IsDate() && config.DbType == DataDbType.Oracle)
+                        //result.Where = result.Where.Replace(string.Format(":{0}", temp.ParameterName), string.Format("to_date(:{0},'yyyy/MM/dd hh24:mi:ss')", temp.ParameterName));
 
                     result.Param.Add(temp);
                 }
