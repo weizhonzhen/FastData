@@ -298,8 +298,8 @@ namespace FastData.Base
             }
 
             string rightPar = RouteExpressionHandler(config, right, ref leftList, ref rightList, ref sb, ref strType, ref i, isRight);
-
-            if (rightPar.ToUpper() == "NULL")
+            
+            if (rightPar.ToUpper() == "NULL"||(config.DbType == DataDbType.Oracle && string.IsNullOrEmpty(rightPar)))
             {
                 if (typeStr == "=")
                     rightPar = "IS NULL";
