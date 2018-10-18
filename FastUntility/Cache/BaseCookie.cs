@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Web;
 
 namespace FastUntility.Cache
@@ -21,7 +22,7 @@ namespace FastUntility.Cache
                 return false;
             var cookie = new HttpCookie(strName);
             cookie.HttpOnly = true;
-            cookie.Value = strValue;
+            cookie.Value = HttpUtility.UrlEncode(strValue, Encoding.UTF8);
             cookie.Expires = DateTime.Now.AddDays(days);
             context.Response.Cookies.Add(cookie);
             return true;
@@ -40,7 +41,7 @@ namespace FastUntility.Cache
                 return false;
             var cookie = new HttpCookie(strName);
             cookie.HttpOnly = true;
-            cookie.Value = strValue;
+            cookie.Value = HttpUtility.UrlEncode(strValue, Encoding.UTF8); 
             cookie.Expires = DateTime.Now.AddDays(days);
             HttpContext.Current.Response.Cookies.Add(cookie);
             return true;
@@ -56,9 +57,7 @@ namespace FastUntility.Cache
         public static string Read(string strName)
         {
             if (HttpContext.Current.Request.Cookies != null && HttpContext.Current.Request.Cookies[strName] != null)
-            {
-                return HttpContext.Current.Request.Cookies[strName].Value;
-            }
+               return HttpUtility.UrlDecode(HttpContext.Current.Request.Cookies[strName].Value, System.Text.Encoding.UTF8);
             else
                 return "";
         }
@@ -73,9 +72,7 @@ namespace FastUntility.Cache
         public static string ReadAsync(HttpContextBase context,string strName)
         {
             if (context.Request.Cookies != null && context.Request.Cookies[strName] != null)
-            {
-                return context.Request.Cookies[strName].Value;
-            }
+                return HttpUtility.UrlDecode(context.Request.Cookies[strName].Value, System.Text.Encoding.UTF8);
             else
                 return "";
         }
