@@ -213,7 +213,9 @@ namespace FastData
             else
                 InstanceMap(key);
 
-            if (DbCache.Exists(db.config.CacheType, name.ToLower()))
+            var config = db == null ? DataConfig.GetConfig(key) : db.config;
+
+            if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = GetMapSql(name, ref param,db,key);
                 return FastRead.ExecuteSql<T>(sql, param,db,key);
@@ -271,7 +273,9 @@ namespace FastData
             else
                 InstanceMap(key);
 
-            if (DbCache.Exists(db.config.CacheType, name.ToLower()))
+            var config = db == null ? DataConfig.GetConfig(key) : db.config;
+
+            if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = GetMapSql(name, ref param,db,key);
                 
@@ -330,7 +334,9 @@ namespace FastData
             else
                 InstanceMap(key);
 
-            if (DbCache.Exists(db.config.CacheType, name.ToLower()))
+            var config = db == null ? DataConfig.GetConfig(key) : db.config;
+
+            if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = GetMapSql(name, ref param,db,key);
 
@@ -421,7 +427,8 @@ namespace FastData
             else
                 InstanceMap(key);
 
-            if (DbCache.Exists(db.config.CacheType, name.ToLower()))
+            var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = GetMapSql(name, ref param,db,key);
 
@@ -512,7 +519,8 @@ namespace FastData
             else
                 InstanceMap(key);
 
-            if (DbCache.Exists(db.config.CacheType, name.ToLower()))
+            var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = GetMapSql(name, ref param,db,key);
 
