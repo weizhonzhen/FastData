@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // 有关程序集的常规信息通过以下
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("Data")]
-[assembly: AssemblyDescription("Data")]
+[assembly: AssemblyTitle("FastData")]
+[assembly: AssemblyDescription("FastData")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Data")]
-[assembly: AssemblyProduct("Data")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2015")]
+[assembly: AssemblyCompany("FastData")]
+[assembly: AssemblyProduct("FastData")]
+[assembly: AssemblyCopyright("Copyright © Microsoft 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
