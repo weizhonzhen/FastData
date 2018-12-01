@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,10 +32,11 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceProperties(Assembly[] list, string nameSpace, string dll)
+        public static void InstanceProperties( string nameSpace, string dll)
         {
             var config = DataConfig.GetConfig();
 
+            var list = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var item in list)
             {
                 if (item.ManifestModule.Name == dll)
@@ -108,7 +109,7 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceTable(Assembly[] list, string nameSpace, string dll, string dbKey = null)
+        public static void InstanceTable(string nameSpace, string dll, string dbKey = null)
         {
             var query = new DataQuery();
             query.Config = DataConfig.GetConfig(dbKey);
@@ -116,6 +117,7 @@ namespace FastData
 
             CreateLogTable(query);
 
+            var list = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var item in list)
             {
                 if (item.ManifestModule.Name == dll)
