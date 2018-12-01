@@ -6,7 +6,7 @@ code firest ,db first ,map
 in Application_Start method
 
 //cache model
-FastMap.InstanceProperties(AppDomain.CurrentDomain.GetAssemblies(), namespace, dll);
+FastMap.InstanceProperties(namespace, dll);
 
 //chache map
 FastMap.InstanceMap(db);
