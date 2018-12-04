@@ -2,7 +2,7 @@
 # Data_Orm
 lambda,map orm,(code first ,db first)
 code firest ,db first ,map
-
+nuget url : https://www.nuget.org/packages/Fast.Data/
 in Application_Start method
 
 //cache model
