@@ -170,7 +170,7 @@ namespace FastUntility.Base
 
                 foreach (var temp in jo)
                 {
-                    item.Add(temp.Key, temp.Value);
+                    item.Add(temp.Key.ToLower(), temp.Value);
                 }
                 return item;
             }
