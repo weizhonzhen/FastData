@@ -234,10 +234,13 @@ namespace System.Collections.Generic
             if (item == null)
                 return "";
 
-            if (item.ContainsKey(key.ToLower()))
-                return item[key.ToLower()];
-            else
-                return "";
+            foreach(KeyValuePair<string,object> temp in item)
+            {
+                if (temp.Key.ToLower() == key.ToLower())
+                    return temp.Value;
+            }
+
+            return "";
         }
 
         public static Dictionary<string, object> SetValue(this Dictionary<string, object> item, string key,object value)
@@ -248,10 +251,16 @@ namespace System.Collections.Generic
             if (item == null)
                 return item;
 
-            if (item.ContainsKey(key.ToLower()))
-                item.Remove(key.ToLower());
+             foreach (var temp in item.Keys)
+            {
+                if (temp.ToLower() == key.ToLower())
+                {
+                    item[temp] = value;
+                    return item;
+                }
+            }
 
-            item.Add(key.ToLower(), value);
+            item.Add(key, value);
             return item;
         }
     }
