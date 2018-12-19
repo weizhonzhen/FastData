@@ -221,6 +221,7 @@ namespace FastUntility.Base
 
 
 
+
 namespace System.Collections.Generic
 {
     public static class Dic
@@ -233,13 +234,10 @@ namespace System.Collections.Generic
             if (item == null)
                 return "";
 
-            foreach (var temp in item.Keys)
-            {
-                if (temp.ToLower() == key.ToLower())
-                    return item[temp];
-            }
-
-            return "";
+            if (item.ContainsKey(key.ToLower()))
+                return item[key.ToLower()];
+            else
+                return "";
         }
 
         public static Dictionary<string, object> SetValue(this Dictionary<string, object> item, string key,object value)
@@ -250,16 +248,10 @@ namespace System.Collections.Generic
             if (item == null)
                 return item;
 
-            foreach (var temp in item.Keys)
-            {
-                if (temp.ToLower() == key.ToLower())
-                {
-                    item[temp] = value;
-                    return item;
-                }
-            }
+            if (item.ContainsKey(key.ToLower()))
+                item.Remove(key.ToLower());
 
-            item.Add(key, value);
+            item.Add(key.ToLower(), value);
             return item;
         }
     }
