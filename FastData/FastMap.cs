@@ -46,7 +46,7 @@ namespace FastData
                         Task.Factory.StartNew(() =>
                         {
                             var typeInfo = (temp as TypeInfo);
-                            if (typeInfo.Namespace.Contains(nameSpace))
+                            if (typeInfo.Namespace != null && typeInfo.Namespace.Contains(nameSpace))
                             {
                                 var key = string.Format("{0}.{1}", typeInfo.Namespace, typeInfo.Name);
 
@@ -125,7 +125,7 @@ namespace FastData
                     foreach (var temp in item.ExportedTypes)
                     {
                         var typeInfo = (temp as TypeInfo);
-                        if (typeInfo.Namespace.Contains(nameSpace))
+                        if (typeInfo.Namespace != null && typeInfo.Namespace.Contains(nameSpace))
                             BaseTable.Check(query, temp.Name, typeInfo.DeclaredProperties.ToList(), typeInfo.GetCustomAttributes().ToList());
                     }
                 }
