@@ -798,7 +798,7 @@ namespace FastData
                                 {
                                     case "isEqual":
                                         {
-                                            if (conditionValue == temp.Value.ToStr())
+                                            if (conditionValue == temp.Value.ToStr().ToLower())
                                             {
                                                 if (paramSql.IndexOf(tempKey) >= 0)
                                                 {
