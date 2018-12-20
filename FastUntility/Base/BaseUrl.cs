@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net;
@@ -34,7 +34,7 @@ namespace FastUntility.Base
             }
             catch (Exception ex)
             {
-                
+
                 BaseLog.SaveLog(url + ":" + ex.ToString(), "GetUrl_exp");
                 return null;
             }
@@ -45,12 +45,12 @@ namespace FastUntility.Base
         /// <summary>
         /// post url(insert)
         /// </summary>
-        public static string PostUrl(string url, Dictionary<string, object> dic)
+        public static string PostUrl(string url, Dictionary<string, object> dic, string mediaType = "application/json")
         {
             try
             {
                 var count = 0;
-                foreach(var item in dic)
+                foreach (var item in dic)
                 {
                     if (count == 0)
                         url = string.Format("{0}?{1}={2}", url, item.Key, item.Value);
@@ -59,8 +59,8 @@ namespace FastUntility.Base
                     count++;
                 }
 
-                var content = new StringContent("", Encoding.UTF8, "application/json");
-                var response = http.PostAsync(new Uri(url),content).Result;
+                var content = new StringContent("", Encoding.UTF8, mediaType);
+                var response = http.PostAsync(new Uri(url), content).Result;
                 response.EnsureSuccessStatusCode();
                 return response.Content.ReadAsStringAsync().Result;
             }
@@ -76,11 +76,11 @@ namespace FastUntility.Base
         /// <summary>
         /// post content(insert)
         /// </summary>
-        public static string PostContent(string url, Dictionary<string, object> dic)
+        public static string PostContent(string url, Dictionary<string, object> dic, string mediaType = "application/json")
         {
             try
             {
-                var content = new StringContent(BaseJson.ModelToJson(dic), Encoding.UTF8, "application/json");
+                var content = new StringContent(BaseJson.ModelToJson(dic), Encoding.UTF8, mediaType);
                 var response = http.PostAsync(new Uri(url), content).Result;
                 response.EnsureSuccessStatusCode();
                 return response.Content.ReadAsStringAsync().Result;
@@ -92,12 +92,12 @@ namespace FastUntility.Base
             }
         }
         #endregion
-        
+
         #region put url (update)
         /// <summary>
         /// put url(update)
         /// </summary>
-        public static string PutUrl(string url, Dictionary<string, object> dic)
+        public static string PutUrl(string url, Dictionary<string, object> dic, string mediaType = "application/json")
         {
             try
             {
@@ -111,7 +111,7 @@ namespace FastUntility.Base
                     count++;
                 }
 
-                var content = new StringContent("", Encoding.UTF8, "application/json");
+                var content = new StringContent("", Encoding.UTF8, mediaType);
                 var response = http.PostAsync(new Uri(url), content).Result;
                 response.EnsureSuccessStatusCode();
                 return response.Content.ReadAsStringAsync().Result;
@@ -128,11 +128,11 @@ namespace FastUntility.Base
         /// <summary>
         /// put content(update)
         /// </summary>
-        public static string PutContent(string url, Dictionary<string, object> dic)
+        public static string PutContent(string url, Dictionary<string, object> dic, string mediaType = "application/json")
         {
             try
             {
-                var content = new StringContent(BaseJson.ModelToJson(dic), Encoding.UTF8, "application/json");
+                var content = new StringContent(BaseJson.ModelToJson(dic), Encoding.UTF8, mediaType);
                 var response = http.PostAsync(new Uri(url), content).Result;
                 response.EnsureSuccessStatusCode();
                 return response.Content.ReadAsStringAsync().Result;
