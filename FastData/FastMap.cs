@@ -59,7 +59,7 @@ namespace FastData
                                     cacheList.Add(model);
                                 }
 
-                                DbCache.Set<List<PropertyModel>>(config.CacheType,key, cacheList);
+                                DbCache.Set<List<PropertyModel>>(config.CacheType, key, cacheList);
                             }
                         });
                     }
@@ -125,7 +125,7 @@ namespace FastData
                     foreach (var temp in item.ExportedTypes)
                     {
                         var typeInfo = (temp as TypeInfo);
-                        if (typeInfo.Namespace != null && typeInfo.Namespace.Contains(nameSpace))
+                        if (typeInfo.Namespace!=null&&typeInfo.Namespace.Contains(nameSpace))
                             BaseTable.Check(query, temp.Name, typeInfo.DeclaredProperties.ToList(), typeInfo.GetCustomAttributes().ToList());
                     }
                 }
@@ -654,13 +654,13 @@ namespace FastData
 
                                     foreach (XmlNode dyn in node.ChildNodes)
                                     {
-                                        if (dyn.Name == "isPropertyAvailable")
+                                        if (dyn.Name.ToLower() == "ispropertyavailable")
                                         {
                                             //属性和值
                                             key.Add(string.Format("{0}.{1}.{2}", tempKey, dyn.Attributes["property"].Value.ToLower(), i));
                                             sql.Add(string.Format("{0}{1}", dyn.Attributes["prepend"].Value.ToLower(), dyn.InnerText));
                                         }
-                                        else if(dyn.Name != "choose")
+                                        else if(dyn.Name.ToLower() != "choose")
                                         {
                                             //属性和值
                                             key.Add(string.Format("{0}.{1}.{2}", tempKey, dyn.Attributes["property"].Value.ToLower(), i));
@@ -796,7 +796,7 @@ namespace FastData
                                 var conditionValue = DbCache.Get(cacheType, conditionValueKey).ToStr().ToLower();
                                 switch (condition)
                                 {
-                                    case "isEqual":
+                                    case "isequal":
                                         {
                                             if (conditionValue == temp.Value.ToStr().ToLower())
                                             {
@@ -817,7 +817,7 @@ namespace FastData
                                                 tempParam.Remove(temp);
                                             break;
                                         }
-                                    case "isNotEqual":
+                                    case "isnotequal":
                                         {
                                             if (conditionValue != temp.Value.ToStr())
                                             {
@@ -838,7 +838,7 @@ namespace FastData
                                                 tempParam.Remove(temp);
                                             break;
                                         }
-                                    case "isGreaterThan":
+                                    case "isgreaterthan":
                                         {
                                             if (temp.Value.ToStr().ToDecimal(0) > conditionValue.ToDecimal(0))
                                             {
@@ -859,7 +859,7 @@ namespace FastData
                                                 tempParam.Remove(temp);
                                             break;
                                         }
-                                    case "isLessThan":
+                                    case "islessthan":
                                         {
                                             if (temp.Value.ToStr().ToDecimal(0) < conditionValue.ToDecimal(0))
                                             {
@@ -880,7 +880,7 @@ namespace FastData
                                                 tempParam.Remove(temp);
                                             break;
                                         }
-                                    case "isNullOrEmpty":
+                                    case "isnullorempty":
                                         {
                                             if (string.IsNullOrEmpty(temp.Value.ToStr()))
                                             {
@@ -901,7 +901,7 @@ namespace FastData
                                                 tempParam.Remove(temp);
                                             break;
                                         }
-                                    case "isNotNullOrEmpty":
+                                    case "isnotnullorempty":
                                         {
                                             if (!string.IsNullOrEmpty(temp.Value.ToStr()))
                                             {
