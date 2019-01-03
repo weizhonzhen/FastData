@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq.Expressions;
@@ -238,8 +238,18 @@ namespace FastData.Base
                                     sb.AppendFormat(" substr({4}{0},{2},{3}) = {5}{0}{1}", mName, i, mStar, mLength, asName, config.Flag);
 
                                 leftList.Add(mName);
-                                rightList.Add(mValue.ToString());
-                                i++;
+                            }
+                            else if (mMethod.ToLower() == "toupper")
+                            {
+                                sb.AppendFormat(" upper({0}{1})= {2}{1}{3}", asName, mName, config.Flag, i);
+
+                                leftList.Add(mName);
+                            }
+                            else if (mMethod.ToLower() == "tolower")
+                            {
+                                sb.AppendFormat(" lower({0}{1})= {2}{1}{3}", asName, mName, config.Flag, i);
+
+                                leftList.Add(mName);
                             }
                             #endregion
                         }
@@ -333,6 +343,16 @@ namespace FastData.Base
                         rightList.Add(rightPar);
                         leftList.Add(leftPar);
                         i++;
+                    }
+                    else if (left is MethodCallExpression)
+                    {
+                        var meExp = (MethodCallExpression)(left.ReduceExtensions().Reduce());
+
+                        if (meExp.Method.Name.ToLower() == "substring" || meExp.Method.Name.ToLower() == "toupper" || meExp.Method.Name.ToLower() == "tolower")
+                        {
+                            rightList.Add(rightPar);
+                            i++;
+                        }
                     }
                 }
             }
