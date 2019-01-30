@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FastData.Property;
 
 namespace FastData.DataModel.MySql
