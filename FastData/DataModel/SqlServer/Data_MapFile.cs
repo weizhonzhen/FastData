@@ -1,48 +1,49 @@
-﻿using System;
+using System;
 using FastData.Property;
 
 namespace FastData.DataModel.SqlServer
 {
     /// <summary>
-    /// sqlserver map文件表
+    /// 出错日志
     /// </summary>
-    [Table(Comments = "map文件")]
-    internal class Data_MapFile
+    /// </summary>
+    [Table(Comments = "出错日志")]
+    internal class Data_LogError
     {
         /// <summary>
-        /// map id
+        /// error id
         /// </summary>
-        [Column(Comments = "Map id", DataType = "varchar", Length = 32, IsNull = false, IsKey = true)]
-        public string MapId { get; set; }
+        [Column(Comments = "Error id", DataType = "varchar", Length = 64, IsNull = false, IsKey = true)]
+        public string ErrorId { get; set; }
 
         /// <summary>
-        /// 文件名称
+        /// 出错方法
         /// </summary>
-        [Column(Comments = "文件名称", DataType = "varchar", IsNull = true, Length = 32)]
-        public string FileName { get; set; }
+        [Column(Comments = "出错的方法", DataType = "varchar", IsNull = true, Length = 32)]
+        public string Method { get; set; }
 
         /// <summary>
-        /// 文件路径
+        /// 出错对象
         /// </summary>
-        [Column(Comments = "文件路径", DataType = "varchar", IsNull = true, Length = 256)]
-        public string FilePath { get; set; }
+        [Column(Comments = "出错对象", DataType = "varchar", IsNull = true, Length = 32)]
+        public string Type { get; set; }
 
         /// <summary>
-        /// 明文文件内容
+        /// 出错内容
         /// </summary>
-        [Column(Comments = "明文文件内容", DataType = "Text", IsNull = true)]
-        public string DeFileContent { get; set; }
+        [Column(Comments = "出错内容", DataType = "varchar", IsNull = false)]
+        public string Content { get; set; }
 
         /// <summary>
-        /// 加密文件内容
+        /// sql语句
         /// </summary>
-        [Column(Comments = "加密文件内容", DataType = "Text", IsNull = true)]
-        public string EnFileContent { get; set; }
+        [Column(Comments = "sql语句", DataType = "varchar", IsNull = false)]
+        public string Sql { get; set; }
 
         /// <summary>
-        /// 最后修改时间
+        /// 增加时间
         /// </summary>
-        [Column(Comments = "最后修改时间", DataType = "Datetime", IsNull = true)]
-        public DateTime LastTime { get; set; }
+        [Column(Comments = "增加时间", DataType = "Datetime", IsNull = false)]
+        public DateTime AddTime { get; set; }
     }
 }
