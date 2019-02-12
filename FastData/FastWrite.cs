@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -47,10 +47,7 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() =>
-            {
-                DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
-            });
+            DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.writeReturn;
         }
@@ -66,7 +63,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<WriteReturn> AddListAsy<T>(List<T> list, DataContext db = null, string key = null) where T : class,new()
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return AddList<T>(list,db, key);
             });
@@ -106,10 +103,8 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() =>
-            {
-                DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
-            });
+            DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
+
             return result.writeReturn;
         }
         #endregion
@@ -125,7 +120,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<WriteReturn> AddAsy<T>(T model, DataContext db = null, string key=null) where T : class,new()
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return Add<T>(model,db, key);
             });
@@ -164,10 +159,8 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() =>
-            {
-                DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
-            });
+            DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
+
             return result.writeReturn;
         }
         #endregion
@@ -182,7 +175,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<WriteReturn> DeleteAsy<T>(Expression<Func<T, bool>> predicate, DataContext db = null, string key=null) where T : class,new()
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return Delete<T>(predicate,db,key);
             });
@@ -223,10 +216,7 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() =>
-            {
-                DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
-            });
+            DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.writeReturn;
         }
@@ -244,7 +234,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<WriteReturn> UpdateAsy<T>(T model, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> field = null, DataContext db = null, string key=null) where T : class,new()
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return Update<T>(model, predicate, field,db,key);
             });
@@ -282,7 +272,7 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() => { DbLog.LogSql(config.IsOutSql, result.Sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds); });
+            DbLog.LogSql(config.IsOutSql, result.Sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.writeReturn;
         }
@@ -297,7 +287,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<WriteReturn> ExecuteSqlAsy(string sql, DbParameter[] param, DataContext db = null,  string key=null)
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return ExecuteSql(sql, param,db,key);
             });
