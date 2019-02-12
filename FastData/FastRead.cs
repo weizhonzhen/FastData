@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -31,22 +31,14 @@ namespace FastData
         /// <returns></returns>
         private static DataQuery JoinType<T, T1>(string joinType, DataQuery item, Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false)
         {
-            var taskField = Task.Factory.StartNew(delegate
-            {
-                var queryField = BaseField.QueryField<T, T1>(predicate, field, item.Config);
-                item.Field.Add(queryField.Field);
-                item.AsName.AddRange(queryField.AsName);
-            });
+            var queryField = BaseField.QueryField<T, T1>(predicate, field, item.Config);
+            item.Field.Add(queryField.Field);
+            item.AsName.AddRange(queryField.AsName);
 
-            var taskCon = Task.Factory.StartNew(delegate
-            {
-                var condtion = VisitExpression.LambdaWhere<T, T1>(predicate, item.Config);
-                item.Predicate.Add(condtion);
-                item.Table.Add(string.Format("{2} {0}{3} {1}", typeof(T1).Name, predicate.Parameters[1].Name
-                , joinType, isDblink && !string.IsNullOrEmpty(item.Config.DbLinkName) ? string.Format("@", item.Config.DbLinkName) : ""));
-            });
-
-            Task.WaitAll(taskField, taskCon);
+            var condtion = VisitExpression.LambdaWhere<T, T1>(predicate, item.Config);
+            item.Predicate.Add(condtion);
+            item.Table.Add(string.Format("{2} {0}{3} {1}", typeof(T1).Name, predicate.Parameters[1].Name
+            , joinType, isDblink && !string.IsNullOrEmpty(item.Config.DbLinkName) ? string.Format("@", item.Config.DbLinkName) : ""));
 
             return item;
         }
@@ -68,22 +60,13 @@ namespace FastData
 
             result.Key = key;
 
-            var taskField = Task.Factory.StartNew(delegate
-            {
-                var queryField = BaseField.QueryField<T>(predicate, field, result.Config);
-                result.Field.Add(queryField.Field);
-                result.AsName.AddRange(queryField.AsName);
-            });
+            var queryField = BaseField.QueryField<T>(predicate, field, result.Config);
+            result.Field.Add(queryField.Field);
+            result.AsName.AddRange(queryField.AsName);
 
-            var taskCon = Task.Factory.StartNew(delegate
-            {
-                var condtion = VisitExpression.LambdaWhere<T>(predicate, result.Config);
-                result.Predicate.Add(condtion);
-                result.Table.Add(string.Format("{0} {1}", typeof(T).Name, predicate.Parameters[0].Name));
-
-            });
-
-            Task.WaitAll(taskField, taskCon);
+            var condtion = VisitExpression.LambdaWhere<T>(predicate, result.Config);
+            result.Predicate.Add(condtion);
+            result.Table.Add(string.Format("{0} {1}", typeof(T).Name, predicate.Parameters[0].Name));
 
             return result;
         }
@@ -192,7 +175,7 @@ namespace FastData
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static List<T> ToList<T>(this DataQuery item, DataContext db=null) where T : class, new()
+        public static List<T> ToList<T>(this DataQuery item, DataContext db = null) where T : class, new()
         {
             var stopwatch = new Stopwatch();
             var result = new DataReturn<T>();
@@ -210,10 +193,7 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() =>
-            {
-                DbLog.LogSql(item.Config.IsOutSql, result.sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
-            });
+            DbLog.LogSql(item.Config.IsOutSql, result.sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
             return result.list;
         }
         #endregion
@@ -227,7 +207,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<List<T>> ToListAsy<T>(this DataQuery item, DataContext db = null) where T : class,new()
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return ToList<T>(item,db);
             });
@@ -256,7 +236,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<Lazy<List<T>>> ToLazyListAsy<T>(this DataQuery item, DataContext db = null) where T : class,new()
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return new Lazy<List<T>>(() => ToList<T>(item,db));
             });
@@ -288,10 +268,7 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() =>
-            {
-                DbLog.LogSql(item.Config.IsOutSql, result.Sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
-            });
+            DbLog.LogSql(item.Config.IsOutSql, result.Sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
             return result.Json;
         }
         #endregion
@@ -304,7 +281,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<string> ToJsonAsy(this DataQuery item, DataContext db = null)
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return ToJson(item,db);
             });
@@ -331,7 +308,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<Lazy<string>> ToLazyJsonAsy(this DataQuery item, DataContext db = null)
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return new Lazy<string>(() => ToJson(item,db));
             });
@@ -366,10 +343,7 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() =>
-            {
-                DbLog.LogSql(item.Config.IsOutSql, result.sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
-            });
+            DbLog.LogSql(item.Config.IsOutSql, result.sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.item;
         }
@@ -384,7 +358,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<T> ToItemAsy<T>(this DataQuery item, DataContext db = null) where T : class,new()
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return ToItem<T>(item,db);
             });
@@ -413,7 +387,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<Lazy<T>> ToLazyItemAsy<T>(this DataQuery item, DataContext db = null) where T : class,new()
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return new Lazy<T>(() => ToItem<T>(item,db));
             });
@@ -445,10 +419,7 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() =>
-            {
-                DbLog.LogSql(item.Config.IsOutSql, result.Sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
-            });
+            DbLog.LogSql(item.Config.IsOutSql, result.Sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.Count;
         }
@@ -462,7 +433,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<int> ToCountAsy<T, T1>(this DataQuery item, DataContext db = null)
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return ToCount(item,db);
             });
@@ -496,10 +467,7 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() =>
-            {
-                DbLog.LogSql(item.Config.IsOutSql, result.sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
-            });
+            DbLog.LogSql(item.Config.IsOutSql, result.sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.pageResult;
         }
@@ -515,7 +483,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<PageResult<T>> ToPageAsy<T>(this DataQuery item, PageModel pModel, DataContext db = null) where T : class,new()
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return ToPage<T>(item, pModel,db);
             });
@@ -546,7 +514,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<Lazy<PageResult<T>>> ToLazyPageAsy<T>(this DataQuery item, PageModel pModel, DataContext db = null) where T : class,new()
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return new Lazy<PageResult<T>>(() => ToPage<T>(item, pModel,db));
             });
@@ -579,7 +547,7 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() => { DbLog.LogSql(item.Config.IsOutSql, result.Sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds); });
+            DbLog.LogSql(item.Config.IsOutSql, result.Sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.PageResult;
         }
@@ -594,7 +562,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<PageResult> ToPageAsy(this DataQuery item, PageModel pModel, DataContext db = null)
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return ToPage(item, pModel,db);
             });
@@ -624,7 +592,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<Lazy<PageResult>> ToLazyPageAsy(this DataQuery item, PageModel pModel, DataContext db = null)
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return new Lazy<PageResult>(() => ToPage(item, pModel,db));
             });
@@ -663,10 +631,7 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() =>
-            {
-                DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
-            });
+            DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.list;
         }
@@ -682,7 +647,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<List<T>> ExecuteSqlAsy<T>(string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class,new()
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return ExecuteSql<T>(sql, param,db, key);
             });
@@ -713,7 +678,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<Lazy<List<T>>> ExecuteLazySqlAsy<T>(string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class,new()
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return new Lazy<List<T>>(() => ExecuteSql<T>(sql, param,db, key));
             });
@@ -745,10 +710,7 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() =>
-            {
-                DbLog.LogSql(item.Config.IsOutSql, result.Sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
-            });
+            DbLog.LogSql(item.Config.IsOutSql, result.Sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.DicList;
         }
@@ -762,7 +724,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<List<Dictionary<string, object>>> ToDicsAsy(this DataQuery item, DataContext db = null)
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return ToDics(item,db);
             });
@@ -789,7 +751,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<Lazy<List<Dictionary<string, object>>>> ToLazyDicsAsy(this DataQuery item, DataContext db = null)
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return new Lazy<List<Dictionary<string, object>>>(() => ToDics(item,db));
             });
@@ -822,10 +784,7 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() =>
-            {
-                DbLog.LogSql(item.Config.IsOutSql, result.Sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
-            });
+            DbLog.LogSql(item.Config.IsOutSql, result.Sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.Dic;
         }
@@ -839,7 +798,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<Dictionary<string, object>> ToDicAsy(this DataQuery item, DataContext db = null)
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return ToDic(item,db);
             });
@@ -866,7 +825,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<Lazy<Dictionary<string, object>>> ToLazyDicAsy(this DataQuery item, DataContext db = null)
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return new Lazy<Dictionary<string, object>>(() => ToDic(item,db));
             });
@@ -899,10 +858,7 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() =>
-            {
-                DbLog.LogSql(item.Config.IsOutSql, result.Sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
-            });
+            DbLog.LogSql(item.Config.IsOutSql, result.Sql, item.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.Table;
         }
@@ -916,7 +872,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<DataTable> ToDataTableAsy(this DataQuery item, DataContext db = null)
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return ToDataTable(item, db);
             });
@@ -943,7 +899,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<Lazy<DataTable>> ToLazyDataTableAsy(this DataQuery item, DataContext db = null)
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return new Lazy<DataTable>(() => ToDataTable(item, db));
             });
@@ -981,7 +937,7 @@ namespace FastData
 
             stopwatch.Stop();
 
-            Task.Factory.StartNew(() => { DbLog.LogSql(config.IsOutSql, result.Sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds); });
+            DbLog.LogSql(config.IsOutSql, result.Sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.DicList;
         }
@@ -997,7 +953,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<List<Dictionary<string, object>>> ExecuteSqlAsy(string sql, DbParameter[] param, DataContext db = null, string key = null)
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return ExecuteSql(sql, param,db,key);
             });
@@ -1028,7 +984,7 @@ namespace FastData
         /// <returns></returns>
         public static async Task<Lazy<List<Dictionary<string, object>>>> ExecuteLazySqlAsy(string sql, DbParameter[] param, DataContext db = null, string key = null)
         {
-            return await Task.Factory.StartNew(() =>
+            return await Task.Run(() =>
             {
                 return new Lazy<List<Dictionary<string, object>>>(() => ExecuteSql(sql, param,db,key));
             });
