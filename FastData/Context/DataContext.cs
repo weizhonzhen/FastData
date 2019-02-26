@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,7 +52,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "DataContext", "");
@@ -133,7 +133,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "GetList<T>", "");
@@ -186,7 +186,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "GetPage<T>", "");
@@ -240,7 +240,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (item.Config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(item.Config, ex, "GetPage", result.Sql);
@@ -295,7 +295,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "GetPageSql", result.Sql);
@@ -348,7 +348,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "GetPageSql", result.sql);
@@ -405,6 +405,12 @@ namespace FastData.Context
                 if (item.Predicate[0].Param.Count != 0)
                     param.AddRange(Parameter.ReNewParam(item.Predicate[0].Param,item.Config));
 
+                if (item.GroupBy.Count > 0)
+                    sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
+
+                if (item.OrderBy.Count > 0)
+                    sql.AppendFormat(" order by {0}", string.Join(",", item.OrderBy));
+
                 result.Sql = ParameterToSql.ObjectParamToSql(param, sql.ToString(), item.Config);
 
                 cmd.Parameters.Clear();
@@ -423,7 +429,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "GetJson", result.Sql);
@@ -466,6 +472,12 @@ namespace FastData.Context
                         param.AddRange(Parameter.ReNewParam(item.Predicate[0].Param,item.Config));
                 }
 
+                if (item.GroupBy.Count > 0)
+                    sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
+
+                if (item.OrderBy.Count > 0)
+                    sql.AppendFormat(" order by {0}", string.Join(",", item.OrderBy));
+
                 result.Sql = ParameterToSql.ObjectParamToSql(param, sql.ToString(), item.Config);
 
                 cmd.Parameters.Clear();
@@ -484,7 +496,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "GetCount", result.Sql);
@@ -525,7 +537,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "ExecuteSql<T>", "");
@@ -554,10 +566,7 @@ namespace FastData.Context
                     result.Sql = sql;
 
                 if (isLog)
-                    Task.Factory.StartNew(() =>
-                    {
-                        DbLog.LogSql(true, result.Sql, config.DbType, 0);
-                    });
+                    DbLog.LogSql(true, result.Sql, config.DbType, 0);
 
                 cmd.Parameters.Clear();
 
@@ -574,8 +583,8 @@ namespace FastData.Context
             catch (Exception ex)
             {
                 result.writeReturn.IsSuccess = false;
-                result.writeReturn.IsError = true;
-                Task.Factory.StartNew(() =>
+                result.writeReturn.Mesasge = ex.Message;
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "ExecuteSql", result.Sql);
@@ -631,6 +640,12 @@ namespace FastData.Context
 
                 if (item.Predicate[0].Param.Count != 0)
                     param.AddRange(Parameter.ReNewParam(item.Predicate[0].Param, item.Config));
+                
+                if (item.GroupBy.Count > 0)
+                    sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
+
+                if (item.OrderBy.Count > 0)
+                    sql.AppendFormat(" order by {0}", string.Join(",", item.OrderBy));
 
                 result.Sql = ParameterToSql.ObjectParamToSql(param, sql.ToString(), item.Config);
 
@@ -653,7 +668,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "GetDic", result.Sql);
@@ -708,6 +723,12 @@ namespace FastData.Context
 
                 if (item.Predicate[0].Param.Count != 0)
                     param.AddRange(Parameter.ReNewParam(item.Predicate[0].Param, item.Config));
+                
+                if (item.GroupBy.Count > 0)
+                    sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
+
+                if (item.OrderBy.Count > 0)
+                    sql.AppendFormat(" order by {0}", string.Join(",", item.OrderBy));
 
                 result.Sql = ParameterToSql.ObjectParamToSql(param, sql.ToString(), item.Config);
 
@@ -727,7 +748,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "GetDataTable", result.Sql);
@@ -776,7 +797,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "Delete<T>", "");
@@ -787,7 +808,8 @@ namespace FastData.Context
                 if (isTrans)
                     RollbackTrans();
 
-                result.writeReturn.IsError = true;
+                result.writeReturn.IsSuccess = false;
+                result.writeReturn.Mesasge = ex.Message;
             }
 
             return result;
@@ -842,7 +864,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "Update<T>", "");
@@ -850,7 +872,7 @@ namespace FastData.Context
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Update<T>", result.sql);
                 });
                 result.writeReturn.IsSuccess = false;
-                result.writeReturn.IsError = true;
+                result.writeReturn.Mesasge = ex.Message;
 
                 if (isTrans)
                     RollbackTrans();
@@ -900,7 +922,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "Add<T>", "");
@@ -911,7 +933,7 @@ namespace FastData.Context
                 if (isTrans)
                     RollbackTrans();
 
-                result.writeReturn.IsError = true;
+                result.writeReturn.Mesasge = ex.Message;
                 result.writeReturn.IsSuccess = false;
                 return result;
             }
@@ -997,7 +1019,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException<T>(config, ex, "AddList<T>", "");
@@ -1029,10 +1051,7 @@ namespace FastData.Context
                     result.Sql = sql;
 
                 if (isLog)
-                    Task.Factory.StartNew(() =>
-                    {
-                        DbLog.LogSql(true, result.Sql, config.DbType, 0);
-                    });
+                    DbLog.LogSql(true, result.Sql, config.DbType, 0);
 
                 cmd.Parameters.Clear();
 
@@ -1049,14 +1068,14 @@ namespace FastData.Context
                 if (isTrans)
                     RollbackTrans();
 
-                Task.Factory.StartNew(() => {
+                Task.Run(() => {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "ExecuteSql", result.Sql);
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "ExecuteSql", result.Sql);
                 });
                 result.writeReturn.IsSuccess = false;
-                result.writeReturn.IsError = true;
+                result.writeReturn.Mesasge = ex.Message;
             }
 
             return result;
