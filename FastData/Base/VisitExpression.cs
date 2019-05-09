@@ -7,6 +7,7 @@ using System.Data.Common;
 using FastUntility.Base;
 using FastData.Type;
 using FastData.Model;
+using System.Data;
 
 namespace FastData.Base
 {
@@ -32,6 +33,7 @@ namespace FastData.Base
 
             var leftList = new List<string>();
             var rightList = new List<string>();
+            var typeList = new List<System.Type>();
             var sb = new StringBuilder();
 
             try
@@ -39,7 +41,7 @@ namespace FastData.Base
                 if (item == null)
                     return result;
 
-                result.Where = RouteExpressionHandler(config, item.Body, ref leftList, ref rightList, ref sb, ref strType, ref i);
+                result.Where = RouteExpressionHandler(config, item.Body, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i);
 
                 result.Where = Remove(result.Where);
 
@@ -49,12 +51,19 @@ namespace FastData.Base
                     temp.ParameterName = leftList[i] + i.ToString();
                     temp.Value = rightList[i];
 
-                    //if (rightList[i].IsDate() && config.DbType == DataDbType.Oracle)
-                        //result.Where = result.Where.Replace(string.Format(":{0}", temp.ParameterName), string.Format("to_date(:{0},'yyyy/MM/dd hh24:mi:ss')", temp.ParameterName));
+                    if (typeList[i].Name == "DateTime")
+                    {
+                        if (config.DbType == DataDbType.Oracle)
+                            temp.DbType = DbType.Date;
+                        else
+                            temp.DbType = DbType.DateTime;
+
+                        temp.Value = rightList[i].ToDate();
+                    }
 
                     result.Param.Add(temp);
                 }
-                
+
                 return result;
             }
             catch (Exception ex)
@@ -70,7 +79,7 @@ namespace FastData.Base
             }
         }
         #endregion
-        
+
         #region Lambda where 2个表
         /// <summary>
         /// Lambda where 2个表
@@ -87,6 +96,7 @@ namespace FastData.Base
             var leftList = new List<string>();
             var rightList = new List<string>();
             var fieldList = new List<string>();
+            var typeList = new List<System.Type>();
             var sb = new StringBuilder();
 
             try
@@ -94,7 +104,7 @@ namespace FastData.Base
                 if (item == null)
                     return result;
 
-                result.Where = RouteExpressionHandler(config, item.Body, ref leftList, ref rightList, ref sb, ref strType, ref i);
+                result.Where = RouteExpressionHandler(config, item.Body, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i);
 
                 result.Where = Remove(result.Where);
 
@@ -104,8 +114,15 @@ namespace FastData.Base
                     temp.ParameterName = leftList[i] + i.ToString();
                     temp.Value = rightList[i];
 
-                    //if (rightList[i].IsDate() && config.DbType == DataDbType.Oracle)
-                        //result.Where = result.Where.Replace(string.Format(":{0}", temp.ParameterName), string.Format("to_date(:{0},'yyyy/MM/dd hh24:mi:ss')", temp.ParameterName));
+                    if (typeList[i].Name == "DateTime")
+                    {
+                        if (config.DbType == DataDbType.Oracle)
+                            temp.DbType = DbType.Date;
+                        else
+                            temp.DbType = DbType.DateTime;
+
+                        temp.Value = rightList[i].ToDate();
+                    }
 
                     result.Param.Add(temp);
                 }
@@ -125,7 +142,7 @@ namespace FastData.Base
             }
         }
         #endregion
-        
+
         #region 解析表达式
         /// <summary>
         /// 解析表达式
@@ -133,14 +150,14 @@ namespace FastData.Base
         /// <param name="exp"></param>
         /// <param name="isRight"></param>
         /// <returns></returns>
-        private static string RouteExpressionHandler(ConfigModel config, Expression exp, ref List<string> leftList, ref List<string> rightList, ref StringBuilder sb, ref string strType, ref int i, bool isRight = false)
+        private static string RouteExpressionHandler(ConfigModel config, Expression exp, ref List<string> leftList, ref List<string> rightList, ref List<System.Type> typeList, ref StringBuilder sb, ref string strType, ref int i, bool isRight = false)
         {
             var isReturnNull = false;
             if (exp is BinaryExpression)
             {
                 BinaryExpression be = (BinaryExpression)exp;
 
-                return BinaryExpressionHandler(config, be.Left, be.Right, be.NodeType, ref leftList, ref rightList, ref sb, ref strType, ref i, isRight);
+                return BinaryExpressionHandler(config, be.Left, be.Right, be.NodeType, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i, isRight);
             }
             else if (exp is MemberExpression)
             {
@@ -155,7 +172,7 @@ namespace FastData.Base
                 StringBuilder sbArray = new StringBuilder();
                 foreach (Expression expression in naExp.Expressions)
                 {
-                    sbArray.AppendFormat(",{0}", RouteExpressionHandler(config, expression, ref leftList, ref rightList, ref sb, ref strType, ref i, isRight));
+                    sbArray.AppendFormat(",{0}", RouteExpressionHandler(config, expression, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i, isRight));
                 }
 
                 return sbArray.Length == 0 ? "" : sbArray.Remove(0, 1).ToString();
@@ -164,6 +181,7 @@ namespace FastData.Base
             {
                 if (isRight)
                 {
+                    typeList.Add(Expression.Lambda(exp).Compile().DynamicInvoke().GetType());
                     return Expression.Lambda(exp).Compile().DynamicInvoke() + "";
                 }
                 else
@@ -221,7 +239,6 @@ namespace FastData.Base
                                 sb.AppendFormat(" {2}{0} like {3}{0}{1}", mName, i, asName, config.Flag);
                                 leftList.Add(mName);
                                 rightList.Add(string.Format("%{0}", mValue));
-                                i++;
                             }
                             else if (mMethod.ToLower() == "startswith")
                             {
@@ -238,18 +255,24 @@ namespace FastData.Base
                                     sb.AppendFormat(" substr({4}{0},{2},{3}) = {5}{0}{1}", mName, i, mStar, mLength, asName, config.Flag);
 
                                 leftList.Add(mName);
+                                //rightList.Add(mValue.ToString());
+                                i++;
                             }
                             else if (mMethod.ToLower() == "toupper")
                             {
                                 sb.AppendFormat(" upper({0}{1})= {2}{1}{3}", asName, mName, config.Flag, i);
 
                                 leftList.Add(mName);
+                                //rightList.Add(mValue.ToString());
+                                i++;
                             }
                             else if (mMethod.ToLower() == "tolower")
                             {
                                 sb.AppendFormat(" lower({0}{1})= {2}{1}{3}", asName, mName, config.Flag, i);
 
                                 leftList.Add(mName);
+                                //rightList.Add(mValue.ToString());
+                                i++;
                             }
                             #endregion
                         }
@@ -269,15 +292,20 @@ namespace FastData.Base
             {
                 ConstantExpression cExp = (ConstantExpression)exp;
                 if (cExp.Value == null)
+                {
                     return "null";
+                }
                 else
+                {
                     return cExp.Value.ToString();
+                }
             }
             else if (exp is UnaryExpression)
             {
                 var ue = ((UnaryExpression)exp);
-                return RouteExpressionHandler(config, ue.Operand, ref leftList, ref rightList, ref sb, ref strType, ref i, isRight);
+                return RouteExpressionHandler(config, ue.Operand, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i, isRight);
             }
+
             return null;
         }
         #endregion
@@ -290,11 +318,11 @@ namespace FastData.Base
         /// <param name="right"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        private static string BinaryExpressionHandler(ConfigModel config, Expression left, Expression right, ExpressionType type, ref List<string> leftList, ref List<string> rightList, ref StringBuilder sb, ref string strType, ref int i, bool isRight = false)
+        private static string BinaryExpressionHandler(ConfigModel config, Expression left, Expression right, ExpressionType type, ref List<string> leftList, ref List<string> rightList, ref List<System.Type> typeList, ref StringBuilder sb, ref string strType, ref int i, bool isRight = false)
         {
             string needParKey = "=,>,<,>=,<=,<>";
 
-            string leftPar = RouteExpressionHandler(config, left, ref leftList, ref rightList, ref sb, ref strType, ref i, isRight);
+            string leftPar = RouteExpressionHandler(config, left, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i, isRight);
 
             string typeStr = ExpressionTypeCast(type);
 
@@ -304,34 +332,34 @@ namespace FastData.Base
             {
                 strType = typeStr;
 
-                sb.Append(string.Format("{0} ", strType));
+                sb.Append(string.Format(" {0} ", strType));
             }
 
-            string rightPar = RouteExpressionHandler(config, right, ref leftList, ref rightList, ref sb, ref strType, ref i, isRight);
-            
-            if (rightPar.ToUpper() == "NULL"||(config.DbType == DataDbType.Oracle && string.IsNullOrEmpty(rightPar)))
+            string rightPar = RouteExpressionHandler(config, right, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i, isRight);
+
+            if (rightPar.ToUpper() == "NULL" || (config.DbType == DataDbType.Oracle && string.IsNullOrEmpty(rightPar)))
             {
                 if (typeStr == "=")
                     rightPar = "IS NULL";
                 else if (typeStr == "<>")
                     rightPar = "IS NOT NULL";
-                
+
                 if (left is UnaryExpression)
                     left = (left as UnaryExpression).Operand;
-                               
-                 if (left is MemberExpression)
-                     sb.AppendFormat("{2}.{0} {1} ", leftPar, rightPar, ((left as MemberExpression).Expression as ParameterExpression).Name);
-                
-                if (left is MethodCallExpression)
-                    {
-                        var meExp = (MethodCallExpression)(left.ReduceExtensions().Reduce());
 
-                        if (meExp.Method.Name.ToLower() == "substring" || meExp.Method.Name.ToLower() == "toupper" || meExp.Method.Name.ToLower() == "tolower")
-                        {
-                            rightList.Add(rightPar);
-                            i++;
-                        }
+                if (left is MemberExpression)
+                    sb.AppendFormat("{2}.{0} {1} ", leftPar, rightPar, ((left as MemberExpression).Expression as ParameterExpression).Name);
+
+                if (left is MethodCallExpression)
+                {
+                    var meExp = (MethodCallExpression)(left.ReduceExtensions().Reduce());
+
+                    if (meExp.Method.Name.ToLower() == "substring" || meExp.Method.Name.ToLower() == "toupper" || meExp.Method.Name.ToLower() == "tolower")
+                    {
+                        rightList.Add(rightPar);
+                        i++;
                     }
+                }
             }
             else
             {
@@ -463,5 +491,6 @@ namespace FastData.Base
             return result;
         }
         #endregion
+
     }
 }
