@@ -25,49 +25,6 @@ namespace FastData
     /// </summary>
     public static class FastMap
     {
-        #region 初始化model成员 1
-        /// <summary>
-        /// 初始化model成员 1
-        /// </summary>
-        /// <param name="list"></param>
-        /// <param name="nameSpace">命名空间</param>
-        /// <param name="dll">dll名称</param>
-        public static void InstanceProperties( string nameSpace, string dll)
-        {
-            var config = DataConfig.GetConfig();
-
-            var list = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var item in list)
-            {
-                if (item.ManifestModule.Name == dll)
-                {
-                    foreach (var temp in item.ExportedTypes)
-                    {
-                        Task.Run(() =>
-                        {
-                            var typeInfo = (temp as TypeInfo);
-                            if (typeInfo.Namespace != null && typeInfo.Namespace.Contains(nameSpace))
-                            {
-                                var key = string.Format("{0}.{1}", typeInfo.Namespace, typeInfo.Name);
-
-                                var cacheList = new List<PropertyModel>();
-                                foreach (var info in typeInfo.DeclaredProperties)
-                                {
-                                    var model = new PropertyModel();
-                                    model.Name = info.Name;
-                                    model.PropertyType = info.PropertyType;
-                                    cacheList.Add(model);
-                                }
-
-                                DbCache.Set<List<PropertyModel>>(config.CacheType, key, cacheList);
-                            }
-                        });
-                    }
-                }
-            }
-        }
-        #endregion
-
         #region 初始化建日记表
         /// <summary>
         /// 初始化建日记表
@@ -102,6 +59,46 @@ namespace FastData
         }
         #endregion
 
+        #region 初始化model成员 1
+        /// <summary>
+        /// 初始化model成员 1
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="nameSpace">命名空间</param>
+        /// <param name="dll">dll名称</param>
+        public static void InstanceProperties(string nameSpace, string dll)
+        {
+            var config = DataConfig.GetConfig();
+
+            var assembly = Assembly.Load(dll.Replace(".dll", ""));
+            if (assembly != null)
+            {
+                foreach (var temp in assembly.ExportedTypes)
+                {
+                    Task.Factory.StartNew(() =>
+                    {
+                        var typeInfo = (temp as TypeInfo);
+                        if (typeInfo.Namespace != null && typeInfo.Namespace.Contains(nameSpace))
+                        {
+                            var key = string.Format("{0}.{1}", typeInfo.Namespace, typeInfo.Name);
+
+                            var cacheList = new List<PropertyModel>();
+                            foreach (var info in typeInfo.DeclaredProperties)
+                            {
+                                var model = new PropertyModel();
+                                model.Name = info.Name;
+                                model.PropertyType = info.PropertyType;
+                                cacheList.Add(model);
+                            }
+
+                            DbCache.Set<List<PropertyModel>>(config.CacheType, key, cacheList);
+                        }
+                    });
+                }
+            }
+        }
+        #endregion
+
         #region 初始化code first 2
         /// <summary>
         /// 初始化code first 2
@@ -117,17 +114,14 @@ namespace FastData
 
             CreateLogTable(query);
 
-            var list = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var item in list)
+            var assembly = Assembly.Load(dll.Replace(".dll", ""));
+            if (assembly != null)
             {
-                if (item.ManifestModule.Name == dll)
+                foreach (var temp in assembly.ExportedTypes)
                 {
-                    foreach (var temp in item.ExportedTypes)
-                    {
-                        var typeInfo = (temp as TypeInfo);
-                        if (typeInfo.Namespace!=null&&typeInfo.Namespace.Contains(nameSpace))
-                            BaseTable.Check(query, temp.Name, typeInfo.DeclaredProperties.ToList(), typeInfo.GetCustomAttributes().ToList());
-                    }
+                    var typeInfo = (temp as TypeInfo);
+                    if (typeInfo.Namespace != null && typeInfo.Namespace.Contains(nameSpace))
+                        BaseTable.Check(query, temp.Name, typeInfo.DeclaredProperties.ToList(), typeInfo.GetCustomAttributes().ToList());
                 }
             }
         }
