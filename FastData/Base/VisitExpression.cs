@@ -186,6 +186,7 @@ namespace FastData.Base
                 }
                 else
                 {
+                    typeList.Add("".GetType());
                     isRight = false;
                     try
                     {
@@ -290,15 +291,12 @@ namespace FastData.Base
             }
             else if (exp is ConstantExpression)
             {
+                typeList.Add("".GetType());
                 ConstantExpression cExp = (ConstantExpression)exp;
                 if (cExp.Value == null)
-                {
                     return "null";
-                }
                 else
-                {
                     return cExp.Value.ToString();
-                }
             }
             else if (exp is UnaryExpression)
             {
