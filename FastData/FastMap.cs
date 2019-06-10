@@ -668,7 +668,7 @@ namespace FastData
                                             if (dyn.Attributes["condition"] != null)
                                             {
                                                 key.Add(string.Format("{0}.{1}.condition.value.{2}", tempKey, dyn.Attributes["property"].Value.ToLower(), i));
-                                                sql.Add(dyn.Attributes["condition"].Value.ToLower());
+                                                sql.Add(dyn.Attributes["condition"].Value);
                                             }
 
                                             //比较条件值
@@ -693,7 +693,7 @@ namespace FastData
                                                 {
                                                     //条件
                                                     key.Add(string.Format("{0}.{1}.{2}.choose.condition.{3}", tempKey, dyn.Attributes["property"].Value.ToLower(),i, count));
-                                                    sql.Add(child.Attributes["property"].Value.ToLower());
+                                                    sql.Add(child.Attributes["property"].Value);
 
                                                     //内容
                                                     key.Add(string.Format("{0}.{1}.{2}.choose.{3}", tempKey, dyn.Attributes["property"].Value.ToLower(),i, count));
@@ -918,7 +918,8 @@ namespace FastData
                                         }
                                     case "if":
                                         {
-                                            conditionValue = conditionValue.Replace(temp.ParameterName.ToLower(), temp.Value.ToStr());
+                                            conditionValue = conditionValue.Replace(temp.ParameterName, temp.Value == null ? null : temp.Value.ToStr());
+                                            conditionValue = conditionValue.Replace("#", "\"");
                                             if (BaseCodeDom.GetResult(conditionValue))
                                             {
                                                 if (paramSql.IndexOf(tempKey) >= 0)
@@ -947,20 +948,21 @@ namespace FastData
                                                 condition = DbCache.Get(cacheType, conditionKey).ToStr().ToLower();
 
                                                 conditionValueKey = string.Format("{0}.choose.condition.{1}", paramKey, j);
-                                                conditionValue = DbCache.Get(cacheType, conditionValueKey).ToStr().ToLower();
-                                                conditionValue = conditionValue.Replace(temp.ParameterName.ToLower(), temp.Value.ToStr());
+                                                conditionValue = DbCache.Get(cacheType, conditionValueKey).ToStr();
+                                                conditionValue = conditionValue.Replace(temp.ParameterName, temp.Value == null ? null : temp.Value.ToStr());
+                                                conditionValue = conditionValue.Replace("#", "\"");
                                                 if (BaseCodeDom.GetResult(conditionValue))
                                                 {
                                                     isSuccess = true;
                                                     if (condition.IndexOf(tempKey) >= 0)
                                                     {
                                                         tempParam.Remove(temp);
-                                                        tempSql.Append(condition.Replace(tempKey, temp.Value.ToString()));
+                                                        tempSql.Append(condition.Replace(tempKey, temp.Value.ToStr()));
                                                     }
                                                     else if (condition.IndexOf(flagParam) < 0 && flag != "")
                                                     {
                                                         tempParam.Remove(temp);
-                                                        tempSql.Append(condition.Replace(tempKey, temp.Value.ToString()));
+                                                        tempSql.Append(condition.Replace(tempKey, temp.Value.ToStr()));
                                                     }
                                                     else
                                                         tempSql.Append(condition);
