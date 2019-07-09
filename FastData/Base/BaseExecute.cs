@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -63,15 +63,10 @@ namespace FastData.Base
         /// <param name="dbType"></param>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public static bool ToBool(DbCommand cmd, string sql, DataQuery item = null)
+        public static bool ToBool(DbCommand cmd, string sql, bool IsProcedure = false)
         {
-            if (item != null)
-            {
-                Task.Factory.StartNew(() =>
-                {
-                    DbLog.LogSql(item.Config.IsOutSql, sql, item.Config.DbType);
-                });
-            }
+            if (IsProcedure)
+                cmd.CommandType = CommandType.StoredProcedure;
 
             cmd.CommandText = sql;
             return cmd.ExecuteNonQuery() > -1;
@@ -245,8 +240,8 @@ namespace FastData.Base
 
                 if (item.Predicate[0].Param.Count != 0)
                     param.AddRange(Parameter.ReNewParam(item.Predicate[0].Param,item.Config));
-
-                if(param.Count!=0)
+                
+                if (param.Count!=0)
                     cmd.Parameters.AddRange(param.ToArray());
 
                 var dt = BaseExecute.ToDataTable(cmd, sql.ToString());
