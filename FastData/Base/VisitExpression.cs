@@ -41,7 +41,7 @@ namespace FastData.Base
                 if (item == null)
                     return result;
 
-                result.Where = RouteExpressionHandler(config, item.Body, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i);
+                result.Where = RouteExpressionHandler(config, item.Body,ExpressionType.Goto, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i);
 
                 result.Where = Remove(result.Where);
 
@@ -104,7 +104,7 @@ namespace FastData.Base
                 if (item == null)
                     return result;
 
-                result.Where = RouteExpressionHandler(config, item.Body, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i);
+                result.Where = RouteExpressionHandler(config, item.Body,ExpressionType.Goto, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i);
 
                 result.Where = Remove(result.Where);
 
@@ -150,7 +150,7 @@ namespace FastData.Base
         /// <param name="exp"></param>
         /// <param name="isRight"></param>
         /// <returns></returns>
-        private static string RouteExpressionHandler(ConfigModel config, Expression exp, ref List<string> leftList, ref List<string> rightList, ref List<System.Type> typeList, ref StringBuilder sb, ref string strType, ref int i, bool isRight = false)
+        private static string RouteExpressionHandler(ConfigModel config, Expression exp,ExpressionType expType, ref List<string> leftList, ref List<string> rightList, ref List<System.Type> typeList, ref StringBuilder sb, ref string strType, ref int i, bool isRight = false)
         {
             var isReturnNull = false;
             if (exp is BinaryExpression)
@@ -178,7 +178,7 @@ namespace FastData.Base
                 StringBuilder sbArray = new StringBuilder();
                 foreach (Expression expression in naExp.Expressions)
                 {
-                    sbArray.AppendFormat(",{0}", RouteExpressionHandler(config, expression, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i, isRight));
+                    sbArray.AppendFormat(",{0}", RouteExpressionHandler(config, expression, expType, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i, isRight));
                 }
 
                 return sbArray.Length == 0 ? "" : sbArray.Remove(0, 1).ToString();
@@ -256,10 +256,16 @@ namespace FastData.Base
                             }
                             else if (mMethod.ToLower() == "substring")
                             {
+                                var tempType = "";
+                                if (expType == ExpressionType.Goto)
+                                    tempType = "=";
+                                else
+                                    tempType = ExpressionTypeCast(expType);
+
                                 if (config.DbType == DataDbType.SqlServer)
-                                    sb.AppendFormat(" substring({4}{0},{2},{3}) = {5}{0}{1}", mName, i, mStar, mLength, asName, config.Flag);
+                                    sb.AppendFormat(" substring({4}{0},{2},{3}) {6} {5}{0}{1}", mName, i, mStar, mLength, asName, config.Flag, tempType);
                                 else if (config.DbType == DataDbType.Oracle || config.DbType == DataDbType.MySql || config.DbType == DataDbType.DB2)
-                                    sb.AppendFormat(" substr({4}{0},{2},{3}) = {5}{0}{1}", mName, i, mStar, mLength, asName, config.Flag);
+                                    sb.AppendFormat(" substr({4}{0},{2},{3}) {6} {5}{0}{1}", mName, i, mStar, mLength, asName, config.Flag, tempType);
 
                                 leftList.Add(mName);
                                 //rightList.Add(mValue.ToString());
@@ -267,7 +273,12 @@ namespace FastData.Base
                             }
                             else if (mMethod.ToLower() == "toupper")
                             {
-                                sb.AppendFormat(" upper({0}{1})= {2}{1}{3}", asName, mName, config.Flag, i);
+                                var tempType = "";
+                                if (expType == ExpressionType.Goto)
+                                    tempType = "=";
+                                else
+                                    tempType = ExpressionTypeCast(expType);
+                                sb.AppendFormat(" upper({0}{1}) {4} {2}{1}{3}", asName, mName, config.Flag, i, tempType);
 
                                 leftList.Add(mName);
                                 //rightList.Add(mValue.ToString());
@@ -275,7 +286,12 @@ namespace FastData.Base
                             }
                             else if (mMethod.ToLower() == "tolower")
                             {
-                                sb.AppendFormat(" lower({0}{1})= {2}{1}{3}", asName, mName, config.Flag, i);
+                                var tempType = "";
+                                if (expType == ExpressionType.Goto)
+                                    tempType = "=";
+                                else
+                                    tempType = ExpressionTypeCast(expType);
+                                sb.AppendFormat(" lower({0}{1}) {4} {2}{1}{3}", asName, mName, config.Flag, i,tempType);
 
                                 leftList.Add(mName);
                                 //rightList.Add(mValue.ToString());
@@ -307,7 +323,7 @@ namespace FastData.Base
             else if (exp is UnaryExpression)
             {
                 var ue = ((UnaryExpression)exp);
-                return RouteExpressionHandler(config, ue.Operand, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i, isRight);
+                return RouteExpressionHandler(config, ue.Operand, expType, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i, isRight);
             }
 
             return null;
@@ -322,13 +338,13 @@ namespace FastData.Base
         /// <param name="right"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        private static string BinaryExpressionHandler(ConfigModel config, Expression left, Expression right, ExpressionType type, ref List<string> leftList, ref List<string> rightList, ref List<System.Type> typeList, ref StringBuilder sb, ref string strType, ref int i, bool isRight = false)
+        private static string BinaryExpressionHandler(ConfigModel config, Expression left, Expression right, ExpressionType expType, ref List<string> leftList, ref List<string> rightList, ref List<System.Type> typeList, ref StringBuilder sb, ref string strType, ref int i, bool isRight = false)
         {
             string needParKey = "=,>,<,>=,<=,<>";
 
-            string leftPar = RouteExpressionHandler(config, left, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i, isRight);
+            string leftPar = RouteExpressionHandler(config, left, expType, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i, isRight);
 
-            string typeStr = ExpressionTypeCast(type);
+            string typeStr = ExpressionTypeCast(expType);
 
             isRight = needParKey.IndexOf(typeStr) > -1;
 
@@ -339,7 +355,7 @@ namespace FastData.Base
                 sb.Append(string.Format(" {0} ", strType));
             }
 
-            string rightPar = RouteExpressionHandler(config, right, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i, isRight);
+            string rightPar = RouteExpressionHandler(config, right, expType, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i, isRight);
 
             if (rightPar.ToUpper() == "NULL" || (config.DbType == DataDbType.Oracle && string.IsNullOrEmpty(rightPar)))
             {
@@ -480,7 +496,7 @@ namespace FastData.Base
         {
             var result = new VisitModel();
             result.Where = item.Where;
-            result.Param = Parameter.ReNewParam(item.Param, config);
+            result.Param = item.Param;
 
             foreach (var temp in item.Param)
             {
