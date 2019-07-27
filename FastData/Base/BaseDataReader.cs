@@ -4,6 +4,7 @@ using System.Data.Common;
 using FastData.Property;
 using FastData.Type;
 using FastData.Model;
+using FastUntility.Core.Base;
 
 namespace FastData.Base
 {
