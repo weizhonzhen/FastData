@@ -1,4 +1,4 @@
-﻿using System.Configuration;
+using System.Configuration;
 
 namespace FastData.Config
 {
@@ -223,6 +223,24 @@ namespace FastData.Config
             set
             {
                 base["CacheType"] = value;
+            }
+        }
+        #endregion
+
+        #region 是否更新缓存
+        /// <summary>
+        ///  是否更新缓存
+        /// </summary>
+        [ConfigurationProperty("IsUpdateCache", IsRequired = false, DefaultValue = "false")]
+        public bool IsUpdateCache
+        {
+            get
+            {
+                return (bool)base["IsUpdateCache"];
+            }
+            set
+            {
+                base["IsUpdateCache"] = value;
             }
         }
         #endregion
