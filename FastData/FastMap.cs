@@ -204,12 +204,9 @@ namespace FastData
         /// </summary>
         public static List<T> Query<T>(string name, DbParameter[] param, DataContext db = null, string key = null) where T : class, new()
         {
-            if (db != null)
-                InstanceMap(db.config.Key);
-            else
-                InstanceMap(key);
-
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            if(config.IsUpdateCache)
+                InstanceMap(config.Key);
 
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
@@ -264,12 +261,9 @@ namespace FastData
         /// </summary>
         public static WriteReturn Write(string name, DbParameter[] param, DataContext db = null, string key = null)
         {
-            if (db != null)
-                InstanceMap(db.config.Key);
-            else
-                InstanceMap(key);
-
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            if (config.IsUpdateCache)
+                InstanceMap(config.Key);
 
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
@@ -325,12 +319,9 @@ namespace FastData
         /// </summary>
         public static List<Dictionary<string, object>> Query(string name, DbParameter[] param, DataContext db = null, string key = null)
         {
-            if (db != null)
-                InstanceMap(db.config.Key);
-            else
-                InstanceMap(key);
-
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            if (config.IsUpdateCache)
+                InstanceMap(config.Key);
 
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
@@ -418,12 +409,9 @@ namespace FastData
         /// </summary>
         public static PageResult QueryPage(PageModel pModel, string name, DbParameter[] param, DataContext db = null, string key = null)
         {
-            if (db != null)
-                InstanceMap(db.config.Key);
-            else
-                InstanceMap(key);
-
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            if (config.IsUpdateCache)
+                InstanceMap(config.Key);
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = GetMapSql(name, ref param,db,key);
@@ -510,12 +498,9 @@ namespace FastData
         /// </summary>
         public static PageResult<T> QueryPage<T>(PageModel pModel, string name, DbParameter[] param, DataContext db = null, string key = null) where T : class, new()
         {
-            if (db != null)
-                InstanceMap(db.config.Key);
-            else
-                InstanceMap(key);
-
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            if (config.IsUpdateCache)
+                InstanceMap(config.Key);
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = GetMapSql(name, ref param,db,key);
