@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Configuration;
 using FastData.Type;
@@ -150,6 +150,7 @@ namespace FastData.Config
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         item.CacheType = (temp as ElementConfig).CacheType;
+                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
                         list.Add(item);
 
                         if (string.IsNullOrEmpty(key))
@@ -196,6 +197,7 @@ namespace FastData.Config
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         item.CacheType = (temp as ElementConfig).CacheType;
+                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
                         list.Add(item);
                     }
 
@@ -242,6 +244,7 @@ namespace FastData.Config
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         item.CacheType = (temp as ElementConfig).CacheType;
+                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
                         list.Add(item);
                     }
 
@@ -288,6 +291,7 @@ namespace FastData.Config
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         item.CacheType = (temp as ElementConfig).CacheType;
+                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
                         list.Add(item);
                     }
 
@@ -334,6 +338,7 @@ namespace FastData.Config
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         item.CacheType = (temp as ElementConfig).CacheType;
+                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
                         list.Add(item);
                     }
 
@@ -349,7 +354,7 @@ namespace FastData.Config
             #region PostgreSql
             if (config.PostgreSql.Count != 0)
             {
-                var cacheKey = "DataConfig.SQLite";
+                var cacheKey = "DataConfig.PostgreSql";
 
                 if (IsReadCache)
                 {
@@ -379,6 +384,7 @@ namespace FastData.Config
                         item.IsMapSave = (temp as ElementConfig).IsMapSave;
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         item.CacheType = (temp as ElementConfig).CacheType;
+                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
                         list.Add(item);
                     }
 
