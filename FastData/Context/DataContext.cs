@@ -857,7 +857,10 @@ namespace FastData.Context
 
                     result.sql = ParameterToSql.ObjectParamToSql(Parameter.ParamMerge(update.Param, visitModel.Param), sql, config);
 
-                    result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, sql);
+                    if (visitModel.IsSuccess)
+                        result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, sql);
+                    else
+                        result.writeReturn.IsSuccess = false;
                 }
                 else
                     result.writeReturn.IsSuccess = false;
