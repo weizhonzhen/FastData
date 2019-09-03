@@ -41,7 +41,7 @@ namespace FastData.Base
                 if (item == null)
                     return result;
 
-                result.Where = RouteExpressionHandler(config, item.Body,ExpressionType.Goto, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i);
+                result.Where = RouteExpressionHandler(config, item.Body, ExpressionType.Goto, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i);
 
                 result.Where = Remove(result.Where);
 
@@ -51,7 +51,7 @@ namespace FastData.Base
                     temp.ParameterName = leftList[i] + i.ToString();
                     temp.Value = rightList[i];
 
-                    if (typeList.Count >= i+1 && typeList[i].Name == "DateTime")
+                    if (typeList.Count >= i + 1 && typeList[i].Name == "DateTime")
                     {
                         if (config.DbType == DataDbType.Oracle)
                             temp.DbType = DbType.Date;
@@ -64,6 +64,7 @@ namespace FastData.Base
                     result.Param.Add(temp);
                 }
 
+                result.IsSuccess = true;
                 return result;
             }
             catch (Exception ex)
@@ -75,6 +76,7 @@ namespace FastData.Base
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "LambdaWhere<T>", "");
                 });
+                result.IsSuccess = false;
                 return result;
             }
         }
@@ -104,7 +106,7 @@ namespace FastData.Base
                 if (item == null)
                     return result;
 
-                result.Where = RouteExpressionHandler(config, item.Body,ExpressionType.Goto, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i);
+                result.Where = RouteExpressionHandler(config, item.Body, ExpressionType.Goto, ref leftList, ref rightList, ref typeList, ref sb, ref strType, ref i);
 
                 result.Where = Remove(result.Where);
 
@@ -127,6 +129,7 @@ namespace FastData.Base
                     result.Param.Add(temp);
                 }
 
+                result.IsSuccess = true;
                 return result;
             }
             catch (Exception ex)
@@ -138,6 +141,7 @@ namespace FastData.Base
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "LambdaWhere<T1, T2>", "");
                 });
+                result.IsSuccess = false;
                 return result;
             }
         }
@@ -150,7 +154,7 @@ namespace FastData.Base
         /// <param name="exp"></param>
         /// <param name="isRight"></param>
         /// <returns></returns>
-        private static string RouteExpressionHandler(ConfigModel config, Expression exp,ExpressionType expType, ref List<string> leftList, ref List<string> rightList, ref List<System.Type> typeList, ref StringBuilder sb, ref string strType, ref int i, bool isRight = false)
+        private static string RouteExpressionHandler(ConfigModel config, Expression exp, ExpressionType expType, ref List<string> leftList, ref List<string> rightList, ref List<System.Type> typeList, ref StringBuilder sb, ref string strType, ref int i, bool isRight = false)
         {
             var isReturnNull = false;
             if (exp is BinaryExpression)
@@ -168,7 +172,10 @@ namespace FastData.Base
                 }
                 else
                 {
-                    typeList.Add(Expression.Lambda(exp).Compile().DynamicInvoke().GetType());
+                    if (Expression.Lambda(exp).Compile().DynamicInvoke() == null)
+                        typeList.Add("".GetType());
+                    else
+                        typeList.Add(Expression.Lambda(exp).Compile().DynamicInvoke().GetType());
                     return Expression.Lambda(exp).Compile().DynamicInvoke() + "";
                 }
             }
@@ -291,7 +298,7 @@ namespace FastData.Base
                                     tempType = "=";
                                 else
                                     tempType = ExpressionTypeCast(expType);
-                                sb.AppendFormat(" lower({0}{1}) {4} {2}{1}{3}", asName, mName, config.Flag, i,tempType);
+                                sb.AppendFormat(" lower({0}{1}) {4} {2}{1}{3}", asName, mName, config.Flag, i, tempType);
 
                                 leftList.Add(mName);
                                 //rightList.Add(mValue.ToString());
