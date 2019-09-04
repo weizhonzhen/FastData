@@ -721,7 +721,9 @@ namespace FastData
 
                                 i++;
                             }
-                            db.Add(tempKey, temp.Attributes["db"].Value.ToStr());
+                            
+                            if (temp.Attributes["db"] != null)
+                                db.Add(tempKey, temp.Attributes["db"].Value.ToStr());
                             param.Add(tempKey, tempParam);
                             #endregion
                         }
