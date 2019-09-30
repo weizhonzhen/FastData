@@ -569,9 +569,10 @@ namespace FastData
             var key = new List<string>();
             var sql = new List<string>();
             var db = new Dictionary<string, object>();
+            var type = new Dictionary<string, object>();
             var param = new Dictionary<string, object>();
 
-            GetXmlList(path, "sqlMap", ref key, ref sql, ref db, ref param, config);
+            GetXmlList(path, "sqlMap", ref key, ref sql, ref db,ref type, ref param, config);
 
             for (var i = 0; i < key.Count; i++)
                 DbCache.Set(config.CacheType, key[i].ToLower(), sql[i]);
@@ -579,6 +580,11 @@ namespace FastData
             foreach (KeyValuePair<string, object> item in db)
             {
                 DbCache.Set(config.CacheType, string.Format("{0}.db", item.Key.ToLower()), item.Value);
+            }
+            
+            foreach (KeyValuePair<string, object> item in type)
+            {
+                DbCache.Set(config.CacheType, string.Format("{0}.type", item.Key.ToLower()), item.Value);
             }
 
             foreach (KeyValuePair<string, object> item in param)
@@ -596,7 +602,7 @@ namespace FastData
         /// <param name="path">文件名</param>
         /// <param name="xmlNode">结点</param>
         /// <returns></returns>
-        private static void GetXmlList(string path, string xmlNode, ref List<string> key, ref List<string> sql, ref Dictionary<string, object> db, ref Dictionary<string, object> param, ConfigModel config)
+        private static void GetXmlList(string path, string xmlNode, ref List<string> key, ref List<string> sql, ref Dictionary<string, object> db, ref Dictionary<string, object> type, ref Dictionary<string, object> param, ConfigModel config)
         {
             try
             {
@@ -632,7 +638,7 @@ namespace FastData
                             var tempParam = new List<string>();
                             #region XmlElement
                             tempKey = temp.Attributes["id"].Value.ToLower();
-
+                            
                             //节点数
                             if (Array.Exists(key.ToArray(), element=> element== tempKey))
                                 Task.Run(() => { BaseLog.SaveLog(string.Format("xml文件:{0},存在相同键:{1}", path, tempKey), "MapKeyExists"); });
@@ -1141,6 +1147,18 @@ namespace FastData
         public static string MapDb(string name)
         {
             return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.db", name.ToLower()));
+        }
+        #endregion
+        
+        #region map type
+        /// <summary>
+        /// map db
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string MapType(string name)
+        {
+            return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.type", name.ToLower()));
         }
         #endregion
 
