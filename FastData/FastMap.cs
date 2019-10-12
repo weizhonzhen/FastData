@@ -572,8 +572,9 @@ namespace FastData
             var db = new Dictionary<string, object>();
             var type = new Dictionary<string, object>();
             var param = new Dictionary<string, object>();
+            var check = new Dictionary<string, object>();
 
-            GetXmlList(path, "sqlMap", ref key, ref sql, ref db,ref type, ref param, config);
+            GetXmlList(path, "sqlMap", ref key, ref sql, ref db,ref type, ref check, ref param, config);
 
             for (var i = 0; i < key.Count; i++)
                 DbCache.Set(config.CacheType, key[i].ToLower(), sql[i]);
@@ -584,7 +585,9 @@ namespace FastData
                 if (!map.Exists(a => a.ToLower() == item.Key.ToLower()))
                     map.Add(item.Key.ToLower());
             }
-            
+
+            DbCache.Set<List<string>>(config.CacheType, "FastMap.Api", map);
+
             foreach (KeyValuePair<string, object> item in type)
             {
                 DbCache.Set(config.CacheType, string.Format("{0}.type", item.Key.ToLower()), item.Value);
@@ -595,7 +598,11 @@ namespace FastData
                 DbCache.Set<List<string>>(config.CacheType, string.Format("{0}.param", item.Key.ToLower()), item.Value as List<string>);
             }
 
-            DbCache.Set<List<string>>(config.CacheType, "FastMap.Api", map);
+            foreach (KeyValuePair<string, object> item in check)
+            {
+                DbCache.Set(config.CacheType, item.Key, item.Value);
+            }
+
             return key;
         }
         #endregion
@@ -607,7 +614,10 @@ namespace FastData
         /// <param name="path">文件名</param>
         /// <param name="xmlNode">结点</param>
         /// <returns></returns>
-        private static void GetXmlList(string path, string xmlNode, ref List<string> key, ref List<string> sql, ref Dictionary<string, object> db, ref Dictionary<string, object> type, ref Dictionary<string, object> param, ConfigModel config)
+        private static void GetXmlList(string path, string xmlNode, 
+            ref List<string> key, ref List<string> sql, ref Dictionary<string, object> db,
+            ref Dictionary<string, object> type, ref Dictionary<string, object> check,
+            ref Dictionary<string, object> param, ConfigModel config)
         {
             try
             {
@@ -668,6 +678,18 @@ namespace FastData
 
                                     foreach (XmlNode dyn in node.ChildNodes)
                                     {
+                                        //check required
+                                        if (dyn.Attributes["required"].Value != null)
+                                            check.Add(string.Format("{0}.{1}.required", tempKey, dyn.Attributes["property"].Value.ToLower()), dyn.Attributes["required"].Value.ToStr());
+
+                                        //check maxlength
+                                        if (dyn.Attributes["maxlength"].Value != null)
+                                            check.Add(string.Format("{0}.{1}.maxlength", tempKey, dyn.Attributes["property"].Value.ToLower()), dyn.Attributes["maxlength"].Value.ToStr());
+
+                                        //check map
+                                        if (dyn.Attributes["map"].Value != null)
+                                            check.Add(string.Format("{0}.{1}.map", tempKey, dyn.Attributes["property"].Value.ToLower()), dyn.Attributes["map"].Value.ToStr());                                       
+
                                         //参数
                                         tempParam.Add(dyn.Attributes["property"].Value);
 
@@ -1189,6 +1211,45 @@ namespace FastData
             {
                 return DbCache.Get<List<string>>(DataConfig.GetConfig().CacheType, "FastMap.Api");
             }
+        }
+        #endregion
+
+        #region 获取map验证必填
+        /// <summary>
+        /// 获取map验证必填
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public static string MapRequired(string name, string param)
+        {
+            return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.{1}.required", name.ToLower(), param.ToLower()));
+        }
+        #endregion
+
+        #region 获取map验证长度
+        /// <summary>
+        /// 获取map验证长度
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public static string MapMaxlength(string name, string param)
+        {
+            return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.{1}.maxlength", name.ToLower(), param.ToLower()));
+        }
+        #endregion
+
+        #region 获取map验证map
+        /// <summary>
+        /// 获取map验证map
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public static string MapCheckMap(string name, string param)
+        {
+            return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.{1}.map", name.ToLower(), param.ToLower()));
         }
         #endregion
     }
