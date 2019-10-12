@@ -688,7 +688,12 @@ namespace FastData
 
                                         //check map
                                         if (dyn.Attributes["map"] != null)
-                                            check.Add(string.Format("{0}.{1}.map", tempKey, dyn.Attributes["property"].Value.ToLower()), dyn.Attributes["map"].Value.ToStr());                                       
+                                            check.Add(string.Format("{0}.{1}.map", tempKey, dyn.Attributes["property"].Value.ToLower()), dyn.Attributes["map"].Value.ToStr());
+
+                                        //check date
+                                        if (dyn.Attributes["date"] != null)
+                                            check.Add(string.Format("{0}.{1}.date", tempKey, dyn.Attributes["property"].Value.ToLower()), dyn.Attributes["date"].Value.ToStr());
+
 
                                         //参数
                                         tempParam.Add(dyn.Attributes["property"].Value);
@@ -1237,6 +1242,19 @@ namespace FastData
         public static string MapMaxlength(string name, string param)
         {
             return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.{1}.maxlength", name.ToLower(), param.ToLower()));
+        }
+        #endregion
+
+        #region 获取map验证日期 
+        /// <summary>
+        /// 获取map验证日期
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public static string MapDate(string name, string param)
+        {
+            return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.{1}.date", name.ToLower(), param.ToLower()));
         }
         #endregion
 
