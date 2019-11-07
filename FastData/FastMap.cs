@@ -335,8 +335,22 @@ namespace FastData
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = GetMapSql(name, ref param,db,key);
+                
+                var result = FastRead.ExecuteSql(sql, param, db, key);
 
-                return FastRead.ExecuteSql(sql, param,db,key);
+                if (MapIsForEach(name, config))
+                {
+                    if (db == null)
+                    {
+                        var tempDb = BaseContext.GetContext(key);
+                        result = MapForEach(result, name, tempDb, key, config);
+                        tempDb.Dispose();
+                    }
+                    else
+                        result = MapForEach(result, name, db, key, config);
+                }
+
+                return result;
             }
             else
                 return new List<Dictionary<string, object>>();
@@ -425,8 +439,22 @@ namespace FastData
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = GetMapSql(name, ref param,db,key);
+                
+                var result = ExecuteSqlPage(pModel, sql, param, db, key);
 
-                return ExecuteSqlPage(pModel, sql, param,db,key);
+                if (MapIsForEach(name, config))
+                {
+                    if (db == null)
+                    {
+                        var tempDb = BaseContext.GetContext(key);
+                        result.list = MapForEach(result.list, name, tempDb, key, config);
+                        tempDb.Dispose();
+                    }
+                    else
+                        result.list = MapForEach(result.list, name, db, key, config);
+                }
+
+                return result;
             }
             else
                 return new PageResult();
@@ -677,11 +705,42 @@ namespace FastData
                                 #region XmlElement 动态条件
                                 if (node is XmlElement)
                                 {
-                                    key.Add(string.Format("{0}.format.{1}", tempKey, i));
-                                    sql.Add(node.Attributes["prepend"].Value.ToLower());
+                                    if (node.Attributes["prepend"] != null)
+                                    {
+                                        key.Add(string.Format("{0}.format.{1}", tempKey, i));
+                                        sql.Add(node.Attributes["prepend"].Value.ToLower());
+                                    }
+                                    
+                                    //foreach
+                                    if (node.Name.ToLower() == "foreach")
+                                    {
+                                        //result name
+                                        key.Add(string.Format("{0}.foreach.name", tempKey));
+                                        if (node.Attributes["name"] != null)
+                                            sql.Add(node.Attributes["name"].Value.ToLower());
+                                        else
+                                            sql.Add("data");
+
+                                        //field
+                                        if (node.Attributes["field"] != null)
+                                        {
+                                            sql.Add(node.Attributes["field"].Value.ToLower());
+                                            key.Add(string.Format("{0}.foreach.field", tempKey));
+                                        }
+
+                                        //sql
+                                        if (node.ChildNodes[0] is XmlText)
+                                        {
+                                            key.Add(string.Format("{0}.foreach.sql", tempKey));
+                                            sql.Add(node.ChildNodes[0].InnerText.Replace("&lt;", "<").Replace("&gt", ">"));
+                                        }
+                                    }
 
                                     foreach (XmlNode dyn in node.ChildNodes)
                                     {
+                                        if (dyn is XmlText)
+                                            continue;
+
                                         //check required
                                         if (dyn.Attributes["required"] != null)
                                             check.Add(string.Format("{0}.{1}.required", tempKey, dyn.Attributes["property"].Value.ToLower()), dyn.Attributes["required"].Value.ToStr());
@@ -1289,6 +1348,69 @@ namespace FastData
         public static string MapExistsMap(string name, string param)
         {
             return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.{1}.existsmap", name.ToLower(), param.ToLower()));
+        }
+        #endregion
+
+        #region 是否foreach
+        /// <summary>
+        /// 是否foreach
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private static bool MapIsForEach(string name, ConfigModel config)
+        {
+            var keyName = string.Format("{0}.foreach.name", name.ToLower());
+            var keyField = string.Format("{0}.foreach.field", name.ToLower());
+            var keySql = string.Format("{0}.foreach.sql", name.ToLower());
+
+            return DbCache.Get(config.CacheType, keyName) != "" &&
+                DbCache.Get(config.CacheType, keyField) != "" &&
+                DbCache.Get(config.CacheType, keySql) != "";
+        }
+        #endregion
+
+        #region foreach数据
+        /// <summary>
+        /// foreach数据
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private static List<Dictionary<string, object>> MapForEach(List<Dictionary<string, object>> data, string name, DataContext db, string key, ConfigModel config)
+        {
+            var result = new List<Dictionary<string, object>>();
+            var param = new List<DbParameter>();
+            var dicName = DbCache.Get(config.CacheType, string.Format("{0}.foreach.name", name.ToLower()));
+            var field = DbCache.Get(config.CacheType, string.Format("{0}.foreach.field", name.ToLower()));
+            var sql = DbCache.Get(config.CacheType, string.Format("{0}.foreach.sql", name.ToLower()));
+
+            foreach (var item in data)
+            {
+                param.Clear();
+                if (field.IndexOf(',') > 0)
+                {
+                    foreach (var split in field.Split(','))
+                    {
+                        var tempParam = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        tempParam.ParameterName = split;
+                        tempParam.Value = item.GetValue(split);
+                        param.Add(tempParam);
+                    }
+                }
+                else
+                {
+                    var tempParam = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                    tempParam.ParameterName = field;
+                    tempParam.Value = item.GetValue(field);
+                    param.Add(tempParam);
+                }
+
+                item.Add(dicName, FastRead.ExecuteSql(sql, param.ToArray(), db, key));
+                result.Add(item);
+            }
+
+            return result;
         }
         #endregion
     }
