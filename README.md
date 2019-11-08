@@ -50,7 +50,7 @@ FastMap.InstanceMap(db);
                 <choose property="userNo">
                    <condition prepend=" and " property="userNo>5">a.userNo=:userNo and a.userNo=5</condition>
                 </choose>
-                <foreach name="data" field="userId">
+                <foreach name="data" field="userId" type="Test.Model.TestModel,Test">
                     select ypxh from base_role where userId=:userId
                 </foreach>
               </dynamic>
