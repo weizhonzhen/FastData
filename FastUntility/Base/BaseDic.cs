@@ -108,7 +108,7 @@ namespace FastUntility.Base
     /// <summary>
     /// 动态属性setvalue
     /// </summary>
-    public class DynamicSet<T>
+    internal class DynamicSet<T>
     {
         private static bool IsSetCache;
         private static Action<object, string, object> SetValueDelegate;
@@ -164,7 +164,7 @@ namespace FastUntility.Base
     /// <summary>
     /// 动态属性getvalue
     /// </summary>
-    public class DynamicGet<T>
+    internal class DynamicGet<T>
     {
         private static bool IsGetCache;
         private static Func<object, string, object> GetValueDelegate;
