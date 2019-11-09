@@ -71,7 +71,7 @@ FastMap.InstanceMap(db);
         </sqlMap>
         
         var param = new List<OracleParameter>();
-        param.Add(new OracleParameter { ParameterName = "brid", Value = "dd5c99f2-0892-4179-83db-c2ccf243104c" });
+        param.Add(new OracleParameter { ParameterName = "userid", Value = "dd5c99f2-0892-4179-83db-c2ccf243104c" });
         var tt = FastMap.Query<TestResult>("Patient.Test", param.ToArray(), null, "test");
         
         namespace Test1.Model
