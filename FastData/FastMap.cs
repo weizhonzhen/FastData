@@ -1507,7 +1507,10 @@ namespace FastData
 
             if (type.IndexOf(',') > 0)
             {
-                assembly = Assembly.Load(type.Split(',')[1]);
+                assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == type.Split(',')[1]);
+                if (assembly == null)
+                    assembly = Assembly.Load(type.Split(',')[1]);
+
                 if (assembly == null)
                     return data;
                 else
