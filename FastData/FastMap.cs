@@ -224,7 +224,10 @@ namespace FastData
                     if (db == null)
                     {
                         var tempDb = BaseContext.GetContext(key);
-                        result = MapForEach<T>(result, name, tempDb, key, config);
+                        for (var i = 1; i < MapForEachCount(name, config); i++)
+                        {
+                            result = MapForEach<T>(result, name, tempDb, key, config,i);
+                        }
                         tempDb.Dispose();
                     }
                     else
@@ -355,7 +358,10 @@ namespace FastData
                     if (db == null)
                     {
                         var tempDb = BaseContext.GetContext(key);
-                        result = MapForEach(result, name, tempDb, key, config);
+                        for (var i = 1; i < MapForEachCount(name, config); i++)
+                        {
+                            result = MapForEach(result, name, tempDb, key, config,i);
+                        }
                         tempDb.Dispose();
                     }
                     else
@@ -459,7 +465,10 @@ namespace FastData
                     if (db == null)
                     {
                         var tempDb = BaseContext.GetContext(key);
-                        result.list = MapForEach(result.list, name, tempDb, key, config);
+                        for (var i = 1; i < MapForEachCount(name, config); i++)
+                        {
+                            result.list = MapForEach(result.list, name, tempDb, key, config,i);
+                        }
                         tempDb.Dispose();
                     }
                     else
@@ -563,7 +572,10 @@ namespace FastData
                     if (db == null)
                     {
                         var tempDb = BaseContext.GetContext(key);
-                        result.list = MapForEach<T>(result.list, name, tempDb, key, config);
+                        for (var i = 1; i < MapForEachCount(name, config); i++)
+                        {
+                            result.list = MapForEach<T>(result.list, name, tempDb, key, config,i);
+                        }
                         tempDb.Dispose();
                     }
                     else
@@ -704,6 +716,7 @@ namespace FastData
                 {
                     foreach (XmlNode temp in item.ChildNodes)
                     {
+                        var foreachCount = 1;
                         var i = 0;
                         if (temp is XmlElement)
                         {
@@ -742,12 +755,12 @@ namespace FastData
                                         //type;
                                         if (node.Attributes["type"] != null)
                                         {
+                                            key.Add(string.Format("{0}.foreach.type.{1}", tempKey, foreachCount));
                                             sql.Add(node.Attributes["type"].Value);
-                                            key.Add(string.Format("{0}.foreach.type", tempKey));
                                         }
 
                                         //result name
-                                        key.Add(string.Format("{0}.foreach.name", tempKey));
+                                        key.Add(string.Format("{0}.foreach.name.{1}", tempKey, foreachCount));
                                         if (node.Attributes["name"] != null)
                                             sql.Add(node.Attributes["name"].Value.ToLower());
                                         else
@@ -756,16 +769,17 @@ namespace FastData
                                         //field
                                         if (node.Attributes["field"] != null)
                                         {
-                                            key.Add(string.Format("{0}.foreach.field", tempKey));
+                                            key.Add(string.Format("{0}.foreach.field.{1}", tempKey, foreachCount));
                                             sql.Add(node.Attributes["field"].Value.ToLower());
                                         }
 
                                         //sql
                                         if (node.ChildNodes[0] is XmlText)
                                         {
-                                            key.Add(string.Format("{0}.foreach.sql", tempKey));
+                                            key.Add(string.Format("{0}.foreach.sql.{1}", tempKey,foreachCount));
                                             sql.Add(node.ChildNodes[0].InnerText.Replace("&lt;", "<").Replace("&gt", ">"));
                                         }
+                                        foreachCount++;
                                     }
 
                                     foreach (XmlNode dyn in node.ChildNodes)
@@ -859,8 +873,18 @@ namespace FastData
                                 i++;
                             }
 
+                            //db
                             if (temp.Attributes["db"] != null)
                                 db.Add(tempKey, temp.Attributes["db"].Value.ToStr());
+
+                            //type
+                            if (temp.Attributes["type"] != null)
+                                type.Add(tempKey, temp.Attributes["type"].Value.ToStr());
+
+                            //foreach count
+                            key.Add(string.Format("{0}.foreach", tempKey));
+                            sql.Add((foreachCount-1).ToStr());
+
                             param.Add(tempKey, tempParam);
                             #endregion
                         }
@@ -1263,9 +1287,10 @@ namespace FastData
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static List<string> MapParam(string name)
+        public static List<string> MapParam(string name,ConfigModel config=null)
         {
-            return DbCache.Get<List<string>>(DataConfig.GetConfig().CacheType, string.Format("{0}.param", name.ToLower()));
+            var cacheType = config == null ? DataConfig.GetConfig().CacheType : config.CacheType;
+            return DbCache.Get<List<string>>(cacheType, string.Format("{0}.param", name.ToLower()));
         }
         #endregion
 
@@ -1389,15 +1414,28 @@ namespace FastData
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        private static bool MapIsForEach(string name, ConfigModel config)
+        private static bool MapIsForEach(string name, ConfigModel config, int i = 1)
         {
-            var keyName = string.Format("{0}.foreach.name", name.ToLower());
-            var keyField = string.Format("{0}.foreach.field", name.ToLower());
-            var keySql = string.Format("{0}.foreach.sql", name.ToLower());
+            var keyName = string.Format("{0}.foreach.name.{0}", name.ToLower(), i);
+            var keyField = string.Format("{0}.foreach.field.{0}", name.ToLower(), i);
+            var keySql = string.Format("{0}.foreach.sql.{0}", name.ToLower(), i);
 
             return DbCache.Get(config.CacheType, keyName) != "" &&
                 DbCache.Get(config.CacheType, keyField) != "" &&
                 DbCache.Get(config.CacheType, keySql) != "";
+        }
+        #endregion
+
+        #region froeach数量
+        /// <summary>
+        /// froeach数量
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        private static int MapForEachCount(string name, ConfigModel config)
+        {
+            return DbCache.Get(config.CacheType, string.Format("{0}.foreach", name.ToLower())).ToInt(1);
         }
         #endregion
 
@@ -1409,13 +1447,13 @@ namespace FastData
         /// <param name="db"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        private static List<Dictionary<string, object>> MapForEach(List<Dictionary<string, object>> data, string name, DataContext db, string key, ConfigModel config)
+        private static List<Dictionary<string, object>> MapForEach(List<Dictionary<string, object>> data, string name, DataContext db, string key, ConfigModel config,int i=1)
         {
             var result = new List<Dictionary<string, object>>();
             var param = new List<DbParameter>();
-            var dicName = DbCache.Get(config.CacheType, string.Format("{0}.foreach.name", name.ToLower()));
-            var field = DbCache.Get(config.CacheType, string.Format("{0}.foreach.field", name.ToLower()));
-            var sql = DbCache.Get(config.CacheType, string.Format("{0}.foreach.sql", name.ToLower()));
+            var dicName = DbCache.Get(config.CacheType, string.Format("{0}.foreach.name.{1}", name.ToLower(), i));
+            var field = DbCache.Get(config.CacheType, string.Format("{0}.foreach.field.{1}", name.ToLower(), i));
+            var sql = DbCache.Get(config.CacheType, string.Format("{0}.foreach.sql.{1}", name.ToLower(), i));
 
             foreach (var item in data)
             {
@@ -1457,14 +1495,14 @@ namespace FastData
         /// <param name="key"></param>
         /// <param name="config"></param>
         /// <returns></returns>
-        private static List<T> MapForEach<T>(List<T> data, string name, DataContext db, string key, ConfigModel config) where T : class, new()
+        private static List<T> MapForEach<T>(List<T> data, string name, DataContext db, string key, ConfigModel config,int i=1) where T : class, new()
         {
             var result = new List<T>();
             var param = new List<DbParameter>();
-            var dicName = DbCache.Get(config.CacheType, string.Format("{0}.foreach.name", name.ToLower()));
-            var type = DbCache.Get(config.CacheType, string.Format("{0}.foreach.type", name.ToLower()));
-            var field = DbCache.Get(config.CacheType, string.Format("{0}.foreach.field", name.ToLower()));
-            var sql = DbCache.Get(config.CacheType, string.Format("{0}.foreach.sql", name.ToLower()));
+            var dicName = DbCache.Get(config.CacheType, string.Format("{0}.foreach.name.{1}", name.ToLower(),i));
+            var type = DbCache.Get(config.CacheType, string.Format("{0}.foreach.type.{1}", name.ToLower(), i));
+            var field = DbCache.Get(config.CacheType, string.Format("{0}.foreach.field.{1}", name.ToLower(), i));
+            var sql = DbCache.Get(config.CacheType, string.Format("{0}.foreach.sql.{1}", name.ToLower(), i));
             Assembly assembly;
 
             if (type.IndexOf(',') > 0)
@@ -1481,7 +1519,7 @@ namespace FastData
                     {
                         var model = Activator.CreateInstance(assembly.GetType(type.Split(',')[0]));
                         var list = Activator.CreateInstance(typeof(List<>).MakeGenericType(assembly.GetType(type.Split(',')[0])));
-                        var infoResult = BaseDic.PropertyInfo<T>().Find(a => a.PropertyType.IsGenericType == true && a.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>));
+                        var infoResult = BaseDic.PropertyInfo<T>().Find(a => a.PropertyType.FullName == list.GetType().FullName);
 
                         //param
                         param.Clear();
