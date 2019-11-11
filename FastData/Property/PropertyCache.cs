@@ -1,11 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using FastData.CacheModel;
 using FastData.Base;
-using FastUntility.Cache;
-using FastUntility.Base;
+using FastData.Config;
 
 namespace FastData.Property
 {
@@ -24,11 +23,12 @@ namespace FastData.Property
         {
             var list = new List<PropertyModel>();
             var key = string.Format("{0}.{1}", typeof(T).Namespace, typeof(T).Name);
+            var config = DataConfig.GetConfig();
 
             if (IsCache)
             {
-                if (BaseCache.Exists(key))
-                    return BaseCache.Get<List<PropertyModel>>(key);
+                if (DbCache.Exists(config.CacheType,key))
+                    return DbCache.Get<List<PropertyModel>>(config.CacheType, key);
                 else
                 {
                     typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList().ForEach(a =>
@@ -39,13 +39,52 @@ namespace FastData.Property
                             list.Add(temp);
                         });
 
-                    BaseCache.Set<List<PropertyModel>>(key, list);
+                    DbCache.Set<List<PropertyModel>>(config.CacheType,key, list);
                 }
             }
             else
             {
-                BaseCache.Remove(key);
+                DbCache.Remove(config.CacheType,key);
                 typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList().ForEach(a =>
+                {
+                    var temp = new PropertyModel();
+                    temp.Name = a.Name;
+                    temp.PropertyType = a.PropertyType;
+                    list.Add(temp);
+                });
+            }
+
+            return list;
+        }
+        #endregion
+
+        #region 缓存发属性成员
+        public static List<PropertyModel> GetPropertyInfo(object model, bool IsCache = true)
+        {
+            var list = new List<PropertyModel>();
+            var key = string.Format("{0}.{1}", model.GetType().Namespace, model.GetType().Name);
+            var config = DataConfig.GetConfig();
+
+            if (IsCache)
+            {
+                if (DbCache.Exists(config.CacheType, key))
+                    return DbCache.Get<List<PropertyModel>>(config.CacheType, key);
+                else
+                {
+                    model.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList().ForEach(a =>
+                    {
+                        var temp = new PropertyModel();
+                        temp.Name = a.Name;
+                        temp.PropertyType = a.PropertyType;
+                        list.Add(temp);
+                    });
+
+                    DbCache.Set<List<PropertyModel>>(config.CacheType, key, list);
+                }
+            }
+            else
+            {
+                model.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList().ForEach(a =>
                 {
                     var temp = new PropertyModel();
                     temp.Name = a.Name;
