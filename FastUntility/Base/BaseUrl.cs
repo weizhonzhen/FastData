@@ -24,12 +24,12 @@ namespace FastUntility.Base
         /// <summary>
         /// get url(select)
         /// </summary>
-        public static string GetUrl(string url)
+        public static string GetUrl(string url, int version = 1)
         {
             try
             {
                 var handle = new HttpRequestMessage();
-                handle.Version = new Version(2, 0);
+                handle.Version = new Version(version, 0);
                 handle.Content = new StringContent("", Encoding.UTF8);
                 handle.Method = HttpMethod.Get;
                 handle.RequestUri = new Uri(url);
@@ -49,7 +49,7 @@ namespace FastUntility.Base
         /// <summary>
         /// post url(insert)
         /// </summary>
-        public static string PostUrl(string url, Dictionary<string, object> dic, string mediaType = "application/json")
+        public static string PostUrl(string url, Dictionary<string, object> dic, int version = 1, string mediaType = "application/json")
         {
             try
             {
@@ -69,7 +69,7 @@ namespace FastUntility.Base
                 }
 
                 var handle = new HttpRequestMessage();
-                handle.Version = new Version(2, 0);
+                handle.Version = new Version(version, 0);
                 handle.Content = new StringContent("", Encoding.UTF8, mediaType);
                 handle.Method = HttpMethod.Put;
                 handle.RequestUri = new Uri(url);
@@ -88,12 +88,12 @@ namespace FastUntility.Base
         /// <summary>
         /// post content(insert)
         /// </summary>
-        public static string PostContent(string url, string param, string mediaType = "application/json")
+        public static string PostContent(string url, string param, int version = 1, string mediaType = "application/json")
         {
             try
             {
                 var handle = new HttpRequestMessage();
-                handle.Version = new Version(2, 0);
+                handle.Version = new Version(version, 0);
                 handle.Content = new StringContent(param, Encoding.UTF8, mediaType);
                 handle.Method = HttpMethod.Put;
                 handle.RequestUri = new Uri(url);
@@ -112,7 +112,7 @@ namespace FastUntility.Base
         /// <summary>
         /// put url(update)
         /// </summary>
-        public static string PutUrl(string url, Dictionary<string, object> dic, string mediaType = "application/json")
+        public static string PutUrl(string url, Dictionary<string, object> dic, int version = 1, string mediaType = "application/json")
         {
             try
             {
@@ -131,9 +131,13 @@ namespace FastUntility.Base
                     count++;
                 }
 
-                var content = new StringContent("", Encoding.UTF8, mediaType);
-                var response = http.PostAsync(new Uri(url), content).Result;
-                response.EnsureSuccessStatusCode();
+                var handle = new HttpRequestMessage();
+                handle.Version = new Version(version, 0);
+                handle.Content = new StringContent("", Encoding.UTF8, mediaType);
+                handle.Method = HttpMethod.Put;
+                handle.RequestUri = new Uri(url);
+
+                var response = http.SendAsync(handle).Result;
                 return response.Content.ReadAsStringAsync().Result;
             }
             catch (Exception ex)
@@ -148,7 +152,7 @@ namespace FastUntility.Base
         /// <summary>
         /// post content(insert)
         /// </summary>
-        public static string PostSoap(string url, string method, Dictionary<string, object> param)
+        public static string PostSoap(string url, string method, Dictionary<string, object> param, int version = 1)
         {
             try
             {
@@ -168,12 +172,11 @@ namespace FastUntility.Base
                 xml.Append("</soap:Envelope>");
 
                 var handle = new HttpRequestMessage();
-                handle.Version = new Version(2, 0);
+                handle.Version = new Version(version, 0);
                 handle.Content = new StringContent(xml.ToString(), Encoding.UTF8, "text/xml");
                 handle.Method = HttpMethod.Post;
                 handle.RequestUri = new Uri(url);
                 var response = http.SendAsync(handle).Result;
-                response.EnsureSuccessStatusCode();
                 var result = response.Content.ReadAsStringAsync().Result;
 
                 result = result.Replace("soap:Envelope", "Envelope");
@@ -196,12 +199,12 @@ namespace FastUntility.Base
         /// <summary>
         /// delete url (delete)
         /// </summary>
-        public static string DeleteUrl(string url, string mediaType = "application/json")
+        public static string DeleteUrl(string url, int version = 1, string mediaType = "application/json")
         {
             try
             {
                 var handle = new HttpRequestMessage();
-                handle.Version = new Version(2, 0);
+                handle.Version = new Version(version, 0);
                 handle.Content = new StringContent("", Encoding.UTF8, mediaType);
                 handle.Method = HttpMethod.Delete;
                 handle.RequestUri = new Uri(url);
@@ -218,3 +221,19 @@ namespace FastUntility.Base
         #endregion
     }
 }
+
+/*
+    GET  请求获取由Request-URI所标识的资源。
+         
+    POST  在Request-URI所标识的资源后附加新的数据。
+         
+    HEAD  请求获取由Request-URI所标识的资源的响应消息报头。
+         
+    OPTIONS  请求查询服务器的性能，或查询与资源相关的选项和需求。
+         
+    PUT   请求服务器存储一个资源，并用Request-URI作为其标识。
+         
+    DELETE  请求服务器删除由Request-URI所标识的资源。
+         
+    TRACE  请求服务器回送收到的请求信息，主要用语测试或诊断。         
+ */
