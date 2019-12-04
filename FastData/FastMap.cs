@@ -639,8 +639,10 @@ namespace FastData
             var type = new Dictionary<string, object>();
             var param = new Dictionary<string, object>();
             var check = new Dictionary<string, object>();
+            var name = new Dictionary<string, object>();
+            var parameName = new Dictionary<string, object>();
 
-            GetXmlList(path, "sqlMap", ref key, ref sql, ref db,ref type, ref check, ref param, config);
+            GetXmlList(path, "sqlMap", ref key, ref sql, ref db,ref type, ref check, ref param, ref name, ref parameName, config);
 
             for (var i = 0; i < key.Count; i++)
                 DbCache.Set(config.CacheType, key[i].ToLower(), sql[i]);
@@ -653,7 +655,6 @@ namespace FastData
             }
 
             DbCache.Set<List<string>>(config.CacheType, "FastMap.Api", map);
-            key.Add("FastMap.Api");
 
             foreach (KeyValuePair<string, object> item in type)
             {
@@ -673,6 +674,18 @@ namespace FastData
                 key.Add(item.Key);
             }
 
+            foreach (KeyValuePair<string, object> item in name)
+            {
+                DbCache.Set(config.CacheType, item.Key, item.Value);
+                key.Add(item.Key);
+            }
+
+            foreach (KeyValuePair<string, object> item in parameName)
+            {
+                DbCache.Set(config.CacheType, item.Key, item.Value);
+                key.Add(item.Key);
+            }
+
             return key;
         }
         #endregion
@@ -687,7 +700,8 @@ namespace FastData
         private static void GetXmlList(string path, string xmlNode, 
             ref List<string> key, ref List<string> sql, ref Dictionary<string, object> db,
             ref Dictionary<string, object> type, ref Dictionary<string, object> check,
-            ref Dictionary<string, object> param, ConfigModel config)
+            ref Dictionary<string, object> param, ref Dictionary<string, object> name,
+            ref Dictionary<string, object> parameName, ConfigModel config)
         {
             try
             {
@@ -730,6 +744,10 @@ namespace FastData
                                 Task.Run(() => { BaseLog.SaveLog(string.Format("xml文件:{0},存在相同键:{1}", path, tempKey), "MapKeyExists"); });
                             key.Add(tempKey);
                             sql.Add(temp.ChildNodes.Count.ToString());
+                            
+                            //name
+                            if (temp.Attributes["name"] != null)
+                                name.Add(string.Format("{0}.remark", tempKey), temp.Attributes["name"].Value);
 
                             foreach (XmlNode node in temp.ChildNodes)
                             {
@@ -807,11 +825,14 @@ namespace FastData
                                         //check date
                                         if (dyn.Attributes["date"] != null)
                                             check.Add(string.Format("{0}.{1}.date", tempKey, dyn.Attributes["property"].Value.ToLower()), dyn.Attributes["date"].Value.ToStr());
-
-
+                                        
                                         //参数
                                         tempParam.Add(dyn.Attributes["property"].Value);
 
+                                        //param name
+                                        if (dyn.Attributes["name"] != null)
+                                            parameName.Add(string.Format("{0}.{1}.remark", tempKey, dyn.Attributes["property"].Value.ToLower()), dyn.Attributes["name"].Value);
+                                        
                                         if (dyn.Name.ToLower() == "ispropertyavailable")
                                         {
                                             //属性和值
@@ -1331,6 +1352,20 @@ namespace FastData
         }
         #endregion
 
+        #region 获取map备注
+        public static string MapRemark(string name)
+        {
+            return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.remark", name.ToLower()));
+        }
+        #endregion
+
+        #region 获取map参数备注
+        public static string MapParamRemark(string name, string param)
+        {
+            return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.{1}.remark", name.ToLower(), param.ToLower()));
+        }
+        #endregion
+
         #region  获取api接口key
         /// <summary>
         /// 获取api接口key
@@ -1421,7 +1456,7 @@ namespace FastData
             var keyField = string.Format("{0}.foreach.field.{0}", name.ToLower(), i);
             var keySql = string.Format("{0}.foreach.sql.{0}", name.ToLower(), i);
 
-             return !string.IsNullOrEmpty(DbCache.Get(config.CacheType, keyName)) &&
+            return !string.IsNullOrEmpty(DbCache.Get(config.CacheType, keyName)) &&
                 !string.IsNullOrEmpty(DbCache.Get(config.CacheType, keyField)) &&
                 !string.IsNullOrEmpty(DbCache.Get(config.CacheType, keySql));
         }
