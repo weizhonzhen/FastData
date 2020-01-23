@@ -24,12 +24,12 @@ namespace FastUntility.Base
         /// <summary>
         /// get url(select)
         /// </summary>
-        public static string GetUrl(string url, int version = 1)
+        public static string GetUrl(string url, int version = 1, int minor = 1)
         {
             try
             {
                 var handle = new HttpRequestMessage();
-                handle.Version = new Version(version, 0);
+                handle.Version = new Version(version, minor);
                 handle.Content = new StringContent("", Encoding.UTF8);
                 handle.Method = HttpMethod.Get;
                 handle.RequestUri = new Uri(url);
@@ -49,7 +49,7 @@ namespace FastUntility.Base
         /// <summary>
         /// post url(insert)
         /// </summary>
-        public static string PostUrl(string url, Dictionary<string, object> dic, int version = 1, string mediaType = "application/json")
+        public static string PostUrl(string url, Dictionary<string, object> dic, int version = 1, int minor = 1, string mediaType = "application/json")
         {
             try
             {
@@ -69,7 +69,7 @@ namespace FastUntility.Base
                 }
 
                 var handle = new HttpRequestMessage();
-                handle.Version = new Version(version, 0);
+                handle.Version = new Version(version, minor);
                 handle.Content = new StringContent("", Encoding.UTF8, mediaType);
                 handle.Method = HttpMethod.Put;
                 handle.RequestUri = new Uri(url);
@@ -88,12 +88,12 @@ namespace FastUntility.Base
         /// <summary>
         /// post content(insert)
         /// </summary>
-        public static string PostContent(string url, string param, int version = 1, string mediaType = "application/json")
+        public static string PostContent(string url, string param, int version = 1, int minor = 1, string mediaType = "application/json")
         {
             try
             {
                 var handle = new HttpRequestMessage();
-                handle.Version = new Version(version, 0);
+                handle.Version = new Version(version, minor);
                 handle.Content = new StringContent(param, Encoding.UTF8, mediaType);
                 handle.Method = HttpMethod.Put;
                 handle.RequestUri = new Uri(url);
@@ -112,7 +112,7 @@ namespace FastUntility.Base
         /// <summary>
         /// put url(update)
         /// </summary>
-        public static string PutUrl(string url, Dictionary<string, object> dic, int version = 1, string mediaType = "application/json")
+        public static string PutUrl(string url, Dictionary<string, object> dic, int version = 1, int minor = 1, string mediaType = "application/json")
         {
             try
             {
@@ -132,7 +132,7 @@ namespace FastUntility.Base
                 }
 
                 var handle = new HttpRequestMessage();
-                handle.Version = new Version(version, 0);
+                handle.Version = new Version(version, minor);
                 handle.Content = new StringContent("", Encoding.UTF8, mediaType);
                 handle.Method = HttpMethod.Put;
                 handle.RequestUri = new Uri(url);
@@ -152,15 +152,16 @@ namespace FastUntility.Base
         /// <summary>
         /// post content(insert)
         /// </summary>
-        public static string PostSoap(string url, string method, Dictionary<string, object> param, int version = 1)
+        public static string PostSoap(string url, string method, Dictionary<string, object> param, string Namespace = "http://tempuri.org/", int version = 1, int minor = 1)
         {
             try
             {
                 var xml = new StringBuilder();
                 xml.Append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
                 xml.Append("<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">");
+                xml.Append("<soap:Header />");
                 xml.Append("<soap:Body>");
-                xml.AppendFormat("<{0} xmlns=\"http://openmas.chinamobile.com/pulgin\">", method);
+                xml.AppendFormat("<{0} xmlns=\"{1}\">", method, Namespace);
 
                 foreach (KeyValuePair<string, object> item in param)
                 {
@@ -172,7 +173,7 @@ namespace FastUntility.Base
                 xml.Append("</soap:Envelope>");
 
                 var handle = new HttpRequestMessage();
-                handle.Version = new Version(version, 0);
+                handle.Version = new Version(version, minor);
                 handle.Content = new StringContent(xml.ToString(), Encoding.UTF8, "text/xml");
                 handle.Method = HttpMethod.Post;
                 handle.RequestUri = new Uri(url);
@@ -185,6 +186,7 @@ namespace FastUntility.Base
                 result = result.Replace(" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"", "");
                 result = result.Replace(" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"", "");
                 result = result.Replace(" xmlns=\"http://openmas.chinamobile.com/pulgin\"", "");
+                result = result.Replace(string.Format(" xmlns=\"{0}\"", Namespace), "");
                 return BaseXml.GetXmlString(result, string.Format("Envelope/Body/{0}Response/{0}Result", method)).Replace("&lt;", "<").Replace("&gt;", ">");
             }
             catch (Exception ex)
@@ -199,12 +201,12 @@ namespace FastUntility.Base
         /// <summary>
         /// delete url (delete)
         /// </summary>
-        public static string DeleteUrl(string url, int version = 1, string mediaType = "application/json")
+        public static string DeleteUrl(string url, int version = 1, int minor = 1, string mediaType = "application/json")
         {
             try
             {
                 var handle = new HttpRequestMessage();
-                handle.Version = new Version(version, 0);
+                handle.Version = new Version(version, minor);
                 handle.Content = new StringContent("", Encoding.UTF8, mediaType);
                 handle.Method = HttpMethod.Delete;
                 handle.RequestUri = new Uri(url);
