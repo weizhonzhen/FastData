@@ -171,8 +171,6 @@ namespace FastData
                 }
             }
 
-            CreateLogTable(query);
-
             foreach (var item in list.Path)
             {
                 var info = new FileInfo(item);
