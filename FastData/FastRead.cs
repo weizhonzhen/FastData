@@ -57,7 +57,6 @@ namespace FastData
         {
             var result = new DataQuery();
             result.Config = DataConfig.GetConfig(key);
-
             result.Key = key;
 
             var queryField = BaseField.QueryField<T>(predicate, field, result.Config);
@@ -179,6 +178,9 @@ namespace FastData
         {
             var stopwatch = new Stopwatch();
             var result = new DataReturn<T>();
+            
+            if (item.Predicate.Exists(a => a.IsSuccess == false))
+                return result.list;
 
             stopwatch.Start();
 
@@ -255,6 +257,9 @@ namespace FastData
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
 
+            if (item.Predicate.Exists(a => a.IsSuccess == false))
+                return result.Json;
+
             stopwatch.Start();
 
             if (db == null)
@@ -327,6 +332,9 @@ namespace FastData
         {
             var result = new DataReturn<T>();
             var stopwatch = new Stopwatch();
+
+            if (item.Predicate.Exists(a => a.IsSuccess == false))
+                return result.item;
 
             stopwatch.Start();
 
@@ -406,6 +414,9 @@ namespace FastData
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
 
+            if (item.Predicate.Exists(a => a.IsSuccess == false))
+                return result.Count;
+
             stopwatch.Start();
 
             if (db == null)
@@ -453,6 +464,9 @@ namespace FastData
         {
             var result = new DataReturn<T>();
             var stopwatch = new Stopwatch();
+
+            if (item.Predicate.Exists(a => a.IsSuccess == false))
+                return result.pageResult;
 
             stopwatch.Start();
 
@@ -503,7 +517,7 @@ namespace FastData
             return new Lazy<PageResult<T>>(() => ToPage<T>(item, pModel,db));
         }
         #endregion
-
+        
         #region 返回分页lazy asy
         /// <summary>
         /// 返回分页lazy asy
@@ -533,6 +547,9 @@ namespace FastData
         {
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
+
+            if (item.Predicate.Exists(a => a.IsSuccess == false))
+                return result.PageResult;
 
             stopwatch.Start();
 
@@ -697,6 +714,9 @@ namespace FastData
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
 
+            if (item.Predicate.Exists(a => a.IsSuccess == false))
+                return result.DicList;
+
             stopwatch.Start();
 
             if (db == null)
@@ -769,6 +789,9 @@ namespace FastData
         {
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
+
+            if (item.Predicate.Exists(a => a.IsSuccess == false))
+                return result.Dic;
 
             stopwatch.Start();
             item.Take = 1;
@@ -843,6 +866,9 @@ namespace FastData
         {
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
+
+            if (item.Predicate.Exists(a => a.IsSuccess == false))
+                return result.Table;
 
             stopwatch.Start();
             item.Take = 1;
