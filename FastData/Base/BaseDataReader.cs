@@ -24,7 +24,7 @@ namespace FastData.Base
         public static List<T> ToList<T>(DbDataReader dr, ConfigModel config, List<string> field = null) where T : class, new()
         {
             var list = new List<T>();
-            var dynSet = new DynamicSet<T>();
+            var dynSet = new Property.DynamicSet<T>();
 
             if (dr == null)
                 return list;
@@ -64,23 +64,26 @@ namespace FastData.Base
                 {
                     for (var i = 0; i < field.Count; i++)
                     {
-                        var id = dr.GetOrdinal(config.DbType == DataDbType.Oracle ? field[i].ToUpper() : field[i]);
-
-                        try
+                        if (propertyList.Exists(a => a.Name.ToLower() == field[i].ToLower()))
                         {
-                            if (!dr.IsDBNull(id))
+                            var id = dr.GetOrdinal(config.DbType == DataDbType.Oracle ? field[i].ToUpper() : field[i]);
+
+                            try
                             {
-                                if (dr.GetValue(id) != DBNull.Value)
+                                if (!dr.IsDBNull(id))
                                 {
-                                    var info = propertyList.Find(a => a.Name.ToLower() == field[i].ToLower());
-                                    if (info.PropertyType.Name == "Nullable`1" && info.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                        dynSet.SetValue(item, info.Name, Convert.ChangeType(dr.GetValue(id), Nullable.GetUnderlyingType(info.PropertyType)), config.IsPropertyCache);
-                                    else
-                                        dynSet.SetValue(item, field[i], Convert.ChangeType(dr.GetValue(id), info.PropertyType), config.IsPropertyCache);
+                                    if (dr.GetValue(id) != DBNull.Value)
+                                    {
+                                        var info = propertyList.Find(a => a.Name.ToLower() == field[i].ToLower());
+                                        if (info.PropertyType.Name == "Nullable`1" && info.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                                            dynSet.SetValue(item, info.Name, Convert.ChangeType(dr.GetValue(id), Nullable.GetUnderlyingType(info.PropertyType)), config.IsPropertyCache);
+                                        else
+                                            dynSet.SetValue(item, field[i], Convert.ChangeType(dr.GetValue(id), info.PropertyType), config.IsPropertyCache);
+                                    }
                                 }
                             }
+                            catch { }
                         }
-                        catch { }
                     }
                 }
 
