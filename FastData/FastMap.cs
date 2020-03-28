@@ -620,6 +620,28 @@ namespace FastData
         }
         #endregion
 
+        #region 验证xml
+        /// <summary>
+        /// 验证xml
+        /// </summary>
+        /// <returns></returns>
+        public static bool CheckMap(string xml, string dbKey = null)
+        {
+            var config = DataConfig.GetConfig(dbKey);
+            var info = new FileInfo(xml);
+
+            var key = new List<string>();
+            var sql = new List<string>();
+            var db = new Dictionary<string, object>();
+            var type = new Dictionary<string, object>();
+            var param = new Dictionary<string, object>();
+            var check = new Dictionary<string, object>();
+            var name = new Dictionary<string, object>();
+            var parameName = new Dictionary<string, object>();
+
+            return GetXmlList(info.FullName, "sqlMap", ref key, ref sql, ref db, ref type, ref check, ref param, ref name, ref parameName, config);
+        }
+        #endregion
 
         #region 读取xml map并缓存
         /// <summary>
@@ -694,7 +716,7 @@ namespace FastData
         /// <param name="path">文件名</param>
         /// <param name="xmlNode">结点</param>
         /// <returns></returns>
-        private static void GetXmlList(string path, string xmlNode, 
+        private static bool GetXmlList(string path, string xmlNode, 
             ref List<string> key, ref List<string> sql, ref Dictionary<string, object> db,
             ref Dictionary<string, object> type, ref Dictionary<string, object> check,
             ref Dictionary<string, object> param, ref Dictionary<string, object> name,
@@ -702,6 +724,7 @@ namespace FastData
         {
             try
             {
+                var result = true;
                 var tempKey = "";
 
                 //变量
@@ -735,10 +758,13 @@ namespace FastData
                             var tempParam = new List<string>();
                             #region XmlElement
                             tempKey = temp.Attributes["id"].Value.ToLower();
-                            
+
                             //节点数
-                            if (Array.Exists(key.ToArray(), element=> element== tempKey))
-                                Task.Run(() => { BaseLog.SaveLog(string.Format("xml文件:{0},存在相同键:{1}", path, tempKey), "MapKeyExists"); });
+                            if (Array.Exists(key.ToArray(), element => element == tempKey))
+                            {
+                                result = false;
+                                Task.Run(() => { BaseLog.SaveLog(string.Format("xml文件:{0},存在相同键:{1}", path, tempKey), "MapKeyExists"); }); 
+                            }
                             key.Add(tempKey);
                             sql.Add(temp.ChildNodes.Count.ToString());
                             
@@ -919,6 +945,8 @@ namespace FastData
                         }
                     }
                 }
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -929,6 +957,7 @@ namespace FastData
                     else
                         DbLog.LogException(true, "InstanceMap", ex, "GetXmlList", "");
                 });
+                return false;
             }
         }
         #endregion
