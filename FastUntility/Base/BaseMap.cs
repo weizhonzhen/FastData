@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -21,29 +21,40 @@ namespace FastUntility.Base
 
             foreach (var item in BaseDic.PropertyInfo<T1>())
             {
-                var info = list.Find(a => a.Name.ToLower() == item.Name.ToLower());
+                if (list.Exists(a => a.Name.ToLower() == item.Name.ToLower()))
+                {
+                    var info = list.Find(a => a.Name.ToLower() == item.Name.ToLower());
 
-                if (info.PropertyType.Namespace == "System")
-                {
-                    if (item.PropertyType.Name == "Nullable`1" && item.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                        dynSet.SetValue(result, info.Name, dynGet.GetValue(model, item.Name, true), true);
-                    else
-                        dynSet.SetValue(result, info.Name, Convert.ChangeType(dynGet.GetValue(model, item.Name, true), item.PropertyType), true);
-                }
-                else
-                {
-                    var tempModel = Convert.ChangeType(dynGet.GetValue(model, item.Name, true), item.PropertyType);
-                    var leafModel = Activator.CreateInstance(info.PropertyType.Assembly.GetType(info.PropertyType.FullName));
-                    var leafList = (info.PropertyType as TypeInfo).GetProperties().ToList();
-                    foreach (var leaf in (item.PropertyType as TypeInfo).GetProperties())
+                    var isList = item.PropertyType.FullName.IndexOf("[[") > 0;
+                    var isLeafSystemType = isList && item.PropertyType.FullName.Split('[')[2].Replace("[", "").StartsWith("System.");
+                    var isSystemType = item.PropertyType.FullName.StartsWith("System.");
+
+                    if (isList && !isLeafSystemType)
                     {
-                        if (leafList.Exists(a => a.Name == leaf.Name))
-                        {
-                            var temp = leafList.Find(a => a.Name.ToLower() == leaf.Name.ToLower());
-                            temp.SetValue(leafModel, leaf.GetValue(tempModel));
-                        }
+
                     }
-                    dynSet.SetValue(result, info.Name, leafModel, true);
+                    else if (isSystemType)
+                    {
+                        if (item.PropertyType.Name == "Nullable`1" && item.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                            dynSet.SetValue(result, info.Name, dynGet.GetValue(model, item.Name, true), true);
+                        else
+                            dynSet.SetValue(result, info.Name, Convert.ChangeType(dynGet.GetValue(model, item.Name, true), item.PropertyType), true);
+                    }
+                    else
+                    {
+                        var tempModel = Convert.ChangeType(dynGet.GetValue(model, item.Name, true), item.PropertyType);
+                        var leafModel = Activator.CreateInstance(info.PropertyType.Assembly.GetType(info.PropertyType.FullName));
+                        var leafList = (info.PropertyType as TypeInfo).GetProperties().ToList();
+                        foreach (var leaf in (item.PropertyType as TypeInfo).GetProperties())
+                        {
+                            if (leafList.Exists(a => a.Name == leaf.Name))
+                            {
+                                var temp = leafList.Find(a => a.Name.ToLower() == leaf.Name.ToLower());
+                                temp.SetValue(leafModel, leaf.GetValue(tempModel));
+                            }
+                        }
+                        dynSet.SetValue(result, info.Name, leafModel, true);
+                    }
                 }
             }
 
