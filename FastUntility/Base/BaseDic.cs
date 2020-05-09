@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -148,6 +148,9 @@ namespace FastUntility.Base
             var cases = new List<SwitchCase>();
             foreach (var propertyInfo in BaseDic.PropertyInfo<T>(IsSetCache))
             {
+                if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
+                    continue;
+
                 var property = Expression.Property(Expression.Convert(instance, typeof(T)), propertyInfo.Name);
                 var setValue = Expression.Assign(property, Expression.Convert(newValue, propertyInfo.PropertyType));
                 var propertyHash = Expression.Constant(propertyInfo.Name.GetHashCode(), typeof(int));
@@ -160,7 +163,7 @@ namespace FastUntility.Base
         }
         #endregion
     }
-    
+
     /// <summary>
     /// 动态属性getvalue
     /// </summary>
@@ -204,6 +207,9 @@ namespace FastUntility.Base
 
             foreach (var propertyInfo in BaseDic.PropertyInfo<T>(IsGetCache))
             {
+                if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
+                    continue;
+
                 var property = Expression.Property(Expression.Convert(instance, typeof(T)), propertyInfo.Name);
                 var propertyHash = Expression.Constant(propertyInfo.Name.GetHashCode(), typeof(int));
                 cases.Add(Expression.SwitchCase(Expression.Convert(property, typeof(object)), propertyHash));
@@ -234,13 +240,12 @@ namespace System.Collections.Generic
             if (item == null)
                 return "";
 
-            foreach(KeyValuePair<string,object> temp in item)
-            {
-                if (temp.Key.ToLower() == key.ToLower())
-                    return temp.Value;
-            }
+            key = item.Keys.ToList().Find(a => a.ToLower() == key.ToLower());
 
-            return "";
+            if (string.IsNullOrEmpty(key))
+                return "";
+            else
+                return item[key];
         }
 
         public static Dictionary<string, object> SetValue(this Dictionary<string, object> item, string key,object value)
@@ -251,16 +256,13 @@ namespace System.Collections.Generic
             if (item == null)
                 return item;
 
-             foreach (var temp in item.Keys)
-            {
-                if (temp.ToLower() == key.ToLower())
-                {
-                    item[temp] = value;
-                    return item;
-                }
-            }
+            key = item.Keys.ToList().Find(a => a.ToLower() == key.ToLower());
 
-            item.Add(key, value);
+            if (!string.IsNullOrEmpty(key))
+                item[key] = value;
+            else
+                item.Add(key, value);
+
             return item;
         }
     }
