@@ -65,10 +65,11 @@ namespace FastData.Base
         /// <returns></returns>
         public static bool ToBool(DbCommand cmd, string sql, bool IsProcedure = false)
         {
+            cmd.CommandText = sql;
+
             if (IsProcedure)
                 cmd.CommandType = CommandType.StoredProcedure;
 
-            cmd.CommandText = sql;
             return cmd.ExecuteNonQuery() > -1;
         }
         #endregion
@@ -99,11 +100,11 @@ namespace FastData.Base
                     table.AppendFormat(" {0} on {1}", item.Table[i], item.Predicate[i].Where);
 
                     if (item.Predicate[i].Param.Count != 0)
-                        param.AddRange(Parameter.ReNewParam(item.Predicate[i].Param,item.Config));
+                        param.AddRange(item.Predicate[i].Param);
                 }
                                 
                 if (item.Predicate[0].Param.Count != 0)
-                    param.AddRange(Parameter.ReNewParam(item.Predicate[0].Param,item.Config));
+                    param.AddRange(item.Predicate[0].Param);
 
                 if (item.Config.DbType == DataDbType.SqlServer)
                 {
@@ -202,7 +203,7 @@ namespace FastData.Base
             }
             catch(Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (item.Config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(item.Config, ex, "ToPageDataReader", "");
@@ -232,16 +233,16 @@ namespace FastData.Base
                     sql = string.Format("{2} {0} on {1}", item.Table[i], item.Predicate[i].Where, sql);
 
                     if (item.Predicate[i].Param.Count != 0)
-                        param.AddRange(Parameter.ReNewParam(item.Predicate[i].Param,item.Config));
+                        param.AddRange(item.Predicate[i].Param);
                 }
 
                 if (!string.IsNullOrEmpty(item.Predicate[0].Where))
                     sql = string.Format("{1} where {0}", item.Predicate[0].Where, sql);
 
                 if (item.Predicate[0].Param.Count != 0)
-                    param.AddRange(Parameter.ReNewParam(item.Predicate[0].Param,item.Config));
-                
-                if (param.Count!=0)
+                    param.AddRange(item.Predicate[0].Param);
+
+                if(param.Count!=0)
                     cmd.Parameters.AddRange(param.ToArray());
 
                 var dt = BaseExecute.ToDataTable(cmd, sql.ToString());
@@ -250,7 +251,7 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (item.Config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(item.Config, ex, "ToPageCount", "");
@@ -279,7 +280,7 @@ namespace FastData.Base
                 tempSql = ParameterToSql.ObjectParamToSql(param.ToList(), sql, config);
 
                 if (param != null)
-                    cmd.Parameters.AddRange(Parameter.ReNewParam(param.ToList(), config).ToArray());
+                    cmd.Parameters.AddRange(param.ToArray());
 
                 var dt = BaseExecute.ToDataTable(cmd, sql.ToString());
 
@@ -287,7 +288,7 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "ToPageCountSql", "");
@@ -340,7 +341,7 @@ namespace FastData.Base
                 tempSql = ParameterToSql.ObjectParamToSql(param.ToList(), sql, config);
 
                 if (param != null)
-                    cmd.Parameters.AddRange(Parameter.ReNewParam(param.ToList(), config).ToArray());
+                    cmd.Parameters.AddRange(param.ToArray());
 
                 cmd.CommandText = sql;
 
@@ -348,7 +349,7 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                         DbLogTable.LogException(config, ex, "ToPageDataReaderSql", "");
