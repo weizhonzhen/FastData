@@ -89,7 +89,7 @@ namespace FastData.Context
                     sql.AppendFormat(" {0} on {1}", item.Table[i], item.Predicate[i].Where);
 
                     if (item.Predicate[i].Param.Count != 0)
-                        param.AddRange(Parameter.ReNewParam(item.Predicate[i].Param,item.Config));
+                        param.AddRange(item.Predicate[i].Param);
                 }
 
                 sql.AppendFormat(" where {0}", item.Predicate[0].Where);
@@ -107,7 +107,7 @@ namespace FastData.Context
                     sql.AppendFormat(" and limit 0 offset {0}", item.Take);
 
                 if (item.Predicate[0].Param.Count != 0)
-                    param.AddRange(Parameter.ReNewParam(item.Predicate[0].Param,item.Config));
+                    param.AddRange(item.Predicate[0].Param);
 
                 if (item.GroupBy.Count > 0)
                     sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
@@ -387,7 +387,7 @@ namespace FastData.Context
                     sql.AppendFormat(" {0} on {1}", item.Table[i], item.Predicate[i].Where);
 
                     if (item.Predicate[i].Param.Count != 0)
-                        param.AddRange(Parameter.ReNewParam(item.Predicate[i].Param,item.Config));
+                        param.AddRange(item.Predicate[i].Param);
                 }
 
                 sql.AppendFormat(" where {0}", item.Predicate[0].Where);
@@ -405,7 +405,7 @@ namespace FastData.Context
                     sql.AppendFormat(" and limit 0 offset {0}", item.Take);
 
                 if (item.Predicate[0].Param.Count != 0)
-                    param.AddRange(Parameter.ReNewParam(item.Predicate[0].Param,item.Config));
+                    param.AddRange(item.Predicate[0].Param);
 
                 if (item.GroupBy.Count > 0)
                     sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
@@ -463,7 +463,7 @@ namespace FastData.Context
                     sql.AppendFormat(" {0} on {1}", item.Table[i], item.Predicate[i].Where);
 
                     if (item.Predicate[i].Param.Count != 0)
-                        param.AddRange(Parameter.ReNewParam(item.Predicate[i].Param,item.Config));
+                        param.AddRange(item.Predicate[i].Param);
                 }
 
                 if (!string.IsNullOrEmpty(item.Predicate[0].Where))
@@ -471,7 +471,7 @@ namespace FastData.Context
                     sql.AppendFormat(" where {0}", item.Predicate[0].Where);
 
                     if (item.Predicate[0].Param.Count != 0)
-                        param.AddRange(Parameter.ReNewParam(item.Predicate[0].Param,item.Config));
+                        param.AddRange(item.Predicate[0].Param);
                 }
 
                 if (item.GroupBy.Count > 0)
@@ -528,7 +528,7 @@ namespace FastData.Context
                 cmd.Parameters.Clear();
 
                 if (param != null)
-                    cmd.Parameters.AddRange(Parameter.ReNewParam(param.ToList(), config).ToArray());
+                    cmd.Parameters.AddRange(param.ToArray());
 
                 var dr = BaseExecute.ToDataReader(cmd, sql);
 
@@ -567,13 +567,12 @@ namespace FastData.Context
                 else
                     result.Sql = sql;
 
-                if (isLog)
-                    DbLog.LogSql(true, result.Sql, config.DbType, 0);
+                DbLog.LogSql(isLog, result.Sql, config.DbType, 0);
 
                 cmd.Parameters.Clear();
 
                 if (param != null)
-                    cmd.Parameters.AddRange(Parameter.ReNewParam(param.ToList(), config).ToArray());
+                    cmd.Parameters.AddRange(param.ToArray());
 
                 var dr = BaseExecute.ToDataReader(cmd, sql);
 
@@ -623,7 +622,7 @@ namespace FastData.Context
                     sql.AppendFormat(" {0} on {1}", item.Table[i], item.Predicate[i].Where);
 
                     if (item.Predicate[i].Param.Count != 0)
-                        param.AddRange(Parameter.ReNewParam(item.Predicate[i].Param, item.Config));
+                        param.AddRange(item.Predicate[i].Param);
                 }
 
                 sql.AppendFormat(" where {0}", item.Predicate[0].Where);
@@ -641,7 +640,7 @@ namespace FastData.Context
                     sql.AppendFormat(" and limit 0 offset {0}", item.Take);
 
                 if (item.Predicate[0].Param.Count != 0)
-                    param.AddRange(Parameter.ReNewParam(item.Predicate[0].Param, item.Config));
+                    param.AddRange(item.Predicate[0].Param);
                 
                 if (item.GroupBy.Count > 0)
                     sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
@@ -706,7 +705,7 @@ namespace FastData.Context
                     sql.AppendFormat(" {0} on {1}", item.Table[i], item.Predicate[i].Where);
 
                     if (item.Predicate[i].Param.Count != 0)
-                        param.AddRange(Parameter.ReNewParam(item.Predicate[i].Param, item.Config));
+                        param.AddRange(item.Predicate[i].Param);
                 }
 
                 sql.AppendFormat(" where {0}", item.Predicate[0].Where);
@@ -724,7 +723,7 @@ namespace FastData.Context
                     sql.AppendFormat(" and limit 0 offset {0}", item.Take);
 
                 if (item.Predicate[0].Param.Count != 0)
-                    param.AddRange(Parameter.ReNewParam(item.Predicate[0].Param, item.Config));
+                    param.AddRange(item.Predicate[0].Param);
                 
                 if (item.GroupBy.Count > 0)
                     sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
@@ -790,7 +789,7 @@ namespace FastData.Context
                 cmd.Parameters.Clear();
 
                 if (visitModel.Param.Count != 0)
-                    cmd.Parameters.AddRange(Parameter.ReNewParam(visitModel.Param, config).ToArray());
+                    cmd.Parameters.AddRange(visitModel.Param.ToArray());
 
                 if (visitModel.IsSuccess)
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, sql.ToString());
@@ -854,10 +853,10 @@ namespace FastData.Context
                     cmd.Parameters.Clear();
 
                     if (update.Param.Count != 0)
-                        cmd.Parameters.AddRange(Parameter.ReNewParam(update.Param, config).ToArray());
+                        cmd.Parameters.AddRange(update.Param.ToArray());
 
                     if (visitModel.Param.Count != 0)
-                        cmd.Parameters.AddRange(Parameter.ReNewParam(visitModel.Param, config).ToArray());
+                        cmd.Parameters.AddRange(visitModel.Param.ToArray());
 
                     result.sql = ParameterToSql.ObjectParamToSql(Parameter.ParamMerge(update.Param, visitModel.Param), sql, config);
 
@@ -920,7 +919,7 @@ namespace FastData.Context
                     cmd.Parameters.Clear();
 
                     if (insert.Param.Count != 0)
-                        cmd.Parameters.AddRange(Parameter.ReNewParam(insert.Param, config).ToArray());
+                        cmd.Parameters.AddRange(insert.Param.ToArray());
 
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, insert.Sql);
 
@@ -1118,8 +1117,7 @@ namespace FastData.Context
                 else
                     result.Sql = sql;
 
-                if (isLog)
-                    DbLog.LogSql(true, result.Sql, config.DbType, 0);
+                DbLog.LogSql(isLog, result.Sql, config.DbType, 0);
 
                 cmd.Parameters.Clear();
 
