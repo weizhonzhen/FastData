@@ -334,7 +334,7 @@ namespace FastData.Check
             if (item.Config.DbType == DataDbType.SqlServer)
             {
                 sql = string.Format("select count(0) count from sys.extended_properties where object_id('{0}')=major_id and minor_id=0", tableName);
-                var count = db.ExecuteSql(sql,null,true).DicList[0]["count"].ToStr().ToInt(0);
+                var count = db.ExecuteSql(sql,null,item.Config.IsOutSql).DicList[0]["count"].ToStr().ToInt(0);
                 if (count >= 1)
                     sql = string.Format("execute sp_updateextendedproperty N'MS_Description', '{0}', N'user', N'dbo', N'table', N'{1}', NULL, NULL", value, tableName);
                 else
@@ -371,7 +371,7 @@ namespace FastData.Check
                                     and exists(select 1 from sys.extended_properties where object_id('{0}')=major_id and colid=minor_id)"
                                       , tableName, name);
 
-                var count = db.ExecuteSql(sql,null,true).DicList[0]["count"].ToStr().ToInt(0);
+                var count = db.ExecuteSql(sql,null,item.Config.IsOutSql).DicList[0]["count"].ToStr().ToInt(0);
                 db.Dispose();
 
                 if (count >= 1)
