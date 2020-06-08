@@ -99,6 +99,6 @@ namespace FastData.Model
         /// <summary>
         /// 出错信息
         /// </summary>
-        public string Mesasge { get; set; }
+        public string Message { get; set; }
     }
 }
