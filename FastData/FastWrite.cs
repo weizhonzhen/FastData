@@ -183,6 +183,56 @@ namespace FastData
         #endregion
 
 
+        #region 删除
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public static WriteReturn Delete<T>(T model, DataContext db = null, string key = null, bool isTrans = false) where T : class, new()
+        {
+            ConfigModel config = null;
+            var result = new DataReturn<T>();
+            var stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+
+            if (db == null)
+            {
+                var tempDb = BaseContext.GetContext(key);
+                result = tempDb.Delete(model, isTrans);
+                config = tempDb.config;
+                tempDb.Dispose();
+            }
+            else
+            {
+                result = db.Delete(model, isTrans);
+                config = db.config;
+            }
+
+            stopwatch.Stop();
+
+            DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
+
+            return result.writeReturn;
+        }
+        #endregion
+
+        #region 删除asy
+        /// <summary>
+        /// 删除asy
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<WriteReturn> UpdateAsy<T>(T model, DataContext db = null, string key = null, bool isTrans = false) where T : class, new()
+        {
+            return await Task.Run(() =>
+            {
+                return Delete<T>(model, db, key);
+            });
+        }
+        #endregion
+
+
         #region 修改(Lambda表达式)
         /// <summary>
         /// 修改(Lambda表达式)
