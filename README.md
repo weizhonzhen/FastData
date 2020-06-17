@@ -11,6 +11,8 @@ FastMap.InstanceProperties(namespace, dll);
 //chache map
 FastMap.InstanceMap(db);
 
+//by Repository
+ services.AddTransient<IFastRepository, FastRepository>();
 
 //web.config
 <configSections>
