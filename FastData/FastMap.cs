@@ -76,7 +76,7 @@ namespace FastData
             query.Config = DataConfig.GetConfig(dbKey);
             query.Key = dbKey;
 
-           MapXml.CreateLogTable(query);
+            MapXml.CreateLogTable(query);
 
             var assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == dll.Replace(".dll", ""));
             if (assembly == null)
@@ -87,7 +87,7 @@ namespace FastData
                 foreach (var temp in assembly.ExportedTypes)
                 {
                     var typeInfo = (temp as TypeInfo);
-                    if (typeInfo.Namespace != null && typeInfo.Namespace==nameSpace)
+                    if (typeInfo.Namespace != null && typeInfo.Namespace == nameSpace)
                         BaseTable.Check(query, temp.Name, typeInfo.DeclaredProperties.ToList(), typeInfo.GetCustomAttributes().ToList());
                 }
             }
@@ -103,63 +103,62 @@ namespace FastData
         {
             var list = MapConfig.GetConfig();
             var config = DataConfig.GetConfig(dbKey);
-            var db = new DataContext(dbKey);
-            var query = new DataQuery { Config = config, Key = dbKey };
+            using (var db = new DataContext(dbKey)) {
+                var query = new DataQuery { Config = config, Key = dbKey };
 
-            if (config.IsMapSave)
-            {
-                query.Config.DesignModel = FastData.Base.Config.CodeFirst;
-                if (query.Config.DbType == DataDbType.Oracle)
+                if (config.IsMapSave)
                 {
-                    var listInfo = typeof(FastData.DataModel.Oracle.Data_MapFile).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
-                    var listAttribute = typeof(FastData.DataModel.Oracle.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();
-                    BaseTable.Check(query, "Data_MapFile", listInfo, listAttribute);
+                    query.Config.DesignModel = FastData.Base.Config.CodeFirst;
+                    if (query.Config.DbType == DataDbType.Oracle)
+                    {
+                        var listInfo = typeof(FastData.DataModel.Oracle.Data_MapFile).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
+                        var listAttribute = typeof(FastData.DataModel.Oracle.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();
+                        BaseTable.Check(query, "Data_MapFile", listInfo, listAttribute);
+                    }
+
+                    if (query.Config.DbType == DataDbType.MySql)
+                    {
+                        var listInfo = typeof(FastData.DataModel.MySql.Data_MapFile).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
+                        var listAttribute = typeof(FastData.DataModel.MySql.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();
+                        BaseTable.Check(query, "Data_MapFile", listInfo, listAttribute);
+                    }
+
+                    if (query.Config.DbType == DataDbType.SqlServer)
+                    {
+                        var listInfo = typeof(FastData.DataModel.SqlServer.Data_MapFile).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
+                        var listAttribute = typeof(FastData.DataModel.SqlServer.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();
+                        BaseTable.Check(query, "Data_MapFile", listInfo, listAttribute);
+                    }
                 }
 
-                if (query.Config.DbType == DataDbType.MySql)
+                foreach (var item in list.Path)
                 {
-                    var listInfo = typeof(FastData.DataModel.MySql.Data_MapFile).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
-                    var listAttribute = typeof(FastData.DataModel.MySql.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();
-                    BaseTable.Check(query, "Data_MapFile", listInfo, listAttribute);
-                }
+                    var info = new FileInfo(item);
+                    var key = BaseSymmetric.md5(32, info.FullName);
 
-                if (query.Config.DbType == DataDbType.SqlServer)
-                {
-                    var listInfo = typeof(FastData.DataModel.SqlServer.Data_MapFile).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
-                    var listAttribute = typeof(FastData.DataModel.SqlServer.Data_MapFile).GetTypeInfo().GetCustomAttributes().ToList();
-                    BaseTable.Check(query, "Data_MapFile", listInfo, listAttribute);
+                    if (!DbCache.Exists(config.CacheType, key))
+                    {
+                        var temp = new MapXmlModel();
+                        temp.LastWrite = info.LastWriteTime;
+                        temp.FileKey = MapXml.ReadXml(item, config, info.Name.ToLower().Replace(".xml", ""));
+                        temp.FileName = info.FullName;
+                        if (MapXml.SaveXml(dbKey, key, info, config, db))
+                            DbCache.Set<MapXmlModel>(config.CacheType, key, temp);
+                    }
+                    else if ((DbCache.Get<MapXmlModel>(config.CacheType, key).LastWrite - info.LastWriteTime).Milliseconds != 0)
+                    {
+                        foreach (var temp in DbCache.Get<MapXmlModel>(config.CacheType, key).FileKey)
+                            DbCache.Remove(config.CacheType, temp);
+
+                        var model = new MapXmlModel();
+                        model.LastWrite = info.LastWriteTime;
+                        model.FileKey = MapXml.ReadXml(item, config, info.Name.ToLower().Replace(".xml", ""));
+                        model.FileName = info.FullName;
+                        if (MapXml.SaveXml(dbKey, key, info, config, db))
+                            DbCache.Set<MapXmlModel>(config.CacheType, key, model);
+                    }
                 }
             }
-
-            foreach (var item in list.Path)
-            {
-                var info = new FileInfo(item);
-                var key = BaseSymmetric.md5(32, info.FullName);
-
-                if (!DbCache.Exists(config.CacheType, key))
-                {
-                    var temp = new MapXmlModel();
-                    temp.LastWrite = info.LastWriteTime;
-                    temp.FileKey = MapXml.ReadXml(item, config, info.Name.ToLower().Replace(".xml", ""));
-                    temp.FileName = info.FullName;
-                    if (MapXml.SaveXml(dbKey,key, info, config, db))
-                        DbCache.Set<MapXmlModel>(config.CacheType, key, temp);
-                }
-                else if ((DbCache.Get<MapXmlModel>(config.CacheType, key).LastWrite - info.LastWriteTime).Milliseconds != 0)
-                {
-                    foreach (var temp in DbCache.Get<MapXmlModel>(config.CacheType, key).FileKey)
-                        DbCache.Remove(config.CacheType, temp);
-
-                    var model = new MapXmlModel();
-                    model.LastWrite = info.LastWriteTime;
-                    model.FileKey = MapXml.ReadXml(item, config, info.Name.ToLower().Replace(".xml", ""));
-                    model.FileName = info.FullName;
-                    if (MapXml.SaveXml(dbKey,key, info, config, db))
-                        DbCache.Set<MapXmlModel>(config.CacheType, key, model);
-                }
-            }
-
-            db.Dispose();
         }
         #endregion
 
@@ -182,12 +181,12 @@ namespace FastData
                 {
                     if (db == null)
                     {
-                        var tempDb = BaseContext.GetContext(key);
+                        using(var tempDb =new DataContext(key)){
                         for (var i = 1; i < MapXml.MapForEachCount(name, config); i++)
                         {
                             result = MapXml.MapForEach<T>(result, name, tempDb, key, config,i);
                         }
-                        tempDb.Dispose();
+                        }
                     }
                     else
                         result = MapXml.MapForEach<T>(result, name, db, key, config);
@@ -316,12 +315,12 @@ namespace FastData
                 {
                     if (db == null)
                     {
-                        var tempDb = BaseContext.GetContext(key);
+                        using(var tempDb =new DataContext(key)){
                         for (var i = 1; i < MapXml.MapForEachCount(name, config); i++)
                         {
                             result = MapXml.MapForEach(result, name, tempDb, key, config,i);
                         }
-                        tempDb.Dispose();
+                        }
                     }
                     else
                         result = MapXml.MapForEach(result, name, db, key, config);
@@ -388,9 +387,9 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(key);
+                using(var tempDb =new DataContext(key)){
                 result = tempDb.GetPageSql(pModel, sql, param);
-                tempDb.Dispose();
+                }
             }
             else
                 result = db.GetPageSql(pModel, sql, param);
@@ -423,12 +422,12 @@ namespace FastData
                 {
                     if (db == null)
                     {
-                        var tempDb = BaseContext.GetContext(key);
+                        using(var tempDb =new DataContext(key)){
                         for (var i = 1; i < MapXml.MapForEachCount(name, config); i++)
                         {
                             result.list = MapXml.MapForEach(result.list, name, tempDb, key, config,i);
                         }
-                        tempDb.Dispose();
+                        }
                     }
                     else
                         result.list = MapXml.MapForEach(result.list, name, db, key, config);
@@ -495,9 +494,9 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(key);
+                using(var tempDb =new DataContext(key)){
                 result = tempDb.GetPageSql<T>(pModel, sql, param);
-                tempDb.Dispose();
+                }
             }
             else
                 result = db.GetPageSql<T>(pModel, sql, param);
@@ -530,12 +529,12 @@ namespace FastData
                 {
                     if (db == null)
                     {
-                        var tempDb = BaseContext.GetContext(key);
+                        using(var tempDb =new DataContext(key)){
                         for (var i = 1; i < MapXml.MapForEachCount(name, config); i++)
                         {
                             result.list = MapXml.MapForEach<T>(result.list, name, tempDb, key, config,i);
                         }
-                        tempDb.Dispose();
+                        }
                     }
                     else
                         result.list = MapXml.MapForEach<T>(result.list, name, db, key, config);

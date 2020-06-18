@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -97,7 +97,7 @@ namespace FastData
         /// <param name="predicate"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public static DataQuery RightJoin<T, T1>(this DataQuery item, Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false) where T1 : class,new()
+        public static DataQuery RightJoin<T, T1>(this DataQuery item, Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false) where T1 : class, new()
         {
             return JoinType("right join", item, predicate, field);
         }
@@ -113,7 +113,7 @@ namespace FastData
         /// <param name="predicate"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public static DataQuery InnerJoin<T, T1>(this DataQuery item, Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false) where T1 : class,new()
+        public static DataQuery InnerJoin<T, T1>(this DataQuery item, Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false) where T1 : class, new()
         {
             return JoinType("inner join", item, predicate, field);
         }
@@ -178,7 +178,7 @@ namespace FastData
         {
             var stopwatch = new Stopwatch();
             var result = new DataReturn<T>();
-            
+
             if (item.Predicate.Exists(a => a.IsSuccess == false))
                 return result.list;
 
@@ -186,9 +186,10 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(item);
-                result = tempDb.GetList<T>(item);
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(item.Key)) 
+                {
+                    result = tempDb.GetList<T>(item);
+                }
             }
             else
                 result = db.GetList<T>(item);
@@ -207,15 +208,15 @@ namespace FastData
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<List<T>> ToListAsy<T>(this DataQuery item, DataContext db = null) where T : class,new()
+        public static async Task<List<T>> ToListAsy<T>(this DataQuery item, DataContext db = null) where T : class, new()
         {
             return await Task.Run(() =>
             {
-                return ToList<T>(item,db);
+                return ToList<T>(item, db);
             });
         }
-        #endregion        
-        
+        #endregion
+
         #region 返回lazy<list>
         /// <summary>
         /// 返回lazy<list>
@@ -223,9 +224,9 @@ namespace FastData
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static Lazy<List<T>> ToLazyList<T>(this DataQuery item, DataContext db = null) where T : class,new()
+        public static Lazy<List<T>> ToLazyList<T>(this DataQuery item, DataContext db = null) where T : class, new()
         {
-            return new Lazy<List<T>>(() => ToList<T>(item,db));
+            return new Lazy<List<T>>(() => ToList<T>(item, db));
         }
         #endregion
 
@@ -236,11 +237,11 @@ namespace FastData
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<Lazy<List<T>>> ToLazyListAsy<T>(this DataQuery item, DataContext db = null) where T : class,new()
+        public static async Task<Lazy<List<T>>> ToLazyListAsy<T>(this DataQuery item, DataContext db = null) where T : class, new()
         {
             return await Task.Run(() =>
             {
-                return new Lazy<List<T>>(() => ToList<T>(item,db));
+                return new Lazy<List<T>>(() => ToList<T>(item, db));
             });
         }
         #endregion
@@ -264,9 +265,10 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(item);
-                result = tempDb.GetJson(item);
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(item.Key)) 
+                {
+                    result = tempDb.GetJson(item);
+                }
             }
             else
                 result = db.GetJson(item);
@@ -288,7 +290,7 @@ namespace FastData
         {
             return await Task.Run(() =>
             {
-                return ToJson(item,db);
+                return ToJson(item, db);
             });
         }
         #endregion
@@ -301,7 +303,7 @@ namespace FastData
         /// <returns></returns>
         public static Lazy<string> ToLazyJson(this DataQuery item, DataContext db = null)
         {
-            return new Lazy<string>(() => ToJson(item,db));
+            return new Lazy<string>(() => ToJson(item, db));
         }
         #endregion
 
@@ -315,7 +317,7 @@ namespace FastData
         {
             return await Task.Run(() =>
             {
-                return new Lazy<string>(() => ToJson(item,db));
+                return new Lazy<string>(() => ToJson(item, db));
             });
         }
         #endregion
@@ -342,9 +344,10 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(item);
-                result = tempDb.GetList<T>(item);
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(item.Key)) 
+                {
+                    result = tempDb.GetList<T>(item);
+                }
             }
             else
                 result = db.GetList<T>(item);
@@ -364,11 +367,11 @@ namespace FastData
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<T> ToItemAsy<T>(this DataQuery item, DataContext db = null) where T : class,new()
+        public static async Task<T> ToItemAsy<T>(this DataQuery item, DataContext db = null) where T : class, new()
         {
             return await Task.Run(() =>
             {
-                return ToItem<T>(item,db);
+                return ToItem<T>(item, db);
             });
         }
         #endregion
@@ -380,9 +383,9 @@ namespace FastData
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static Lazy<T> ToLazyItem<T>(this DataQuery item, DataContext db = null) where T : class,new()
+        public static Lazy<T> ToLazyItem<T>(this DataQuery item, DataContext db = null) where T : class, new()
         {
-            return new Lazy<T>(()=>ToItem<T>(item,db));
+            return new Lazy<T>(() => ToItem<T>(item, db));
         }
         #endregion
 
@@ -393,11 +396,11 @@ namespace FastData
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static async Task<Lazy<T>> ToLazyItemAsy<T>(this DataQuery item, DataContext db = null) where T : class,new()
+        public static async Task<Lazy<T>> ToLazyItemAsy<T>(this DataQuery item, DataContext db = null) where T : class, new()
         {
             return await Task.Run(() =>
             {
-                return new Lazy<T>(() => ToItem<T>(item,db));
+                return new Lazy<T>(() => ToItem<T>(item, db));
             });
         }
         #endregion
@@ -421,9 +424,10 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(item);
-                result = tempDb.GetCount(item);
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(item.Key)) 
+                {
+                    result = tempDb.GetCount(item);
+                }
             }
             else
                 result = db.GetCount(item);
@@ -446,7 +450,7 @@ namespace FastData
         {
             return await Task.Run(() =>
             {
-                return ToCount(item,db);
+                return ToCount(item, db);
             });
         }
         #endregion
@@ -472,9 +476,10 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(item);
-                result = tempDb.GetPage<T>(item, pModel);
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(item.Key)) 
+                {
+                    result = tempDb.GetPage<T>(item, pModel);
+                }
             }
             else
                 result = db.GetPage<T>(item, pModel);
@@ -495,11 +500,11 @@ namespace FastData
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public static async Task<PageResult<T>> ToPageAsy<T>(this DataQuery item, PageModel pModel, DataContext db = null) where T : class,new()
+        public static async Task<PageResult<T>> ToPageAsy<T>(this DataQuery item, PageModel pModel, DataContext db = null) where T : class, new()
         {
             return await Task.Run(() =>
             {
-                return ToPage<T>(item, pModel,db);
+                return ToPage<T>(item, pModel, db);
             });
         }
         #endregion
@@ -512,12 +517,12 @@ namespace FastData
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public static Lazy<PageResult<T>> ToLazyPage<T>(this DataQuery item, PageModel pModel, DataContext db = null) where T : class,new()
+        public static Lazy<PageResult<T>> ToLazyPage<T>(this DataQuery item, PageModel pModel, DataContext db = null) where T : class, new()
         {
-            return new Lazy<PageResult<T>>(() => ToPage<T>(item, pModel,db));
+            return new Lazy<PageResult<T>>(() => ToPage<T>(item, pModel, db));
         }
         #endregion
-        
+
         #region 返回分页lazy asy
         /// <summary>
         /// 返回分页lazy asy
@@ -526,11 +531,11 @@ namespace FastData
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public static async Task<Lazy<PageResult<T>>> ToLazyPageAsy<T>(this DataQuery item, PageModel pModel, DataContext db = null) where T : class,new()
+        public static async Task<Lazy<PageResult<T>>> ToLazyPageAsy<T>(this DataQuery item, PageModel pModel, DataContext db = null) where T : class, new()
         {
             return await Task.Run(() =>
             {
-                return new Lazy<PageResult<T>>(() => ToPage<T>(item, pModel,db));
+                return new Lazy<PageResult<T>>(() => ToPage<T>(item, pModel, db));
             });
         }
         #endregion
@@ -555,9 +560,10 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(item);
-                result = tempDb.GetPage(item, pModel);
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(item.Key)) 
+                {
+                    result = tempDb.GetPage(item, pModel);
+                }
             }
             else
                 result = db.GetPage(item, pModel);
@@ -581,7 +587,7 @@ namespace FastData
         {
             return await Task.Run(() =>
             {
-                return ToPage(item, pModel,db);
+                return ToPage(item, pModel, db);
             });
         }
         #endregion
@@ -596,7 +602,7 @@ namespace FastData
         /// <returns></returns>
         public static Lazy<PageResult> ToLazyPage(this DataQuery item, PageModel pModel, DataContext db = null)
         {
-            return new Lazy<PageResult>(() => ToPage(item, pModel,db));
+            return new Lazy<PageResult>(() => ToPage(item, pModel, db));
         }
         #endregion
 
@@ -611,7 +617,7 @@ namespace FastData
         {
             return await Task.Run(() =>
             {
-                return new Lazy<PageResult>(() => ToPage(item, pModel,db));
+                return new Lazy<PageResult>(() => ToPage(item, pModel, db));
             });
         }
         #endregion
@@ -635,10 +641,11 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(key);
-                result = tempDb.ExecuteSql<T>(sql, param);
-                config = tempDb.config;
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(key)) 
+                {
+                    result = tempDb.ExecuteSql<T>(sql, param);
+                    config = tempDb.config;
+                }
             }
             else
             {
@@ -662,11 +669,11 @@ namespace FastData
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static async Task<List<T>> ExecuteSqlAsy<T>(string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class,new()
+        public static async Task<List<T>> ExecuteSqlAsy<T>(string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class, new()
         {
             return await Task.Run(() =>
             {
-                return ExecuteSql<T>(sql, param,db, key);
+                return ExecuteSql<T>(sql, param, db, key);
             });
         }
         #endregion
@@ -679,9 +686,9 @@ namespace FastData
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static Lazy<List<T>> ExecuteLazySql<T>(string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class,new()
+        public static Lazy<List<T>> ExecuteLazySql<T>(string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class, new()
         {
-            return new Lazy<List<T>>(() => ExecuteSql<T>(sql, param,db, key));
+            return new Lazy<List<T>>(() => ExecuteSql<T>(sql, param, db, key));
         }
         #endregion
 
@@ -693,11 +700,11 @@ namespace FastData
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static async Task<Lazy<List<T>>> ExecuteLazySqlAsy<T>(string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class,new()
+        public static async Task<Lazy<List<T>>> ExecuteLazySqlAsy<T>(string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class, new()
         {
             return await Task.Run(() =>
             {
-                return new Lazy<List<T>>(() => ExecuteSql<T>(sql, param,db, key));
+                return new Lazy<List<T>>(() => ExecuteSql<T>(sql, param, db, key));
             });
         }
         #endregion
@@ -721,9 +728,10 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(item);
-                result = tempDb.GetDic(item);
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(item.Key))
+                {
+                    result = tempDb.GetDic(item);
+                }
             }
             else
                 result = db.GetDic(item);
@@ -746,7 +754,7 @@ namespace FastData
         {
             return await Task.Run(() =>
             {
-                return ToDics(item,db);
+                return ToDics(item, db);
             });
         }
         #endregion
@@ -759,7 +767,7 @@ namespace FastData
         /// <returns></returns>
         public static Lazy<List<Dictionary<string, object>>> ToLazyDics(this DataQuery item, DataContext db = null)
         {
-            return new Lazy<List<Dictionary<string, object>>>(() => ToDics(item,db));
+            return new Lazy<List<Dictionary<string, object>>>(() => ToDics(item, db));
         }
         #endregion
 
@@ -773,7 +781,7 @@ namespace FastData
         {
             return await Task.Run(() =>
             {
-                return new Lazy<List<Dictionary<string, object>>>(() => ToDics(item,db));
+                return new Lazy<List<Dictionary<string, object>>>(() => ToDics(item, db));
             });
         }
         #endregion
@@ -798,9 +806,10 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(item);
-                result = tempDb.GetDic(item);
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(item.Key)) 
+                {
+                    result = tempDb.GetDic(item);
+                }
             }
             else
                 result = db.GetDic(item);
@@ -823,7 +832,7 @@ namespace FastData
         {
             return await Task.Run(() =>
             {
-                return ToDic(item,db);
+                return ToDic(item, db);
             });
         }
         #endregion
@@ -836,7 +845,7 @@ namespace FastData
         /// <returns></returns>
         public static Lazy<Dictionary<string, object>> ToLazyDic(this DataQuery item, DataContext db = null)
         {
-            return new Lazy<Dictionary<string, object>>(() => ToDic(item,db));
+            return new Lazy<Dictionary<string, object>>(() => ToDic(item, db));
         }
         #endregion
 
@@ -850,7 +859,7 @@ namespace FastData
         {
             return await Task.Run(() =>
             {
-                return new Lazy<Dictionary<string, object>>(() => ToDic(item,db));
+                return new Lazy<Dictionary<string, object>>(() => ToDic(item, db));
             });
         }
         #endregion
@@ -875,9 +884,10 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(item);
-                result = tempDb.GetDataTable(item);
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(item.Key)) 
+                {
+                    result = tempDb.GetDataTable(item);
+                }
             }
             else
                 result = db.GetDataTable(item);
@@ -950,10 +960,11 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(key);
-                result = tempDb.ExecuteSql(sql, param, false);
-                config = tempDb.config;
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(key)) 
+                {
+                    result = tempDb.ExecuteSql(sql, param, false);
+                    config = tempDb.config;
+                }
             }
             else
             {
@@ -981,7 +992,7 @@ namespace FastData
         {
             return await Task.Run(() =>
             {
-                return ExecuteSql(sql, param,db,key);
+                return ExecuteSql(sql, param, db, key);
             });
         }
         #endregion
@@ -996,7 +1007,7 @@ namespace FastData
         /// <returns></returns>
         public static Lazy<List<Dictionary<string, object>>> ExecuteLazySql(string sql, DbParameter[] param, DataContext db = null, string key = null)
         {
-            return new Lazy<List<Dictionary<string, object>>>(() => ExecuteSql(sql, param,db,key));
+            return new Lazy<List<Dictionary<string, object>>>(() => ExecuteSql(sql, param, db, key));
         }
         #endregion
 
@@ -1012,7 +1023,7 @@ namespace FastData
         {
             return await Task.Run(() =>
             {
-                return new Lazy<List<Dictionary<string, object>>>(() => ExecuteSql(sql, param,db,key));
+                return new Lazy<List<Dictionary<string, object>>>(() => ExecuteSql(sql, param, db, key));
             });
         }
         #endregion

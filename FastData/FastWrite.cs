@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -34,10 +34,11 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(key);
-                config = tempDb.config;
-                result = tempDb.AddList<T>(list);
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(key))
+                {
+                    config = tempDb.config;
+                    result = tempDb.AddList<T>(list);
+                }
             }
             else
             {
@@ -61,11 +62,11 @@ namespace FastData
         /// <param name="model">实体</param>
         /// <param name="IsTrans">是否事务</param>
         /// <returns></returns>
-        public static async Task<WriteReturn> AddListAsy<T>(List<T> list, DataContext db = null, string key = null) where T : class,new()
+        public static async Task<WriteReturn> AddListAsy<T>(List<T> list, DataContext db = null, string key = null) where T : class, new()
         {
             return await Task.Run(() =>
             {
-                return AddList<T>(list,db, key);
+                return AddList<T>(list, db, key);
             });
         }
         #endregion
@@ -90,10 +91,11 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(key);
-                result = tempDb.Add<T>(model, false);
-                config = tempDb.config;
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(key))
+                {
+                    result = tempDb.Add<T>(model, false);
+                    config = tempDb.config;
+                }
             }
             else
             {
@@ -118,11 +120,11 @@ namespace FastData
         /// <param name="IsTrans">是否事务</param>
         /// <param name="notAddField">不需要增加的字段</param>
         /// <returns></returns>
-        public static async Task<WriteReturn> AddAsy<T>(T model, DataContext db = null, string key=null) where T : class,new()
+        public static async Task<WriteReturn> AddAsy<T>(T model, DataContext db = null, string key = null) where T : class, new()
         {
             return await Task.Run(() =>
             {
-                return Add<T>(model,db, key);
+                return Add<T>(model, db, key);
             });
         }
         #endregion
@@ -146,10 +148,11 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = new DataContext(key);
-                result = tempDb.Delete<T>(predicate);
-                config = tempDb.config;
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(key))
+                {
+                    result = tempDb.Delete<T>(predicate);
+                    config = tempDb.config;
+                }
             }
             else
             {
@@ -173,11 +176,11 @@ namespace FastData
         /// <param name="predicate">表达式</param>
         /// <param name="IsTrans">是否事务</param>
         /// <returns></returns>
-        public static async Task<WriteReturn> DeleteAsy<T>(Expression<Func<T, bool>> predicate, DataContext db = null, string key=null) where T : class,new()
+        public static async Task<WriteReturn> DeleteAsy<T>(Expression<Func<T, bool>> predicate, DataContext db = null, string key = null) where T : class, new()
         {
             return await Task.Run(() =>
             {
-                return Delete<T>(predicate,db,key);
+                return Delete<T>(predicate, db, key);
             });
         }
         #endregion
@@ -199,10 +202,11 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(key);
-                result = tempDb.Delete(model, isTrans);
-                config = tempDb.config;
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(key))
+                {
+                    result = tempDb.Delete(model, isTrans);
+                    config = tempDb.config;
+                }
             }
             else
             {
@@ -253,10 +257,11 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(key);
-                result = tempDb.Update<T>(model, predicate, field);
-                config = tempDb.config;
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(key))
+                {
+                    result = tempDb.Update<T>(model, predicate, field);
+                    config = tempDb.config;
+                }
             }
             else
             {
@@ -282,11 +287,11 @@ namespace FastData
         /// <param name="IsTrans">是否事务</param>
         /// <param name="field">需要修改的字段</param>
         /// <returns></returns>
-        public static async Task<WriteReturn> UpdateAsy<T>(T model, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> field = null, DataContext db = null, string key=null) where T : class,new()
+        public static async Task<WriteReturn> UpdateAsy<T>(T model, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> field = null, DataContext db = null, string key = null) where T : class, new()
         {
             return await Task.Run(() =>
             {
-                return Update<T>(model, predicate, field,db,key);
+                return Update<T>(model, predicate, field, db, key);
             });
         }
         #endregion
@@ -308,10 +313,11 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(key);
-                result = tempDb.Update(model, field);
-                config = tempDb.config;
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(key))
+                {
+                    result = tempDb.Update(model, field);
+                    config = tempDb.config;
+                }
             }
             else
             {
@@ -358,10 +364,11 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(key);
-                result = tempDb.UpdateList(list, field);
-                config = tempDb.config;
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(key))
+                {
+                    result = tempDb.UpdateList(list, field);
+                    config = tempDb.config;
+                }
             }
             else
             {
@@ -409,10 +416,11 @@ namespace FastData
 
             if (db == null)
             {
-                var tempDb = BaseContext.GetContext(key);
-                result = tempDb.ExecuteSql(sql, param,false);
-                config = tempDb.config;
-                tempDb.Dispose();
+                using (var tempDb = new DataContext(key))
+                {
+                    result = tempDb.ExecuteSql(sql, param, false);
+                    config = tempDb.config;
+                }
             }
             else
             {
@@ -435,14 +443,14 @@ namespace FastData
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static async Task<WriteReturn> ExecuteSqlAsy(string sql, DbParameter[] param, DataContext db = null,  string key=null)
+        public static async Task<WriteReturn> ExecuteSqlAsy(string sql, DbParameter[] param, DataContext db = null, string key = null)
         {
             return await Task.Run(() =>
             {
-                return ExecuteSql(sql, param,db,key);
+                return ExecuteSql(sql, param, db, key);
             });
         }
         #endregion
-               
+
     }
 }
