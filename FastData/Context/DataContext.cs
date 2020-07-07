@@ -1149,7 +1149,7 @@ namespace FastData.Context
         /// <param name="IsTrans"></param>
         /// <param name="IsAsync"></param>
         /// <returns></returns>
-        public DataReturn<T> AddList<T>(List<T> list, bool isTrans = false) where T : class, new()
+        public DataReturn<T> AddList<T>(List<T> list) where T : class, new()
         {
             var result = new DataReturn<T>();
             var sql = new StringBuilder();
@@ -1157,6 +1157,7 @@ namespace FastData.Context
 
             try
             {
+                BeginTrans();
                 if (config.DbType == DataDbType.Oracle)
                 {
                     #region oracle
@@ -1270,9 +1271,15 @@ namespace FastData.Context
 
                     #endregion
                 }
+
+                if (result.writeReturn.IsSuccess)
+                    SubmitTrans();
+                else if (result.writeReturn.IsSuccess == false)
+                    RollbackTrans();
             }
             catch (Exception ex)
             {
+                RollbackTrans();
                 Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
