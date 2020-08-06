@@ -175,7 +175,7 @@ namespace FastUntility.Base
 
                 foreach (KeyValuePair<string, object> item in param)
                 {
-                    xml.AppendFormat("<{0}>{1}</{0}>", item.Key, item.Value);
+                    xml.AppendFormat("<{0}>{1}</{0}>", item.Key, item.Value.ToStr().Replace("<", "&lt;").Replace(">", "&gt;"));
                 }
 
                 xml.AppendFormat("</{0}>", method);
