@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FastUntility.Cache;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
@@ -15,7 +16,14 @@ namespace FastData.Property
         // 构建函数        
         public DynamicGet()
         {
-            GetValueDelegate = GenerateGetValue();
+            var key = string.Format("DynamicGet<T>.{0}.{1}", typeof(T)?.Namespace, typeof(T).Name);
+            if (!BaseCache.Exists(key))
+            {
+                GetValueDelegate = GenerateGetValue();
+                BaseCache.Set<object>(key, GetValueDelegate);
+            }
+            else
+                GetValueDelegate = BaseCache.Get<object>(key) as Func<object, string, object>;
         }
 
         #region 动态getvalue
@@ -44,22 +52,17 @@ namespace FastData.Property
             var nameHash = Expression.Variable(typeof(int), "nameHash");
             var calHash = Expression.Assign(nameHash, Expression.Call(memberName, typeof(object).GetMethod("GetHashCode")));
             var cases = new List<SwitchCase>();
-            //var task = new List<Task>();
 
             foreach (var propertyInfo in PropertyCache.GetPropertyInfo<T>(IsGetCache))
             {
                 if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
                     continue;
 
-                //task.Add(Task.Run(() =>
-                //{
                 var property = Expression.Property(Expression.Convert(instance, typeof(T)), propertyInfo.Name);
-                    var propertyHash = Expression.Constant(propertyInfo.Name.GetHashCode(), typeof(int));
-                    cases.Add(Expression.SwitchCase(Expression.Convert(property, typeof(object)), propertyHash));
-                //}));
+                var propertyHash = Expression.Constant(propertyInfo.Name.GetHashCode(), typeof(int));
+                cases.Add(Expression.SwitchCase(Expression.Convert(property, typeof(object)), propertyHash));
             }
 
-            //Task.WaitAll(task.ToArray());
             var switchEx = Expression.Switch(nameHash, Expression.Constant(null), cases.ToArray());
             var methodBody = Expression.Block(typeof(object), new[] { nameHash }, calHash, switchEx);
 
@@ -78,7 +81,15 @@ namespace FastData.Property
         public DynamicGet(object model)
         {
             Instance = model;
-            GetValueDelegate = GenerateGetValue();
+
+            var key = string.Format("DynamicGet.{0}.{1}", model.GetType()?.Namespace, model.GetType().Name);
+            if (!BaseCache.Exists(key))
+            {
+                GetValueDelegate = GenerateGetValue();
+                BaseCache.Set<object>(key, GetValueDelegate);
+            }
+            else
+                GetValueDelegate = BaseCache.Get<object>(key) as Func<object, string, object>;
         }
 
         #region 动态getvalue
