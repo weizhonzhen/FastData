@@ -21,6 +21,8 @@ namespace FastData.Repository
 {
     public class FastRepository : IFastRepository
     {
+        internal Query query { get; set; } = new Query();
+
         #region maq 执行返回结果
         /// <summary>
         /// maq 执行返回结果
@@ -452,9 +454,12 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public string MapDb(string name)
+        public string MapDb(string name, bool isMapDb = false)
         {
-            return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.db", name.ToLower()));
+            if (string.IsNullOrEmpty(this.query.Data.Key) && isMapDb == false)
+                return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.db", name.ToLower()));
+            else
+                return this.query.Data.Key;
         }
         #endregion
 
@@ -973,6 +978,53 @@ namespace FastData.Repository
             {
                 return ExecuteSql(sql, param, db, key);
             });
+        }
+        #endregion
+
+
+        #region 表查询
+        /// <summary>
+        /// 表查询
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="predicate">条件</param>
+        /// <param name="field">字段</param>
+        /// <param name="Key"></param>
+        /// <returns></returns>
+        public IQuery Query<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> field = null, string key = null)
+        {
+            if (this.query.Data.Config == null && string.IsNullOrEmpty(key))
+                throw new Exception("数据库查询key不能为空");
+
+            if (!string.IsNullOrEmpty(key))
+            {
+                query.Data.Config = DataConfig.GetConfig(key);
+                query.Data.Key = key;
+            }
+
+            var queryField = BaseField.QueryField<T>(predicate, field, query.Data.Config);
+            query.Data.Field.Add(queryField.Field);
+            query.Data.AsName.AddRange(queryField.AsName);
+
+            var condtion = VisitExpression.LambdaWhere<T>(predicate, query.Data.Config);
+            query.Data.Predicate.Add(condtion);
+            query.Data.Table.Add(string.Format("{0} {1}", typeof(T).Name, predicate.Parameters[0].Name));
+
+            return query;
+        }
+        #endregion
+
+        #region 多种数据库类型切换
+        /// <summary>
+        /// 多种数据库类型切换
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public IFastRepository SetKey(string key)
+        {
+            query.Data.Config = DataConfig.GetConfig(key);
+            query.Data.Key = key;
+            return this;
         }
         #endregion
     }

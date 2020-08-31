@@ -16,19 +16,6 @@ namespace FastData.Repository
     {
         internal DataQuery Data { get; set; } = new DataQuery();
 
-        #region 多种数据库类型切换
-        /// <summary>
-        /// 多种数据库类型切换
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public DataQuery SetKey(string key)
-        {
-            this.Data.Config= DataConfig.GetConfig(key);
-            return this.Data;
-        }
-        #endregion
-
         #region 查询join
         /// <summary>
         /// 查询join
@@ -40,7 +27,7 @@ namespace FastData.Repository
         /// <param name="predicate">条件</param>
         /// <param name="field">字段</param>
         /// <returns></returns>
-        private DataQuery JoinType<T, T1>(string joinType, Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false)
+        private IQuery JoinType<T, T1>(string joinType, Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false)
         {
             var queryField = BaseField.QueryField<T, T1>(predicate, field, this.Data.Config);
             this.Data.Field.Add(queryField.Field);
@@ -51,7 +38,7 @@ namespace FastData.Repository
             this.Data.Table.Add(string.Format("{2} {0}{3} {1}", typeof(T1).Name, predicate.Parameters[1].Name
             , joinType, isDblink && !string.IsNullOrEmpty(this.Data.Config.DbLinkName) ? string.Format("@", this.Data.Config.DbLinkName) : ""));
 
-            return this.Data;
+            return this;
         }
         #endregion
 
@@ -65,7 +52,7 @@ namespace FastData.Repository
         /// <param name="predicate"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public DataQuery LeftJoin<T, T1>(Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false)
+        public IQuery LeftJoin<T, T1>(Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false)
         {
             return JoinType("left join", predicate, field);
         }
@@ -81,7 +68,7 @@ namespace FastData.Repository
         /// <param name="predicate"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public DataQuery RightJoin<T, T1>(Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false) where T1 : class, new()
+        public IQuery RightJoin<T, T1>(Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false) where T1 : class, new()
         {
             return JoinType("right join", predicate, field);
         }
@@ -97,7 +84,7 @@ namespace FastData.Repository
         /// <param name="predicate"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public DataQuery InnerJoin<T, T1>(Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false) where T1 : class, new()
+        public IQuery InnerJoin<T, T1>(Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false) where T1 : class, new()
         {
             return JoinType("inner join", predicate, field);
         }
@@ -111,11 +98,11 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public DataQuery OrderBy<T>(Expression<Func<T, object>> field, bool isDesc = true)
+        public IQuery OrderBy<T>(Expression<Func<T, object>> field, bool isDesc = true)
         {
             var orderBy = BaseField.OrderBy<T>(field, this.Data.Config, isDesc);
             this.Data.OrderBy.AddRange(orderBy);
-            return this.Data;
+            return this;
         }
         #endregion
 
@@ -127,11 +114,11 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public DataQuery GroupBy<T>(Expression<Func<T, object>> field)
+        public IQuery GroupBy<T>(Expression<Func<T, object>> field)
         {
             var groupBy = BaseField.GroupBy<T>(field, this.Data.Config);
             this.Data.GroupBy.AddRange(groupBy);
-            return this.Data;
+            return this;
         }
         #endregion
 
@@ -143,10 +130,10 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public DataQuery Take(int i)
+        public IQuery Take(int i)
         {
             this.Data.Take = i;
-            return this.Data;
+            return this;
         }
         #endregion
 

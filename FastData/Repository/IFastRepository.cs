@@ -51,7 +51,7 @@ namespace FastData.Repository
 
         Task<Lazy<PageResult<T>>> QueryPageLazyAsy<T>(PageModel pModel, string name, DbParameter[] param, DataContext db = null, string key = null) where T : class, new();
 
-        string MapDb(string name);
+        string MapDb(string name, bool isMapDb = false);
 
         List<string> MapParam(string name);
 
@@ -87,6 +87,10 @@ namespace FastData.Repository
 
         WriteReturn ExecuteSql(string sql, DbParameter[] param, DataContext db = null, string key = null);
 
-        Task<WriteReturn> ExecuteSqlAsy(string sql, DbParameter[] param, DataContext db = null, string key = null);        
+        Task<WriteReturn> ExecuteSqlAsy(string sql, DbParameter[] param, DataContext db = null, string key = null);
+
+        IQuery Query<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> field = null, string key = null);
+
+        IFastRepository SetKey(string key);
     }
 }
