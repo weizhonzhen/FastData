@@ -87,5 +87,10 @@ namespace FastData.Model
         /// 是否更新缓存
         /// </summary>
         public bool IsUpdateCache { get; set; }
+                
+        /// <summary>
+        /// 切换数据库
+        /// </summary>
+        public bool IsChangeDb { get; set; }
     }
 }
