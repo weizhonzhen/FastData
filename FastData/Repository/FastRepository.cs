@@ -996,10 +996,19 @@ namespace FastData.Repository
             if (this.query.Data.Config == null && string.IsNullOrEmpty(key))
                 throw new Exception("数据库查询key不能为空");
 
-            if (!string.IsNullOrEmpty(key))
+           if (this.query.Data.Config == null && string.IsNullOrEmpty(key))
+                throw new Exception("数据库查询key不能为空");
+            else if (!string.IsNullOrEmpty(key))
             {
-                query.Data.Config = DataConfig.GetConfig(key);
-                query.Data.Key = key;
+                this.query.Data = new DataQuery();
+                this.query.Data.Config = DataConfig.GetConfig(key);
+                this.query.Data.Key = key;
+            }
+            else
+            {
+                key = this.query.Data.Key;
+                this.query.Data = new DataQuery();
+                this.query.Data.Key = key;
             }
 
             var queryField = BaseField.QueryField<T>(predicate, field, query.Data.Config);
