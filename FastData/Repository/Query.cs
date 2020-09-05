@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace FastData.Repository
 {
-    public class Query : IQuery
+    internal class Query : IQuery
     {
         internal DataQuery Data { get; set; } = new DataQuery();
 
@@ -52,7 +52,7 @@ namespace FastData.Repository
         /// <param name="predicate"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public IQuery LeftJoin<T, T1>(Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false)
+        public override IQuery LeftJoin<T, T1>(Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false)
         {
             return JoinType("left join", predicate, field);
         }
@@ -68,7 +68,7 @@ namespace FastData.Repository
         /// <param name="predicate"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public IQuery RightJoin<T, T1>(Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false) where T1 : class, new()
+        public override IQuery RightJoin<T, T1>(Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false)
         {
             return JoinType("right join", predicate, field);
         }
@@ -84,7 +84,7 @@ namespace FastData.Repository
         /// <param name="predicate"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public IQuery InnerJoin<T, T1>(Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false) where T1 : class, new()
+        public override IQuery InnerJoin<T, T1>(Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false)
         {
             return JoinType("inner join", predicate, field);
         }
@@ -98,7 +98,7 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public IQuery OrderBy<T>(Expression<Func<T, object>> field, bool isDesc = true)
+        public override IQuery OrderBy<T>(Expression<Func<T, object>> field, bool isDesc = true)
         {
             var orderBy = BaseField.OrderBy<T>(field, this.Data.Config, isDesc);
             this.Data.OrderBy.AddRange(orderBy);
@@ -114,7 +114,7 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public IQuery GroupBy<T>(Expression<Func<T, object>> field)
+        public override IQuery GroupBy<T>(Expression<Func<T, object>> field)
         {
             var groupBy = BaseField.GroupBy<T>(field, this.Data.Config);
             this.Data.GroupBy.AddRange(groupBy);
@@ -130,7 +130,7 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public IQuery Take(int i)
+        public override IQuery Take(int i)
         {
             this.Data.Take = i;
             return this;
@@ -145,7 +145,7 @@ namespace FastData.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public List<T> ToList<T>(DataContext db = null) where T : class, new()
+        public override List<T> ToList<T>(DataContext db = null)
         {
             var stopwatch = new Stopwatch();
             var result = new DataReturn<T>();
@@ -179,7 +179,7 @@ namespace FastData.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public async Task<List<T>> ToListAsy<T>(DataContext db = null) where T : class, new()
+        public override async Task<List<T>> ToListAsy<T>(DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -195,7 +195,7 @@ namespace FastData.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public Lazy<List<T>> ToLazyList<T>(DataContext db = null) where T : class, new()
+        public override Lazy<List<T>> ToLazyList<T>(DataContext db = null)
         {
             return new Lazy<List<T>>(() => ToList<T>(db));
         }
@@ -208,7 +208,7 @@ namespace FastData.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public async Task<Lazy<List<T>>> ToLazyListAsy<T>(DataContext db = null) where T : class, new()
+        public override async Task<Lazy<List<T>>> ToLazyListAsy<T>(DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -224,7 +224,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public string ToJson(DataContext db = null)
+        public override string ToJson(DataContext db = null)
         {
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
@@ -257,7 +257,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public async Task<string> ToJsonAsy(DataContext db = null)
+        public override async Task<string> ToJsonAsy(DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -272,7 +272,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public Lazy<string> ToLazyJson(DataContext db = null)
+        public override Lazy<string> ToLazyJson(DataContext db = null)
         {
             return new Lazy<string>(() => ToJson(db));
         }
@@ -284,7 +284,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public async Task<Lazy<string>> ToLazyJsonAsy(DataContext db = null)
+        public override async Task<Lazy<string>> ToLazyJsonAsy(DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -301,7 +301,7 @@ namespace FastData.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public T ToItem<T>(DataContext db = null) where T : class, new()
+        public override T ToItem<T>(DataContext db = null)
         {
             var result = new DataReturn<T>();
             var stopwatch = new Stopwatch();
@@ -337,7 +337,7 @@ namespace FastData.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public async Task<T> ToItemAsy<T>(DataContext db = null) where T : class, new()
+        public override async Task<T> ToItemAsy<T>(DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -353,7 +353,7 @@ namespace FastData.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public Lazy<T> ToLazyItem<T>(DataContext db = null) where T : class, new()
+        public override Lazy<T> ToLazyItem<T>(DataContext db = null)
         {
             return new Lazy<T>(() => ToItem<T>(db));
         }
@@ -366,7 +366,7 @@ namespace FastData.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public async Task<Lazy<T>> ToLazyItemAsy<T>(DataContext db = null) where T : class, new()
+        public override async Task<Lazy<T>> ToLazyItemAsy<T>(DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -382,7 +382,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public int ToCount(DataContext db = null)
+        public override int ToCount(DataContext db = null)
         {
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
@@ -416,7 +416,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public async Task<int> ToCountAsy<T, T1>(DataContext db = null)
+        public override async Task<int> ToCountAsy<T, T1>(DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -434,7 +434,7 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public PageResult<T> ToPage<T>(PageModel pModel, DataContext db = null) where T : class, new()
+        public override PageResult<T> ToPage<T>(PageModel pModel, DataContext db = null)
         {
             var result = new DataReturn<T>();
             var stopwatch = new Stopwatch();
@@ -469,7 +469,7 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public async Task<PageResult<T>> ToPageAsy<T>(PageModel pModel, DataContext db = null) where T : class, new()
+        public override async Task<PageResult<T>> ToPageAsy<T>(PageModel pModel, DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -486,7 +486,7 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public Lazy<PageResult<T>> ToLazyPage<T>(PageModel pModel, DataContext db = null) where T : class, new()
+        public override Lazy<PageResult<T>> ToLazyPage<T>(PageModel pModel, DataContext db = null)
         {
             return new Lazy<PageResult<T>>(() => ToPage<T>(pModel, db));
         }
@@ -500,7 +500,7 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public async Task<Lazy<PageResult<T>>> ToLazyPageAsy<T>(PageModel pModel, DataContext db = null) where T : class, new()
+        public override async Task<Lazy<PageResult<T>>> ToLazyPageAsy<T>(PageModel pModel, DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -517,7 +517,7 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public PageResult ToPage(PageModel pModel, DataContext db = null)
+        public override PageResult ToPage(PageModel pModel, DataContext db = null)
         {
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
@@ -551,7 +551,7 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public async Task<PageResult> ToPageAsy(PageModel pModel, DataContext db = null)
+        public override async Task<PageResult> ToPageAsy(PageModel pModel, DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -568,7 +568,7 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public Lazy<PageResult> ToLazyPage(PageModel pModel, DataContext db = null)
+        public override Lazy<PageResult> ToLazyPage(PageModel pModel, DataContext db = null)
         {
             return new Lazy<PageResult>(() => ToPage(pModel, db));
         }
@@ -581,7 +581,7 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public async Task<Lazy<PageResult>> ToLazyPageAsy(PageModel pModel, DataContext db = null)
+        public override async Task<Lazy<PageResult>> ToLazyPageAsy(PageModel pModel, DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -597,7 +597,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public DataTable ToDataTable(DataContext db = null)
+        public override DataTable ToDataTable(DataContext db = null)
         {
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
@@ -631,7 +631,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public async Task<DataTable> ToDataTableAsy(DataContext db = null)
+        public override async Task<DataTable> ToDataTableAsy(DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -646,7 +646,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public Lazy<DataTable> ToLazyDataTable(DataContext db = null)
+        public override Lazy<DataTable> ToLazyDataTable(DataContext db = null)
         {
             return new Lazy<DataTable>(() => ToDataTable(db));
         }
@@ -658,7 +658,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public async Task<Lazy<DataTable>> ToLazyDataTableAsy(DataContext db = null)
+        public override async Task<Lazy<DataTable>> ToLazyDataTableAsy(DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -674,7 +674,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public List<Dictionary<string, object>> ToDics(DataContext db = null)
+        public override List<Dictionary<string, object>> ToDics(DataContext db = null)
         {
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
@@ -707,7 +707,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public async Task<List<Dictionary<string, object>>> ToDicsAsy(DataContext db = null)
+        public override async Task<List<Dictionary<string, object>>> ToDicsAsy(DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -722,7 +722,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public Lazy<List<Dictionary<string, object>>> ToLazyDics(DataContext db = null)
+        public override Lazy<List<Dictionary<string, object>>> ToLazyDics(DataContext db = null)
         {
             return new Lazy<List<Dictionary<string, object>>>(() => ToDics(db));
         }
@@ -734,7 +734,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public async Task<Lazy<List<Dictionary<string, object>>>> ToLazyDicsAsy(DataContext db = null)
+        public override async Task<Lazy<List<Dictionary<string, object>>>> ToLazyDicsAsy(DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -750,7 +750,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public Dictionary<string, object> ToDic(DataContext db = null)
+        public override Dictionary<string, object> ToDic(DataContext db = null)
         {
             var result = new DataReturn();
             var stopwatch = new Stopwatch();
@@ -784,7 +784,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, object>> ToDicAsy(DataContext db = null)
+        public override async Task<Dictionary<string, object>> ToDicAsy(DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -799,7 +799,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public Lazy<Dictionary<string, object>> ToLazyDic(DataContext db = null)
+        public override Lazy<Dictionary<string, object>> ToLazyDic(DataContext db = null)
         {
             return new Lazy<Dictionary<string, object>>(() => ToDic(db));
         }
@@ -811,7 +811,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public async Task<Lazy<Dictionary<string, object>>> ToLazyDicAsy(DataContext db = null)
+        public override async Task<Lazy<Dictionary<string, object>>> ToLazyDicAsy(DataContext db = null)
         {
             return await Task.Factory.StartNew(() =>
             {
