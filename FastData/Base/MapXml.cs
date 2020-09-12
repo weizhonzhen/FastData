@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using FastData.Type;
 using FastData.Check;
 using FastData.Config;
+using FastUntility.Cache;
 
 namespace FastData.Base
 {
@@ -386,10 +387,9 @@ namespace FastData.Base
         /// <param name="data"></param>
         /// <param name="name"></param>
         /// <param name="db"></param>
-        /// <param name="key"></param>
         /// <param name="config"></param>
         /// <returns></returns>
-        public static List<T> MapForEach<T>(List<T> data, string name, DataContext db, string key, ConfigModel config, int i = 1) where T : class, new()
+        public static List<T> MapForEach<T>(List<T> data, string name, DataContext db,ConfigModel config, int i = 1) where T : class, new()
         {
             var result = new List<T>();
             var param = new List<DbParameter>();
@@ -401,13 +401,18 @@ namespace FastData.Base
 
             if (type.IndexOf(',') > 0)
             {
-                assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == type.Split(',')[1]);
+                var key = string.Format("ForEach.{0}", type.Split(',')[1]);
+                if (BaseCache.Exists(key))
+                    assembly = BaseCache.Get<object>(key) as Assembly;
+                else
+                    assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == type.Split(',')[1]);
                 if (assembly == null)
                     assembly = Assembly.Load(type.Split(',')[1]);
                 if (assembly == null)
                     return data;
                 else
                 {
+                    BaseCache.Set<object>(key, assembly);
                     if (assembly.GetType(type.Split(',')[0]) == null)
                         return data;
 
@@ -584,7 +589,7 @@ namespace FastData.Base
             var apilist = new List<string>();
             foreach (KeyValuePair<string, object> item in db)
             {
-                DbCache.Set(config.CacheType, string.Format("{0}.db", item.Key.ToLower()), item.Value);
+                DbCache.Set(config.CacheType, string.Format("{0}.db", item.Key.ToLower()), item.Value.ToStr());
                 apilist.Add(item.Key.ToLower());
             }
 
@@ -594,7 +599,7 @@ namespace FastData.Base
 
             foreach (KeyValuePair<string, object> item in type)
             {
-                DbCache.Set(config.CacheType, string.Format("{0}.type", item.Key.ToLower()), item.Value);
+                DbCache.Set(config.CacheType, string.Format("{0}.type", item.Key.ToLower()), item.Value.ToStr());
                 key.Add(string.Format("{0}.type", item.Key.ToLower()));
             }
 
@@ -606,19 +611,19 @@ namespace FastData.Base
 
             foreach (KeyValuePair<string, object> item in check)
             {
-                DbCache.Set(config.CacheType, item.Key, item.Value);
+                DbCache.Set(config.CacheType, item.Key, item.Value.ToStr());
                 key.Add(item.Key);
             }
 
             foreach (KeyValuePair<string, object> item in name)
             {
-                DbCache.Set(config.CacheType, item.Key, item.Value);
+                DbCache.Set(config.CacheType, item.Key, item.Value.ToStr());
                 key.Add(item.Key);
             }
 
             foreach (KeyValuePair<string, object> item in parameName)
             {
-                DbCache.Set(config.CacheType, item.Key, item.Value);
+                DbCache.Set(config.CacheType, item.Key, item.Value.ToStr());
                 key.Add(item.Key);
             }
 
@@ -687,7 +692,7 @@ namespace FastData.Base
 
                             //name
                             if (temp.Attributes["name"] != null)
-                                name.Add(string.Format("{0}.remark", tempKey), temp.Attributes["name"].Value);
+                                name.Add(string.Format("{0}.remark", tempKey), temp.Attributes["name"].Value.ToStr());
 
                             foreach (XmlNode node in temp.ChildNodes)
                             {
