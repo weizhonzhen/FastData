@@ -57,6 +57,28 @@ namespace FastData.Repository
 
         Dictionary<string, object> Api();
 
+        bool CheckMap(string xml, string dbKey = null);
+
+        string MapDb(string name);
+
+        string MapType(string name);
+
+        bool IsExists(string name);
+
+        string MapRemark(string name);
+
+        string MapParamRemark(string name, string param);
+
+        string MapRequired(string name, string param);
+
+        string MapMaxlength(string name, string param);
+
+        string MapDate(string name, string param);
+
+        string MapCheckMap(string name, string param);
+
+        string MapExistsMap(string name, string param);
+
         WriteReturn AddList<T>(List<T> list, DataContext db = null, string key = null, bool isLog = false) where T : class, new();
 
         Task<WriteReturn> AddListAsy<T>(List<T> list, DataContext db = null, string key = null, bool isLog = false) where T : class, new();
