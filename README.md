@@ -13,6 +13,7 @@ FastMap.InstanceMap(db);
 
 //by Repository
  services.AddTransient<IFastRepository, FastRepository>();
+ services.AddTransient<IRedisRepository, RedisRepository>();
 
 //web.config
 <configSections>
