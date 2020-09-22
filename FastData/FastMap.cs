@@ -40,25 +40,22 @@ namespace FastData
 
             if (assembly != null)
             {
-                foreach (var temp in assembly.ExportedTypes)
-                {
-                    var typeInfo = (temp as TypeInfo);
-                    if (typeInfo.Namespace != null && typeInfo.Namespace==nameSpace)
+                assembly.ExportedTypes.ToList().ForEach(t => {
+                    var typeInfo = (t as TypeInfo);
+                    if (typeInfo.Namespace != null && typeInfo.Namespace == nameSpace)
                     {
                         var key = string.Format("{0}.{1}", typeInfo.Namespace, typeInfo.Name);
-
                         var cacheList = new List<PropertyModel>();
-                        foreach (var info in typeInfo.DeclaredProperties)
-                        {
+                        typeInfo.DeclaredProperties.ToList().ForEach(a => {
                             var model = new PropertyModel();
-                            model.Name = info.Name;
-                            model.PropertyType = info.PropertyType;
+                            model.Name = a.Name;
+                            model.PropertyType = a.PropertyType;
                             cacheList.Add(model);
-                        }
+                        });
 
                         DbCache.Set<List<PropertyModel>>(config.CacheType, key, cacheList);
                     }
-                }
+                });
             }
         }
         #endregion
@@ -84,12 +81,11 @@ namespace FastData
 
             if (assembly != null)
             {
-                foreach (var temp in assembly.ExportedTypes)
-                {
-                    var typeInfo = (temp as TypeInfo);
+                assembly.ExportedTypes.ToList().ForEach(a => {
+                    var typeInfo = (a as TypeInfo);
                     if (typeInfo.Namespace != null && typeInfo.Namespace == nameSpace)
-                        BaseTable.Check(query, temp.Name, typeInfo.DeclaredProperties.ToList(), typeInfo.GetCustomAttributes().ToList());
-                }
+                        BaseTable.Check(query, a.Name, typeInfo.DeclaredProperties.ToList(), typeInfo.GetCustomAttributes().ToList());
+                });
             }
         }
         #endregion
@@ -131,33 +127,31 @@ namespace FastData
                     }
                 }
 
-                foreach (var item in list.Path)
-                {
-                    var info = new FileInfo(item);
+                list.Path.ForEach(p => {
+                    var info = new FileInfo(p);
                     var key = BaseSymmetric.md5(32, info.FullName);
 
                     if (!DbCache.Exists(config.CacheType, key))
                     {
                         var temp = new MapXmlModel();
                         temp.LastWrite = info.LastWriteTime;
-                        temp.FileKey = MapXml.ReadXml(item, config, info.Name.ToLower().Replace(".xml", ""));
+                        temp.FileKey = MapXml.ReadXml(p, config, info.Name.ToLower().Replace(".xml", ""));
                         temp.FileName = info.FullName;
                         if (MapXml.SaveXml(dbKey, key, info, config, db))
                             DbCache.Set<MapXmlModel>(config.CacheType, key, temp);
                     }
                     else if ((DbCache.Get<MapXmlModel>(config.CacheType, key).LastWrite - info.LastWriteTime).Milliseconds != 0)
                     {
-                        foreach (var temp in DbCache.Get<MapXmlModel>(config.CacheType, key).FileKey)
-                            DbCache.Remove(config.CacheType, temp);
+                        DbCache.Get<MapXmlModel>(config.CacheType, key).FileKey.ForEach(a => { DbCache.Remove(config.CacheType, a); });
 
                         var model = new MapXmlModel();
                         model.LastWrite = info.LastWriteTime;
-                        model.FileKey = MapXml.ReadXml(item, config, info.Name.ToLower().Replace(".xml", ""));
+                        model.FileKey = MapXml.ReadXml(p, config, info.Name.ToLower().Replace(".xml", ""));
                         model.FileName = info.FullName;
                         if (MapXml.SaveXml(dbKey, key, info, config, db))
                             DbCache.Set<MapXmlModel>(config.CacheType, key, model);
                     }
-                }
+                });
             }
         }
         #endregion
@@ -181,11 +175,12 @@ namespace FastData
                 {
                     if (db == null)
                     {
-                        using(var tempDb =new DataContext(key)){
-                        for (var i = 1; i < MapXml.MapForEachCount(name, config); i++)
+                        using (var tempDb = new DataContext(key))
                         {
-                            result = MapXml.MapForEach<T>(result, name, tempDb, config,i);
-                        }
+                            for (var i = 1; i < MapXml.MapForEachCount(name, config); i++)
+                            {
+                                result = MapXml.MapForEach<T>(result, name, tempDb, config, i);
+                            }
                         }
                     }
                     else
