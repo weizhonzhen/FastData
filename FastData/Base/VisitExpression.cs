@@ -8,6 +8,7 @@ using FastUntility.Base;
 using FastData.Type;
 using FastData.Model;
 using System.Data;
+using System.Linq;
 
 namespace FastData.Base
 {
@@ -226,20 +227,19 @@ namespace FastData.Base
                             var mLength = "";
                             var mCount = 0;
 
-                            foreach (var item in meExp.Arguments)
-                            {
+                            meExp.Arguments.ToList().ForEach(a => {
                                 mCount++;
-                                mValue = Expression.Lambda(item).Compile().DynamicInvoke().ToString();
+                                mValue = Expression.Lambda(a).Compile().DynamicInvoke().ToString();
 
                                 if (meExp.Arguments.Count == 2)
                                 {
                                     if (mCount == 1)
-                                        mStar = Expression.Lambda(item).Compile().DynamicInvoke().ToString();
+                                        mStar = Expression.Lambda(a).Compile().DynamicInvoke().ToString();
 
                                     if (mCount == 2)
-                                        mLength = Expression.Lambda(item).Compile().DynamicInvoke().ToString();
+                                        mLength = Expression.Lambda(a).Compile().DynamicInvoke().ToString();
                                 }
-                            }
+                            });
 
                             if (mMethod.ToLower() == "contains")
                             {
@@ -505,15 +505,14 @@ namespace FastData.Base
             result.Where = item.Where;
             result.Param = item.Param;
 
-            foreach (var temp in item.Param)
-            {
-                var replace = string.Format("#{0}#", temp.ParameterName.ToLower());
+            item.Param.ForEach(a => {
+                var replace = string.Format("#{0}#", a.ParameterName.ToLower());
                 if (item.Where.ToLower().IndexOf(replace) >= 0)
                 {
-                    result.Param.RemoveAll(a => a.ParameterName == temp.ParameterName);
-                    result.Where = result.Where.ToLower().Replace(replace, temp.Value.ToString());
+                    result.Param.RemoveAll(p => p.ParameterName == a.ParameterName);
+                    result.Where = result.Where.ToLower().Replace(replace, a.Value.ToString());
                 }
-            }
+            });
 
             return result;
         }

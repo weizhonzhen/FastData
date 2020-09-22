@@ -1,4 +1,4 @@
-using FastData.Property;
+﻿using FastData.Property;
 using FastUntility.Base;
 using System.Collections.Generic;
 using System.Data;
@@ -60,11 +60,10 @@ namespace FastData.Base
 
             sql1.AppendFormat("insert into {0} (", typeof(T).Name);
             sql2.Append("select ");
-            foreach (var item in PropertyCache.GetPropertyInfo<T>())
-            {
-                sql1.AppendFormat("{0},", item.Name);
-                sql2.AppendFormat("tb.{0},", item.Name);
-            }
+            PropertyCache.GetPropertyInfo<T>().ForEach(a => {
+                sql1.AppendFormat("{0},", a.Name);
+                sql2.AppendFormat("tb.{0},", a.Name);
+            });
             sql1.Append(")");
             sql2.AppendFormat("from @{0} as tb", typeof(T).Name);
 
@@ -86,16 +85,11 @@ namespace FastData.Base
             cmd.CommandText = string.Format("select top 1 * from {0}", typeof(T).Name);
             dt.Load(cmd.ExecuteReader());
             dt.Clear();
-            foreach (var item in list)
-            {
+            list.ForEach(p => {
                 var row = dt.NewRow();
-                foreach (var info in PropertyCache.GetPropertyInfo<T>())
-                {
-                    row[info.Name] = dyn.GetValue(item, info.Name, true);
-                }
+                PropertyCache.GetPropertyInfo<T>().ForEach(a => { row[a.Name] = dyn.GetValue(p, a.Name, true); });
                 dt.Rows.Add(row);
-            }
-
+            });
             return dt;
         }
         #endregion
@@ -161,23 +155,15 @@ namespace FastData.Base
             var sql = new StringBuilder();
             sql.AppendFormat("insert into {0}(", typeof(T).Name);
             var dyn = new Property.DynamicGet<T>();
-
-            foreach (var info in PropertyCache.GetPropertyInfo<T>())
-            {
-                sql.AppendFormat("{0},", info.Name);
-            }
+            PropertyCache.GetPropertyInfo<T>().ForEach(a => { sql.AppendFormat("{0},", a.Name); });
             sql.Append(")").Replace(",)", ")");
-
-            foreach (var item in list)
-            {
+            list.ForEach(a => {
                 sql.Append("(");
-
-                foreach (var info in PropertyCache.GetPropertyInfo<T>())
-                {
-                    sql.AppendFormat("'{0}',", dyn.GetValue(item, info.Name, true));
-                }
+                PropertyCache.GetPropertyInfo<T>().ForEach(p => {
+                    sql.AppendFormat("'{0}',", dyn.GetValue(a, p.Name, true));
+                });
                 sql.Append("),").Replace(",)", ")");
-            }
+            });
 
             return sql.ToStr().Substring(0, sql.ToStr().Length - 1);
         }

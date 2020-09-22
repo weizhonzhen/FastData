@@ -3,7 +3,6 @@ using System.Text;
 using Microsoft.CSharp;
 using System.CodeDom.Compiler;
 using FastUntility.Base;
-using System.Threading.Tasks;
 
 namespace FastData.Base
 {
@@ -24,17 +23,16 @@ namespace FastData.Base
 
             if (result.Errors.HasErrors)
             {
-                Task.Factory.StartNew(() =>
+                var error = new StringBuilder();
+                error.AppendFormat("code:{0},error info:", GetCode(code));
+                               
+                foreach (CompilerError info in result.Errors)
                 {
-                    var error = new StringBuilder();
-                    error.AppendFormat("code:{0},error info:", GetCode(code));
-                    foreach (CompilerError info in result.Errors)
-                    {
-                        error.Append(info.ErrorText);
-                    }
+                    error.Append(info.ErrorText);
+                }
 
-                    BaseLog.SaveLog(error.ToString(), "DynamicCompiler");
-                });
+                BaseLog.SaveLog(error.ToString(), "DynamicCompiler");
+
                 return false;
             }
             else
@@ -43,7 +41,7 @@ namespace FastData.Base
                 var assembly = result.CompiledAssembly;
                 var instance = assembly.CreateInstance("DynamicCode.Condition");
                 var method = instance.GetType().GetMethod("OutPut");
-                return (bool)method.Invoke(instance, null);                
+                return (bool)method.Invoke(instance, null);
             }
         }
 
