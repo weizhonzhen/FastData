@@ -4,7 +4,7 @@ using System.Configuration;
 using FastUntility.Base;
 using FastData.Base;
 using FastData.CacheModel;
-using FastUntility.Cache;
+using System.Linq;
 
 namespace FastData.Config
 {
@@ -83,6 +83,7 @@ namespace FastData.Config
                 if (File.Exists(path))
                     result.Path.Add(path);
             }
+
             result.LastWrite = info.LastWriteTime;
 
             return result;
