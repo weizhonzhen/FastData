@@ -39,41 +39,40 @@ namespace FastData.Check
 
                         if (model.Count >= table.Column.Count)
                         {
-                            foreach (var temp in model)
-                            {
+                            model.ForEach(p => {
                                 var tempSql = new List<string>();
-                                var info = table.Column.Find(a => a.Name.ToLower() == temp.Name.ToLower()) ?? new ColumnModel();
-                                var result = CheckModel.CompareTo<ColumnModel>(info, temp);
+                                var info = table.Column.Find(a => a.Name.ToLower() == p.Name.ToLower()) ?? new ColumnModel();
+                                var result = CheckModel.CompareTo<ColumnModel>(info, p);
                                 if (result.IsUpdate)
                                 {
-                                    table.Column.Remove(temp);
+                                    table.Column.Remove(p);
                                     table.Column.Add(result.Item);
                                     UpdateTable(item, result, tableName);
                                 }
-                            }
+                            });
                         }
                         else
                         {
                             var tempColumn = new List<ColumnModel>();
                             tempColumn = table.Column;
-                            foreach (var temp in tempColumn)
-                            {
+                           
+                            tempColumn.ForEach(p => {
                                 var tempSql = new List<string>();
-                                var info = table.Column.Find(a => a.Name.ToLower() == temp.Name.ToLower()) ?? new ColumnModel();
-                                var result = CheckModel.CompareTo<ColumnModel>(temp, info);
+                                var info = table.Column.Find(a => a.Name.ToLower() == p.Name.ToLower()) ?? new ColumnModel();
+                                var result = CheckModel.CompareTo<ColumnModel>(p, info);
                                 if (result.IsUpdate)
                                 {
-                                    table.Column.Remove(temp);
+                                    table.Column.Remove(p);
                                     table.Column.Add(result.Item);
                                     UpdateTable(item, result, tableName);
                                 }
 
                                 if (result.IsDelete)
                                 {
-                                    model.Remove(temp);
+                                    model.Remove(p);
                                     UpdateTable(item, result, tableName);
                                 }
-                            }
+                            });
 
                             table.Column = model;
                         }
@@ -122,32 +121,30 @@ namespace FastData.Check
                 var dataReturn = new DataReturn();
 
                 //create table
-                foreach (var temp in info)
-                {
-                    if (temp == lastItem)
-                        sql.AppendFormat("{0} {1} {2}", temp.Name, GetFieldType(temp), GetFieldKey(temp));
+                info.ForEach(a => {
+                    if (a == lastItem)
+                        sql.AppendFormat("{0} {1} {2}", a.Name, GetFieldType(a), GetFieldKey(a));
                     else
-                        sql.AppendFormat("{0} {1} {2},", temp.Name, GetFieldType(temp), GetFieldKey(temp));
+                        sql.AppendFormat("{0} {1} {2},", a.Name, GetFieldType(a), GetFieldKey(a));
 
-                    if (temp.IsKey)
-                        key.Add(temp.Name);
-                }
+                    if (a.IsKey)
+                        key.Add(a.Name);
+                });
+
                 sql.Append(")");
                 db.ExecuteSql(sql.ToString(), null, false, item.Config.IsOutSql);
 
                 //主键
-                foreach (var temp in key)
-                {
+                key.ForEach(a => {
                     sql = new StringBuilder();
-                    sql.AppendFormat("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, temp);
+                    sql.AppendFormat("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, a);
                     db.ExecuteSql(sql.ToString(), null, false, item.Config.IsOutSql);
-                }
+                });
             }
 
-            foreach (var temp in info)
-            {
-                UpdateColumn(item, temp.Name, temp.Comments, GetFieldType(temp), tableName);
-            }
+            info.ForEach(a => {
+                UpdateColumn(item, a.Name, a.Comments, GetFieldType(a), tableName);
+            });
         }
         #endregion
 
@@ -164,44 +161,42 @@ namespace FastData.Check
             {
 
                 //add colunm
-                foreach (var temp in info.AddName)
-                {
-                    var tempSql = string.Format("alter table {0} add {1} {2}", tableName, temp.Name, GetFieldType(temp));
+                info.AddName.ForEach(a => {
+                    var tempSql = string.Format("alter table {0} add {1} {2}", tableName, a.Name, GetFieldType(a));
                     db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
-                }
+                });
 
                 //修改列不为空
-                foreach (var temp in info.RemoveNull)
-                {
+                info.RemoveNull.ForEach(a => {
                     var tempSql = "";
 
                     //删除主键
-                    var isKey = CheckKey(item, temp.Name, tableName);
+                    var isKey = CheckKey(item, a.Name, tableName);
                     if (isKey)
                     {
-                        tempSql = string.Format("alter table {0} drop constraint pk_{0}_{1}", tableName, temp.Name);
+                        tempSql = string.Format("alter table {0} drop constraint pk_{0}_{1}", tableName, a.Name);
                         db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
                     }
 
                     if (item.Config.DbType == DataDbType.SqlServer)
                     {
-                        tempSql = string.Format("alter table {0} alter column {1} {2} not null", tableName, temp.Name, GetFieldType(temp));
+                        tempSql = string.Format("alter table {0} alter column {1} {2} not null", tableName, a.Name, GetFieldType(a));
                         db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
                     }
 
                     if (item.Config.DbType == DataDbType.MySql || item.Config.DbType == DataDbType.Oracle)
                     {
-                        tempSql = string.Format("alter table {0} modify {1} {2} not null", tableName, temp.Name, GetFieldType(temp));
+                        tempSql = string.Format("alter table {0} modify {1} {2} not null", tableName, a.Name, GetFieldType(a));
                         db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
                     }
 
                     //增加主键
                     if (isKey)
                     {
-                        tempSql = string.Format("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, temp.Name);
+                        tempSql = string.Format("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, a.Name);
                         db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
                     }
-                }
+                });
 
                 //修改列空
                 foreach (var temp in info.AddNull)
@@ -237,82 +232,107 @@ namespace FastData.Check
                     }
                 }
 
-                //删除主键
-                foreach (var temp in info.RemoveKey)
-                {
-                    var tempSql = string.Format("alter table {0} drop constraint pk_{0}_{1}", tableName, temp);
-                    db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
-                }
-
-                //增加主键
-                foreach (var temp in info.AddKey)
-                {
+                info.AddNull.ForEach(a => {
                     var tempSql = "";
+
+                    //删除主键
+                    var isKey = CheckKey(item, a.Name, tableName);
+                    if (isKey)
+                    {
+                        tempSql = string.Format("alter table {0} drop constraint pk_{0}_{1}", tableName, a.Name);
+                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
+                    }
+
                     if (item.Config.DbType == DataDbType.SqlServer)
                     {
-                        tempSql = string.Format("alter table {0} alter column {1} {2} not null", tableName, temp.Name, GetFieldType(temp));
+                        tempSql = string.Format("alter table {0} alter column {1} {2} null", tableName, a.Name, GetFieldType(a));
                         db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
                     }
 
                     if (item.Config.DbType == DataDbType.MySql || item.Config.DbType == DataDbType.Oracle)
                     {
-                        tempSql = string.Format("alter table {0} modify {1} {2} not null", tableName, temp.Name, GetFieldType(temp));
+                        tempSql = string.Format("alter table {0} modify {1} {2} null", tableName, a.Name, GetFieldType(a));
                         db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
                     }
 
-                    tempSql = string.Format("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, temp.Name);
+                    //增加主键
+                    if (isKey)
+                    {
+                        tempSql = string.Format("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, a.Name);
+                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
+                    }
+                });
+
+                //删除主键
+                info.RemoveKey.ForEach(a => {
+                    var tempSql = string.Format("alter table {0} drop constraint pk_{0}_{1}", tableName, a);
                     db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
-                }
+                });
+
+                //增加主键
+                info.AddKey.ForEach(a => {
+                    var tempSql = "";
+                    if (item.Config.DbType == DataDbType.SqlServer)
+                    {
+                        tempSql = string.Format("alter table {0} alter column {1} {2} not null", tableName, a.Name, GetFieldType(a));
+                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
+                    }
+
+                    if (item.Config.DbType == DataDbType.MySql || item.Config.DbType == DataDbType.Oracle)
+                    {
+                        tempSql = string.Format("alter table {0} modify {1} {2} not null", tableName, a.Name, GetFieldType(a));
+                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
+                    }
+
+                    tempSql = string.Format("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, a.Name);
+                    db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
+                });
 
                 //修改列
-                foreach (var temp in info.Type)
-                {
+                info.Type.ForEach(t => {
                     var tempSql = "";
-
-                    if (!info.AddName.Exists(a => a.Name == temp.Name))
+                    if (!info.AddName.Exists(a => a.Name == t.Name))
                     {
                         //删除主键
-                        var isKey = CheckKey(item, temp.Name, tableName);
+                        var isKey = CheckKey(item, t.Name, tableName);
                         if (isKey)
                         {
-                            tempSql = string.Format("alter table {0} drop constraint pk_{0}_{1}", tableName, temp.Name);
+                            tempSql = string.Format("alter table {0} drop constraint pk_{0}_{1}", tableName, t.Name);
                             db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
                         }
 
                         if (item.Config.DbType == DataDbType.SqlServer)
                         {
-                            tempSql = string.Format("alter table {0} alter column {1} {2}", tableName, temp.Name, GetFieldType(temp));
+                            tempSql = string.Format("alter table {0} alter column {1} {2}", tableName, t.Name, GetFieldType(t));
                             db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
                         }
 
                         if (item.Config.DbType == DataDbType.MySql || item.Config.DbType == DataDbType.Oracle)
                         {
-                            tempSql = string.Format("alter table {0} modify {1} {2}", tableName, temp.Name, GetFieldType(temp));
+                            tempSql = string.Format("alter table {0} modify {1} {2}", tableName, t.Name, GetFieldType(t));
                             db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
                         }
 
                         //增加主键
                         if (isKey)
                         {
-                            tempSql = string.Format("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, temp.Name);
+                            tempSql = string.Format("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, t.Name);
                             db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
                         }
                     }
-                }
+                });
 
                 //删除列
-                foreach (var temp in info.RemoveName)
-                {
-                    var tempSql = string.Format("alter table {0} drop column {1}", tableName, temp);
+                info.RemoveName.ForEach(a => {
+                    var tempSql = string.Format("alter table {0} drop column {1}", tableName, a);
                     db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql);
-                }
+                });
             }
 
             //修改列备注
-            foreach (var temp in info.Comments)
-            {
-                UpdateColumn(item, temp.Name, temp.Comments, GetFieldType(temp.Type), tableName);
-            }
+            info.Comments.ForEach(a => {
+                UpdateColumn(item, a.Name, a.Comments, GetFieldType(a.Type), tableName);
+            });
         }
         #endregion
 
