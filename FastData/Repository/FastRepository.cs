@@ -489,9 +489,8 @@ namespace FastData.Repository
             {
                 var query = new DataQuery { Config = config, Key = dbKey };
 
-                foreach (var item in list.Path)
-                {
-                    var info = new FileInfo(item);
+                list.Path.ForEach(p => {
+                    var info = new FileInfo(p);
                     var key = BaseSymmetric.md5(32, info.FullName);
 
                     if (!DbCache.Exists(config.CacheType, key))
@@ -505,8 +504,7 @@ namespace FastData.Repository
                     }
                     else if ((DbCache.Get<MapXmlModel>(config.CacheType, key).LastWrite - info.LastWriteTime).Milliseconds != 0)
                     {
-                        foreach (var temp in DbCache.Get<MapXmlModel>(config.CacheType, key).FileKey)
-                            DbCache.Remove(config.CacheType, temp);
+                        DbCache.Get<MapXmlModel>(config.CacheType, key).FileKey.ForEach(a => { DbCache.Remove(config.CacheType, a); });
 
                         var model = new MapXmlModel();
                         model.LastWrite = info.LastWriteTime;
@@ -515,7 +513,7 @@ namespace FastData.Repository
                         if (MapXml.SaveXml(dbKey, key, info, config, db))
                             DbCache.Set<MapXmlModel>(config.CacheType, key, model);
                     }
-                }
+                });
 
                 if (config.IsMapSave)
                 {
