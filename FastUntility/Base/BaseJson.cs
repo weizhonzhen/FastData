@@ -4,6 +4,7 @@ using System.Text;
 using System.Data.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NPOI.SS.Formula.Functions;
 
 namespace FastUntility.Base
 {
@@ -62,10 +63,7 @@ namespace FastUntility.Base
             sb.Append("[");
             try
             {
-                foreach (var item in list)
-                {
-                    sb.Append(ModelToJson(item) + ",");
-                }
+                list.ForEach(a => { sb.Append(ModelToJson(a) + ","); });
 
                 sb.Append("]").Replace(",]", "]");
 
@@ -231,13 +229,13 @@ namespace FastUntility.Base
             while (reader.Read())
             {
                 var dic = new Dictionary<string, object>();
-                foreach (var col in cols)
-                {
-                    if (reader[col] is DBNull)
-                        dic.Add(col, "");
+              
+                cols.ForEach(a => {
+                    if (reader[a] is DBNull)
+                        dic.Add(a, "");
                     else
-                        dic.Add(col, reader[col]);
-                }
+                        dic.Add(a, reader[a]);
+                });
 
                 result.Add(dic);
             }
@@ -260,20 +258,20 @@ namespace FastUntility.Base
             //列名
             for (var i = 0; i < reader.FieldCount; i++)
             {
-                  if (!cols.Exists(a => a.ToLower() == reader.GetName(i).ToLower()))
+                if (!cols.Exists(a => a.ToLower() == reader.GetName(i).ToLower()))
                     cols.Add(reader.GetName(i));
             }
 
             while (reader.Read())
             {
                 var dic = new Dictionary<string, object>();
-                foreach (var col in cols)
-                {
-                    if (reader[col] is DBNull)
-                        dic.Add(col.ToLower(), "");
+                
+                cols.ForEach(a => {
+                    if (reader[a] is DBNull)
+                        dic.Add(a.ToLower(), "");
                     else
-                        dic.Add(col.ToLower(), reader[col]);
-                }
+                        dic.Add(a.ToLower(), reader[a]);
+                });
 
                 result.Add(dic);
             }
