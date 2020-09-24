@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -24,7 +24,7 @@ namespace FastData
         /// <param name="model">实体</param>
         /// <param name="IsTrans">是否事务</param>
         /// <returns></returns>
-        public static WriteReturn AddList<T>(List<T> list, DataContext db = null, string key = null, bool isLog = false) where T : class, new()
+        public static WriteReturn AddList<T>(List<T> list, DataContext db = null, string key = null,bool IsTrans=false, bool isLog = false) where T : class, new()
         {
             ConfigModel config = null;
             var result = new DataReturn<T>();
@@ -37,7 +37,7 @@ namespace FastData
                 using (var tempDb = new DataContext(key))
                 {
                     config = tempDb.config;
-                    result = tempDb.AddList<T>(list,isLog);
+                    result = tempDb.AddList<T>(list,IsTrans,isLog);
                 }
             }
             else
@@ -62,11 +62,11 @@ namespace FastData
         /// <param name="model">实体</param>
         /// <param name="IsTrans">是否事务</param>
         /// <returns></returns>
-        public static async Task<WriteReturn> AddListAsy<T>(List<T> list, DataContext db = null, string key = null) where T : class, new()
+        public static async Task<WriteReturn> AddListAsy<T>(List<T> list, DataContext db = null, string key = null, bool IsTrans = false, bool isLog = false) where T : class, new()
         {
             return await Task.Run(() =>
             {
-                return AddList<T>(list, db, key);
+                return AddList<T>(list, db, key, IsTrans, isLog);
             });
         }
         #endregion
