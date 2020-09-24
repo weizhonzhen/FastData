@@ -1149,7 +1149,7 @@ namespace FastData.Context
         /// <param name="IsTrans"></param>
         /// <param name="IsAsync"></param>
         /// <returns></returns>
-        public DataReturn<T> AddList<T>(List<T> list, bool isLog = false) where T : class, new()
+        public DataReturn<T> AddList<T>(List<T> list, bool IsTrans = false, bool isLog = false) where T : class, new()
         {
             var result = new DataReturn<T>();
             var sql = new StringBuilder();
@@ -1157,7 +1157,9 @@ namespace FastData.Context
 
             try
             {
-                BeginTrans();
+                if (IsTrans)
+                    BeginTrans();
+
                 if (config.DbType == DataDbType.Oracle)
                 {
                     #region oracle
@@ -1166,9 +1168,10 @@ namespace FastData.Context
                         cmd.Parameters.Clear();
                         cmd.CommandText = string.Format("alter table {0} nologging", typeof(T).Name);
                         cmd.ExecuteNonQuery();
-                    }                    
+                    }
 
-                    cmd.GetType().GetMethods().ToList().ForEach(a => {
+                    cmd.GetType().GetMethods().ToList().ForEach(a =>
+                    {
                         if (a.Name == "set_ArrayBindCount")
                         {
                             var param = new object[1];
@@ -1186,7 +1189,8 @@ namespace FastData.Context
 
                     sql.AppendFormat("insert into {0} values(", typeof(T).Name);
 
-                    PropertyCache.GetPropertyInfo<T>().ForEach(a => {
+                    PropertyCache.GetPropertyInfo<T>().ForEach(a =>
+                    {
                         object[] pValue = new object[list.Count];
                         var param = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
 
@@ -1236,8 +1240,9 @@ namespace FastData.Context
                             param[0] = string.Format("@{0}", typeof(T).Name);
                             param[1] = CommandParam.GetTable<T>(cmd, list);
                             var sqlParam = method.Invoke(cmd.Parameters, param);
-                                                        
-                            sqlParam.GetType().GetMethods().ToList().ForEach(a => {
+
+                            sqlParam.GetType().GetMethods().ToList().ForEach(a =>
+                            {
                                 if (a.Name == "set_SqlDbType")
                                 {
                                     param = new object[1];
@@ -1277,14 +1282,15 @@ namespace FastData.Context
                     #endregion
                 }
 
-                if (result.writeReturn.IsSuccess)
+                if (result.writeReturn.IsSuccess && IsTrans)
                     SubmitTrans();
-                else if (result.writeReturn.IsSuccess == false)
+                else if (result.writeReturn.IsSuccess == false && IsTrans)
                     RollbackTrans();
             }
             catch (Exception ex)
             {
-                RollbackTrans();
+                if (IsTrans)
+                    RollbackTrans();
                 Task.Run(() =>
                 {
                     if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
