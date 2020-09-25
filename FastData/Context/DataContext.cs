@@ -1149,7 +1149,7 @@ namespace FastData.Context
         /// <param name="IsTrans"></param>
         /// <param name="IsAsync"></param>
         /// <returns></returns>
-        public DataReturn<T> AddList<T>(List<T> list, bool IsTrans = false, bool isLog = false) where T : class, new()
+        public DataReturn<T> AddList<T>(List<T> list, bool IsTrans = false, bool isLog = true) where T : class, new()
         {
             var result = new DataReturn<T>();
             var sql = new StringBuilder();
@@ -1191,7 +1191,7 @@ namespace FastData.Context
 
                     PropertyCache.GetPropertyInfo<T>().ForEach(a =>
                     {
-                        object[] pValue = new object[list.Count];
+                        var pValue = new List<object>();
                         var param = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
 
                         if (a.PropertyType.Name.ToLower() == "nullable`1")
@@ -1203,15 +1203,14 @@ namespace FastData.Context
                         param.ParameterName = a.Name;
                         sql.AppendFormat("{0}{1},", config.Flag, a.Name);
 
-                        for (var i = 0; i < list.Count; i++)
-                        {
-                            var value = dyn.GetValue(list[i], a.Name, true);
+                        list.ForEach(l => {
+                            var value = dyn.GetValue(l, a.Name, true);
                             if (value == null)
                                 value = DBNull.Value;
-                            pValue[i] = value;
-                        }
+                            pValue.Add(value);
+                        });
 
-                        param.Value = pValue;
+                        param.Value = pValue.ToArray();
                         cmd.Parameters.Add(param);
                     });
 
