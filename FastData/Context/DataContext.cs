@@ -34,7 +34,7 @@ namespace FastData.Context
             conn.Close();
             cmd.Dispose();
             conn.Dispose();
-            GC.SuppressFinalize(true);
+            GC.SuppressFinalize(this);
         }
         #endregion
 
