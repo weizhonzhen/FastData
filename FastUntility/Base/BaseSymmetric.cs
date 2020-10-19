@@ -186,6 +186,27 @@ namespace FastUntility.Base
         }
         #endregion
 
+        #region MD5加密
+        /// <summary>
+        /// 标签：2015.7.13，魏中针
+        /// 说明：MD5加密
+        /// </summary>
+        /// <param name="code">md5加密位数，16位或32位</param>
+        /// <param name="Source">要加密的字符串</param>
+        /// <returns></returns>
+        public static string md5(int code, string Source)
+        {
+            if (code == 16) //16位MD5加密（取32位加密的9~25字符） 
+            {
+                return System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile(Source, "MD5").ToLower().Substring(8, 16);
+            }
+            else//32位加密 
+            {
+                return System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile(Source, "MD5").ToLower();
+            }
+        }
+        #endregion
+
         #region  Generate 根据值获取经过MD5加密的数据
         /// <summary>
         /// Generate 根据值获取经过MD5加密的数据
