@@ -166,11 +166,12 @@ namespace FastUntility.Base
                     model.sheet.Autobreaks = true;
                     model.sheet.HorizontallyCenter = true;
                 });
-                
-                var file = new MemoryStream();
-                model.workbook.Write(file);
 
-                return file.ToArray();
+                using (var file = new MemoryStream())
+                {
+                    model.workbook.Write(file);
+                    return file.ToArray();
+                }
             }
             catch (Exception ex)
             {

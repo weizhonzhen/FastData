@@ -82,10 +82,13 @@ namespace FastUntility.Base
 
                 Code = sCode;
 
-                MemoryStream stream = new MemoryStream();
-                oBmp.Save(stream, ImageFormat.Jpeg);
-
-                return stream.ToArray();
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    oBmp.Save(stream, ImageFormat.Jpeg);
+                    oBmp.Dispose();
+                    oGraphics.Dispose();
+                    return stream.ToArray();
+                }
             }
             finally
             {
