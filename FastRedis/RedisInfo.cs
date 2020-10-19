@@ -721,6 +721,7 @@ namespace FastRedis
 
                     m_streamWriter.Flush();
                     m_streamWriter.Close();
+                    m_streamWriter.Dispose();
                     fs.Close();
                 }
             }
