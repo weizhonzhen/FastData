@@ -3,8 +3,6 @@ using NServiceKit.Redis;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FastRedis.Repository
@@ -708,6 +706,7 @@ namespace FastRedis.Repository
 
                     m_streamWriter.Flush();
                     m_streamWriter.Close();
+                    m_streamWriter.Dispose();
                     fs.Close();
                 }
             }
