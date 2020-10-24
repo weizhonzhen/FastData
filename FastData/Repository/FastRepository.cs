@@ -68,7 +68,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return Query<T>(name, param, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -91,7 +91,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return new Lazy<List<T>>(() => Query<T>(name, param, db, key));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -144,7 +144,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return Query(name, param, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -167,7 +167,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return new Lazy<List<Dictionary<string, object>>>(() => Query(name, param, db, key));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -202,7 +202,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return Write(name, param, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -225,7 +225,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return new Lazy<WriteReturn>(() => Write(name, param, db, key));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -311,7 +311,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return QueryPage(pModel, name, param, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -334,7 +334,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return new Lazy<PageResult>(() => QueryPage(pModel, name, param, db, key));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -421,7 +421,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return QueryPage<T>(pModel, name, param, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -444,7 +444,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return new Lazy<PageResult<T>>(() => QueryPage<T>(pModel, name, param, db, key));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -748,7 +748,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return AddList<T>(list, key,IsTrans,isLog);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -804,7 +804,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return Add<T>(model, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -858,7 +858,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return Delete<T>(predicate, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -908,7 +908,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return Delete<T>(model, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -967,7 +967,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return Update<T>(model, predicate, field, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -1017,7 +1017,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return Update<T>(model, field, db, key, isTrans);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -1067,7 +1067,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return UpdateList<T>(list, field, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -1120,7 +1120,7 @@ namespace FastData.Repository
             return await Task.Run(() =>
             {
                 return ExecuteSql(sql, param, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 

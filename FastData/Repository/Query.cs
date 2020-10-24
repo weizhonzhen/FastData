@@ -184,7 +184,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return ToList<T>(db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -213,7 +213,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return new Lazy<List<T>>(() => ToList<T>(db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -262,7 +262,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return ToJson(db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -289,7 +289,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return new Lazy<string>(() => ToJson(db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -342,7 +342,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return ToItem<T>(db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -371,7 +371,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return new Lazy<T>(() => ToItem<T>(db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -421,7 +421,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return ToCount(db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -474,7 +474,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return ToPage<T>(pModel, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -505,7 +505,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return new Lazy<PageResult<T>>(() => ToPage<T>(pModel, db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -556,7 +556,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return ToPage(pModel, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -586,7 +586,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return new Lazy<PageResult>(() => ToPage(pModel, db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -636,7 +636,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return ToDataTable(db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -663,7 +663,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return new Lazy<DataTable>(() => ToDataTable(db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -712,7 +712,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return ToDics(db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -739,7 +739,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return new Lazy<List<Dictionary<string, object>>>(() => ToDics(db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -789,7 +789,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return ToDic(db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -816,7 +816,7 @@ namespace FastData.Repository
             return await Task.Factory.StartNew(() =>
             {
                 return new Lazy<Dictionary<string, object>>(() => ToDic(db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
     }
