@@ -50,7 +50,7 @@ namespace FastRedis
             return await Task.Factory.StartNew(() =>
             {
                 return Exists(key,db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
         
@@ -100,7 +100,7 @@ namespace FastRedis
             return await Task.Factory.StartNew(() =>
             {
                 return Set<T>(key, model, hours,db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -150,7 +150,7 @@ namespace FastRedis
             return await Task.Factory.StartNew(() =>
             {
                 return Set(key, model, hours,db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
         
@@ -200,7 +200,7 @@ namespace FastRedis
             return await Task.Factory.StartNew(() =>
             {
                 return Set(key, model, Minutes, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
         
@@ -246,7 +246,7 @@ namespace FastRedis
             return await Task.Factory.StartNew(() =>
             {
                 return Get(key,db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -292,7 +292,7 @@ namespace FastRedis
             return await Task.Factory.StartNew(() =>
             {
                 return Get<T>(key,db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -336,7 +336,7 @@ namespace FastRedis
             return await Task.Factory.StartNew(() =>
             {
                 return Remove(key,db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion                
         
@@ -381,7 +381,7 @@ namespace FastRedis
             return await Task.Factory.StartNew(() =>
             {
                 return SetDic<T>(dic,db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -424,7 +424,7 @@ namespace FastRedis
             return await Task.Factory.StartNew(() =>
             {
                 return GetDic<T>(keys,db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -467,7 +467,7 @@ namespace FastRedis
             return await Task.Factory.StartNew(() =>
             {
                 return RemoveDic(keys,db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -513,7 +513,7 @@ namespace FastRedis
             Task.Factory.StartNew(() =>
             {
                 Send(queueName, message, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -557,7 +557,7 @@ namespace FastRedis
             return await Task.Factory.StartNew(() =>
             {
                return Receive(queueName, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
         
@@ -603,7 +603,7 @@ namespace FastRedis
             Task.Factory.StartNew(() =>
             {
                 Publish(channel, message, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -655,7 +655,7 @@ namespace FastRedis
             Task.Factory.StartNew(() =>
             {
                 Receive(channel, message, subscribe, unSubscribe, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
