@@ -59,7 +59,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return AddList<T>(list, key, IsTrans, isLog);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -117,7 +117,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return Add<T>(model, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -173,7 +173,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return Delete<T>(predicate, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -224,7 +224,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return Delete<T>(model, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -284,7 +284,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return Update<T>(model, predicate, field, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -335,7 +335,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return Update<T>(model, field, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -386,7 +386,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return UpdateList<T>(list, field, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -440,7 +440,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return ExecuteSql(sql, param, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 

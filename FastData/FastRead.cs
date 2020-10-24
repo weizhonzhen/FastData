@@ -213,7 +213,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return ToList<T>(item, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -242,7 +242,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return new Lazy<List<T>>(() => ToList<T>(item, db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -291,7 +291,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return ToJson(item, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -318,7 +318,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return new Lazy<string>(() => ToJson(item, db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -372,7 +372,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return ToItem<T>(item, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -401,7 +401,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return new Lazy<T>(() => ToItem<T>(item, db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -451,7 +451,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return ToCount(item, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -505,7 +505,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return ToPage<T>(item, pModel, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -536,7 +536,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return new Lazy<PageResult<T>>(() => ToPage<T>(item, pModel, db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -588,7 +588,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return ToPage(item, pModel, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -618,7 +618,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return new Lazy<PageResult>(() => ToPage(item, pModel, db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -674,7 +674,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return ExecuteSql<T>(sql, param, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -705,7 +705,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return new Lazy<List<T>>(() => ExecuteSql<T>(sql, param, db, key));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -755,7 +755,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return ToDics(item, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -782,7 +782,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return new Lazy<List<Dictionary<string, object>>>(() => ToDics(item, db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -833,7 +833,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return ToDic(item, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -860,7 +860,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return new Lazy<Dictionary<string, object>>(() => ToDic(item, db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -911,7 +911,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return ToDataTable(item, db);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -938,7 +938,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return new Lazy<DataTable>(() => ToDataTable(item, db));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -993,7 +993,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return ExecuteSql(sql, param, db, key);
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
 
@@ -1024,7 +1024,7 @@ namespace FastData
             return await Task.Run(() =>
             {
                 return new Lazy<List<Dictionary<string, object>>>(() => ExecuteSql(sql, param, db, key));
-            });
+            }).ConfigureAwait(false);
         }
         #endregion
     }
