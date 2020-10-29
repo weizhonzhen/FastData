@@ -44,6 +44,8 @@ namespace FastUntility.Base
                 handle.Method = HttpMethod.Get;
                 handle.RequestUri = new Uri(url);
                 var response = http.SendAsync(handle).Result;
+                handle.Content.Dispose();
+                handle.Dispose();
                 return response.Content.ReadAsStringAsync().Result;
             }
             catch (Exception ex)
@@ -84,6 +86,8 @@ namespace FastUntility.Base
                 handle.Method = HttpMethod.Put;
                 handle.RequestUri = new Uri(url);
                 var response = http.SendAsync(handle).Result;
+                handle.Content.Dispose();
+                handle.Dispose();
                 return response.Content.ReadAsStringAsync().Result;
             }
             catch (Exception ex)
@@ -108,6 +112,8 @@ namespace FastUntility.Base
                 handle.Method = HttpMethod.Put;
                 handle.RequestUri = new Uri(url);
                 var response = http.SendAsync(handle).Result;
+                handle.Content.Dispose();
+                handle.Dispose();
                 return response.Content.ReadAsStringAsync().Result;
             }
             catch (Exception ex)
@@ -148,6 +154,8 @@ namespace FastUntility.Base
                 handle.RequestUri = new Uri(url);
 
                 var response = http.SendAsync(handle).Result;
+                handle.Content.Dispose();
+                handle.Dispose();
                 return response.Content.ReadAsStringAsync().Result;
             }
             catch (Exception ex)
@@ -188,6 +196,8 @@ namespace FastUntility.Base
                 handle.Method = HttpMethod.Post;
                 handle.RequestUri = new Uri(url);
                 var response = http.SendAsync(handle).Result;
+                handle.Content.Dispose();
+                handle.Dispose();
                 var result = response.Content.ReadAsStringAsync().Result;
 
                 result = result.Replace("soap:Envelope", "Envelope");
@@ -221,6 +231,8 @@ namespace FastUntility.Base
                 handle.Method = HttpMethod.Delete;
                 handle.RequestUri = new Uri(url);
                 var response = http.SendAsync(handle).Result;
+                handle.Content.Dispose();
+                handle.Dispose();
                 return response.Content.ReadAsStringAsync().Result;
             }
             catch (Exception ex)
