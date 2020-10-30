@@ -94,8 +94,6 @@ namespace FastData.Base
                 var sb = new StringBuilder();
                 var param = new List<DbParameter>();
                 
-                cmd.Parameters.Clear();
-
                 table.Append(item.Table[0]);
                 for (var i = 1; i < item.Predicate.Count; i++)
                 {
@@ -226,7 +224,6 @@ namespace FastData.Base
         {
             try
             {
-                cmd.Parameters.Clear();
                 var param = new List<DbParameter>();
                 sql = string.Format("select count(0) from {0}", item.Table[0]);
 
@@ -275,8 +272,6 @@ namespace FastData.Base
         {
             try
             {
-                cmd.Parameters.Clear();
-
                 sql = string.Format("select count(0) from ({0})t", sql);
 
                 tempSql = ParameterToSql.ObjectParamToSql(param.ToList(), sql, config);
@@ -316,8 +311,6 @@ namespace FastData.Base
         {
             try
             {
-                cmd.Parameters.Clear();
-
                 if (config.DbType == DataDbType.Oracle)
                     sql = string.Format("select * from(select field.*,ROWNUM RN from({0}) field where rownum<={1}) where rn>={2}"
                                     , sql, pModel.EndId, pModel.StarId);
