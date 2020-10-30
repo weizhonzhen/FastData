@@ -24,13 +24,8 @@ namespace FastData.Context
         private DbCommand cmd;
         private DbTransaction trans;
 
-
-        #region 回收资源
-        /// <summary>
-        /// 回收资源
-        /// </summary>
-        public void Dispose()
-        {
+        private void Dispose(DbCommand cmd)
+        {            
             if (cmd.Parameters != null && config.DbType == DataDbType.Oracle)
                 foreach (var param in cmd.Parameters)
                 {
@@ -40,6 +35,16 @@ namespace FastData.Context
                             m.Invoke(param, null);
                     });
                 }
+            cmd.Parameters.Clear();
+        }
+
+        #region 回收资源
+        /// <summary>
+        /// 回收资源
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(cmd);
             conn.Close();
             cmd.Dispose();
             conn.Dispose();
@@ -126,7 +131,7 @@ namespace FastData.Context
 
                 result.sql = ParameterToSql.ObjectParamToSql(param, sql.ToString(), item.Config);
 
-                cmd.Parameters.Clear();
+                Dispose(cmd);
 
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
@@ -171,6 +176,7 @@ namespace FastData.Context
             {
                 pModel.StarId = (pModel.PageId - 1) * pModel.PageSize + 1;
                 pModel.EndId = pModel.PageId * pModel.PageSize;
+                Dispose(cmd);
                 pModel.TotalRecord = BaseExecute.ToPageCount(item, cmd, ref sql);
 
                 if (pModel.TotalRecord > 0)
@@ -183,6 +189,7 @@ namespace FastData.Context
                     if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
+                    Dispose(cmd);
                     var dr = BaseExecute.ToPageDataReader(item, cmd, pModel, ref sql);
                     result.pageResult.list = BaseDataReader.ToList<T>(dr, item.Config, item.AsName);
                     result.sql = sql;
@@ -225,6 +232,7 @@ namespace FastData.Context
             {
                 pModel.StarId = (pModel.PageId - 1) * pModel.PageSize + 1;
                 pModel.EndId = pModel.PageId * pModel.PageSize;
+                Dispose(cmd);
                 pModel.TotalRecord = BaseExecute.ToPageCount(item, cmd, ref sql);
 
                 if (pModel.TotalRecord > 0)
@@ -236,7 +244,8 @@ namespace FastData.Context
  
                     if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
-                        
+
+                    Dispose(cmd);
                     var dr = BaseExecute.ToPageDataReader(item, cmd, pModel, ref sql);
                     result.PageResult.list = BaseJson.DataReaderToDic(dr);
                     result.Sql = sql;
@@ -279,6 +288,7 @@ namespace FastData.Context
             {
                 pModel.StarId = (pModel.PageId - 1) * pModel.PageSize + 1;
                 pModel.EndId = pModel.PageId * pModel.PageSize;
+                Dispose(cmd);
                 pModel.TotalRecord = BaseExecute.ToPageCountSql(param, cmd, sql, config, ref countSql);
 
                 if (pModel.TotalRecord > 0)
@@ -291,6 +301,7 @@ namespace FastData.Context
                      if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
+                    Dispose(cmd);
                     var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql);
 
                     result.PageResult.list = BaseJson.DataReaderToDic(dr);
@@ -334,6 +345,7 @@ namespace FastData.Context
             {
                 pModel.StarId = (pModel.PageId - 1) * pModel.PageSize + 1;
                 pModel.EndId = pModel.PageId * pModel.PageSize;
+                Dispose(cmd);
                 pModel.TotalRecord = BaseExecute.ToPageCountSql(param, cmd, sql, config, ref countSql);
 
                 if (pModel.TotalRecord > 0)
@@ -344,8 +356,9 @@ namespace FastData.Context
                         pModel.TotalPage = (pModel.TotalRecord / pModel.PageSize) + 1;
                     
                     if (pModel.PageId > pModel.TotalPage)
-                        pModel.PageId = pModel.TotalPage;                    
-                    
+                        pModel.PageId = pModel.TotalPage;
+
+                    Dispose(cmd);
                     var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql);
 
                     result.pageResult.list = BaseDataReader.ToList<T>(dr, config, null);
@@ -424,7 +437,7 @@ namespace FastData.Context
 
                 result.Sql = ParameterToSql.ObjectParamToSql(param, sql.ToString(), item.Config);
 
-                cmd.Parameters.Clear();
+                Dispose(cmd);
 
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
@@ -491,7 +504,7 @@ namespace FastData.Context
 
                 result.Sql = ParameterToSql.ObjectParamToSql(param, sql.ToString(), item.Config);
 
-                cmd.Parameters.Clear();
+                Dispose(cmd);
 
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
@@ -533,8 +546,8 @@ namespace FastData.Context
                     result.sql = ParameterToSql.ObjectParamToSql(param.ToList(), sql, config);
                 else
                     result.sql = sql;
-               
-                cmd.Parameters.Clear();
+
+                Dispose(cmd);
 
                 if (param != null)
                     cmd.Parameters.AddRange(param.ToArray());
@@ -578,7 +591,7 @@ namespace FastData.Context
 
                 DbLog.LogSql(isLog, result.Sql, config.DbType, 0);
 
-                cmd.Parameters.Clear();
+                Dispose(cmd);
 
                 if (param != null)
                     cmd.Parameters.AddRange(param.ToArray());
@@ -659,7 +672,7 @@ namespace FastData.Context
 
                 result.Sql = ParameterToSql.ObjectParamToSql(param, sql.ToString(), item.Config);
 
-                cmd.Parameters.Clear();
+                Dispose(cmd);
 
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
@@ -742,7 +755,7 @@ namespace FastData.Context
 
                 result.Sql = ParameterToSql.ObjectParamToSql(param, sql.ToString(), item.Config);
 
-                cmd.Parameters.Clear();
+                Dispose(cmd);
 
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
@@ -795,7 +808,7 @@ namespace FastData.Context
 
                 result.sql = ParameterToSql.ObjectParamToSql(visitModel.Param, sql.ToString(), config);
 
-                cmd.Parameters.Clear();
+                Dispose(cmd);
 
                 if (visitModel.Param.Count != 0)
                     cmd.Parameters.AddRange(visitModel.Param.ToArray());
@@ -851,7 +864,7 @@ namespace FastData.Context
 
                 result.sql = ParameterToSql.ObjectParamToSql(optionModel.Param, optionModel.Sql, config);
 
-                cmd.Parameters.Clear();
+                Dispose(cmd);
 
                 if (optionModel.Param.Count != 0)
                     cmd.Parameters.AddRange(optionModel.Param.ToArray());
@@ -915,7 +928,7 @@ namespace FastData.Context
 
                     sql = string.Format("{0} {1}", update.Sql, string.IsNullOrEmpty(visitModel.Where) ? "" : string.Format("where {0}", visitModel.Where.Replace(string.Format("{0}.", predicate.Parameters[0].Name), "")));
 
-                    cmd.Parameters.Clear();
+                    Dispose(cmd);
 
                     if (update.Param.Count != 0)
                         cmd.Parameters.AddRange(update.Param.ToArray());
@@ -979,7 +992,7 @@ namespace FastData.Context
                     BeginTrans();
                 if (update.IsSuccess)
                 {
-                    cmd.Parameters.Clear();
+                    Dispose(cmd);
 
                     if (update.Param.Count != 0)
                         cmd.Parameters.AddRange(update.Param.ToArray());
@@ -1048,7 +1061,7 @@ namespace FastData.Context
                     using (var adapter = DbProviderFactories.GetFactory(config.ProviderName).CreateDataAdapter())
                     {
                         BeginTrans();
-                        cmd.Parameters.Clear();
+                        Dispose(cmd);
                         adapter.InsertCommand = cmd;
                         adapter.InsertCommand.CommandText = update.Sql;
                         adapter.InsertCommand.UpdatedRowSource = UpdateRowSource.None;
@@ -1112,7 +1125,7 @@ namespace FastData.Context
                 {
                     result.sql = ParameterToSql.ObjectParamToSql(insert.Param, insert.Sql, config);
 
-                    cmd.Parameters.Clear();
+                    Dispose(cmd);
 
                     if (insert.Param.Count != 0)
                         cmd.Parameters.AddRange(insert.Param.ToArray());
@@ -1172,7 +1185,7 @@ namespace FastData.Context
                 if (config.DbType == DataDbType.Oracle)
                 {
                     #region oracle
-                    cmd.Parameters.Clear();
+                    Dispose(cmd);
                     if (!isLog)
                     {
                         cmd.CommandText = string.Format("alter table {0} nologging", typeof(T).Name);
@@ -1238,7 +1251,7 @@ namespace FastData.Context
                 if (config.DbType == DataDbType.SqlServer)
                 {
                     #region sqlserver
-                    cmd.Parameters.Clear();
+                    Dispose(cmd);
                     CommandParam.InitTvps<T>(cmd);
                     foreach (var method in cmd.Parameters.GetType().GetMethods())
                     {
@@ -1276,7 +1289,7 @@ namespace FastData.Context
                 if (config.DbType == DataDbType.MySql)
                 {
                     #region mysql
-                    cmd.Parameters.Clear();
+                    Dispose(cmd);
                     cmd.CommandText = CommandParam.GetMySql<T>(list);
                     result.writeReturn.IsSuccess = cmd.ExecuteNonQuery() > 0;
                     #endregion
@@ -1285,7 +1298,7 @@ namespace FastData.Context
                 if (config.DbType == DataDbType.SQLite)
                 {
                     #region sqlite
-                    cmd.Parameters.Clear();
+                    Dispose(cmd);
 
 
 
@@ -1334,7 +1347,7 @@ namespace FastData.Context
 
                 DbLog.LogSql(isLog, result.Sql, config.DbType, 0);
 
-                cmd.Parameters.Clear();
+                Dispose(cmd);
 
                 if (param != null)
                     cmd.Parameters.AddRange(param);
