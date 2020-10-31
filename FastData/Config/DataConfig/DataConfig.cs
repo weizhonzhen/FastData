@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Configuration;
 using FastData.Type;
@@ -400,18 +400,18 @@ namespace FastData.Config
             return result;
         }
         #endregion
-                
+
         public static bool DataType(string key = null)
         {
             var config = (DataConfig)ConfigurationManager.GetSection("DataConfig");
 
             var result = new List<bool>();
-            result.Add(config.Oracle.Count > 1);
-            result.Add(config.DB2.Count > 1);
-            result.Add(config.SQLite.Count > 1);
-            result.Add(config.SqlServer.Count > 1);
-            result.Add(config.PostgreSql.Count > 1);
-            result.Add(config.MySql.Count > 1);
+            result.Add(config.Oracle.Count > 0);
+            result.Add(config.DB2.Count > 0);
+            result.Add(config.SQLite.Count > 0);
+            result.Add(config.SqlServer.Count > 0);
+            result.Add(config.PostgreSql.Count > 0);
+            result.Add(config.MySql.Count > 0);
 
             return result.Count(a => a == true) > 1;
         }
