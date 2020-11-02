@@ -25,30 +25,22 @@ namespace FastUntility.Base
         {
             try
             {
-                //变量
                 var xmlHead = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
                 var xmlDoc = new XmlDocument();
                 var list = new List<T>();
 
-                //载入xml
                 xmlDoc.LoadXml(xmlValue);
-
-                //结点
                 var nodelList = xmlDoc.SelectNodes(xmlNodel);
 
                 foreach (XmlNode item in nodelList)
                 {
-                    //结点值
                     xmlValue = xmlHead + "<" + item.LocalName + ">" + item.InnerXml + "</" + item.LocalName + ">";
 
-                    //字符流
-                    StringReader sR = new StringReader(xmlValue);
-
-                    //xml反序列到对象
-                    var xmlDes = new XmlSerializer(typeof(T));
-
-                    //加入list
-                    list.Add((T)xmlDes.Deserialize(sR));
+                    using (StringReader sR = new StringReader(xmlValue))
+                    {
+                        var xmlDes = new XmlSerializer(typeof(T));
+                        list.Add((T)xmlDes.Deserialize(sR));
+                    }
                 }
 
                 return list;
@@ -71,13 +63,8 @@ namespace FastUntility.Base
         {
             try
             {
-                //变量
-                var xmlDoc = new XmlDocument();
-                
-                //载入xml
+                var xmlDoc = new XmlDocument();                
                 xmlDoc.Load(context.Server.MapPath(FileName));
-
-                //结点
                 var nodelList = xmlDoc.SelectNodes(xmlNodel);
 
                 var list = new List<string>();
@@ -107,13 +94,8 @@ namespace FastUntility.Base
         {
             try
             {
-                //变量
-                var xmlDoc = new XmlDocument();
-                
-                //载入xml
+                var xmlDoc = new XmlDocument();                
                 xmlDoc.Load(HttpContext.Current.Server.MapPath(FileName));
-               
-                //结点
                 var nodelList = xmlDoc.SelectNodes(xmlNodel);
 
                 var list = new List<string>();
@@ -143,13 +125,8 @@ namespace FastUntility.Base
         {
             try
             {
-                //变量
                 var xmlDoc = new XmlDocument();
-
-                //载入xml
                 xmlDoc.LoadXml(xmlValue);
-
-                //结点
                 var nodelList = xmlDoc.SelectNodes(xmlNodel);
 
                 var list = new List<string>();
