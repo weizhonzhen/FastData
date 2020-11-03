@@ -5,6 +5,7 @@ using System.Data.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPOI.SS.Formula.Functions;
+using System.Linq;
 
 namespace FastUntility.Base
 {
@@ -217,7 +218,7 @@ namespace FastUntility.Base
         /// </summary>
         /// <param name="dr"></param>
         /// <returns></returns>
-        public static string DataReaderToJson(DbDataReader reader)
+        public static string DataReaderToJson(DbDataReader reader, bool isOracle = false)
         {
             var result = new List<Dictionary<string, object>>();
             var cols = new List<string>();
@@ -233,6 +234,43 @@ namespace FastUntility.Base
                 cols.ForEach(a => {
                     if (reader[a] is DBNull)
                         dic.Add(a, "");
+                    else if (isOracle)
+                    {
+                        var id = reader.GetOrdinal(a.ToUpper());
+                        var typeName = reader.GetDataTypeName(id).ToLower();
+                        if (typeName == "clob" || typeName == "nclob")
+                        {
+                            reader.GetType().GetMethods().ToList().ForEach(m => {
+                                if (m.Name == "GetOracleClob")
+                                {
+                                    var param = new object[1];
+                                    param[0] = id;
+                                    var temp = m.Invoke(reader, param);
+                                    temp.GetType().GetMethods().ToList().ForEach(v => {
+                                        if (v.Name == "get_Value")
+                                            dic.Add(a, v.Invoke(temp, null));
+                                    });
+                                }
+                            });
+                        }
+                        else if (typeName == "blob")
+                        {
+                            reader.GetType().GetMethods().ToList().ForEach(m => {
+                                if (m.Name == "GetOracleBlob")
+                                {
+                                    var param = new object[1];
+                                    param[0] = id;
+                                    var temp = m.Invoke(reader, param);
+                                    temp.GetType().GetMethods().ToList().ForEach(v => {
+                                        if (v.Name == "get_Value")
+                                            dic.Add(a, v.Invoke(temp, null));
+                                    });
+                                }
+                            });
+                        }
+                        else
+                            dic.Add(a, reader[a]);
+                    }
                     else
                         dic.Add(a, reader[a]);
                 });
@@ -250,7 +288,7 @@ namespace FastUntility.Base
         /// </summary>
         /// <param name="dr"></param>
         /// <returns></returns>
-        public static List<Dictionary<string, object>> DataReaderToDic(DbDataReader reader)
+        public static List<Dictionary<string, object>> DataReaderToDic(DbDataReader reader, bool isOracle = false)
         {
             var result = new List<Dictionary<string, object>>();
             var cols = new List<string>();
@@ -269,8 +307,45 @@ namespace FastUntility.Base
                 cols.ForEach(a => {
                     if (reader[a] is DBNull)
                         dic.Add(a.ToLower(), "");
+                    else if (isOracle)
+                    {
+                        var id = reader.GetOrdinal(a.ToUpper());
+                        var typeName = reader.GetDataTypeName(id).ToLower();
+                        if (typeName == "clob" || typeName == "nclob")
+                        {
+                            reader.GetType().GetMethods().ToList().ForEach(m => {
+                                if (m.Name == "GetOracleClob")
+                                {
+                                    var param = new object[1];
+                                    param[0] = id;
+                                    var temp = m.Invoke(reader, param);
+                                    temp.GetType().GetMethods().ToList().ForEach(v => {
+                                        if (v.Name == "get_Value")
+                                            dic.Add(a.ToLower(), v.Invoke(temp, null));
+                                    });
+                                }
+                            });
+                        }
+                        else if (typeName == "blob")
+                        {
+                            reader.GetType().GetMethods().ToList().ForEach(m => {
+                                if (m.Name == "GetOracleBlob")
+                                {
+                                    var param = new object[1];
+                                    param[0] = id;
+                                    var temp = m.Invoke(reader, param);
+                                    temp.GetType().GetMethods().ToList().ForEach(v => {
+                                        if (v.Name == "get_Value")
+                                            dic.Add(a.ToLower(), v.Invoke(temp, null));
+                                    });
+                                }
+                            });
+                        }
+                        else
+                            dic.Add(a, reader[a]);
+                    }
                     else
-                        dic.Add(a.ToLower(), reader[a]);
+                        dic.Add(a, reader[a]);
                 });
 
                 result.Add(dic);
