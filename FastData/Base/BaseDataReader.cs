@@ -97,6 +97,12 @@ namespace FastData.Base
                                     if (v.Name == "get_Value")
                                         value = v.Invoke(temp, null);
                                 });
+
+                                temp.GetType().GetMethods().ToList().ForEach(v =>
+                                {
+                                    if (v.Name == "Dispose")
+                                        v.Invoke(temp, null);
+                                });
                             }
                         });
                     }
@@ -113,6 +119,12 @@ namespace FastData.Base
                                 {
                                     if (v.Name == "get_Value")
                                         value = v.Invoke(temp, null);
+                                });
+
+                                temp.GetType().GetMethods().ToList().ForEach(v =>
+                                {
+                                    if (v.Name == "Dispose")
+                                        v.Invoke(temp, null);
                                 });
                             }
                         });
