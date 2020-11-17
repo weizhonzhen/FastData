@@ -8,9 +8,6 @@ in Application_Start method
 //cache model
 FastMap.InstanceProperties(namespace, dll);
 
-//init map cache by Resource xml
- FastData.Core.FastMap.InstanceMapResource("Test1",db);
-
 //chache map
 FastMap.InstanceMap(db);
 
