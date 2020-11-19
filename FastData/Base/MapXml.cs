@@ -566,7 +566,7 @@ namespace FastData.Base
         /// <summary>
         /// 读取xml map并缓存
         /// </summary>
-        public static List<string> ReadXml(string path, ConfigModel config, string fileName)
+        public static List<string> ReadXml(string path, ConfigModel config, string fileName,string xml=null)
         {
             var map = DbCache.Get<Dictionary<string, object>>(DataConfig.GetConfig().CacheType, "FastMap.Api") ?? new Dictionary<string, object>();
             var key = new List<string>();
@@ -578,7 +578,7 @@ namespace FastData.Base
             var name = new Dictionary<string, object>();
             var parameName = new Dictionary<string, object>();
 
-            GetXmlList(path, "sqlMap", ref key, ref sql, ref db, ref type, ref check, ref param, ref name, ref parameName, config);
+            GetXmlList(path, "sqlMap", ref key, ref sql, ref db, ref type, ref check, ref param, ref name, ref parameName, config,xml);
 
             for (var i = 0; i < key.Count; i++)
             {
@@ -635,7 +635,7 @@ namespace FastData.Base
             ref List<string> key, ref List<string> sql, ref Dictionary<string, object> db,
             ref Dictionary<string, object> type, ref Dictionary<string, object> check,
             ref Dictionary<string, object> param, ref Dictionary<string, object> name,
-            ref Dictionary<string, object> parameName, ConfigModel config)
+            ref Dictionary<string, object> parameName, ConfigModel config,string xml=null)
         {
             try
             {
@@ -654,6 +654,8 @@ namespace FastData.Base
                     else
                         xmlDoc.Load(path);
                 }
+                else if (xml != null)
+                    xmlDoc.LoadXml(xml);
                 else
                     xmlDoc.Load(path);
 
