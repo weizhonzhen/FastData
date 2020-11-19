@@ -11,6 +11,9 @@ FastMap.InstanceProperties(namespace, dll);
 //chache map
 FastMap.InstanceMap(db);
 
+//init map cache by Resource （xml file，SqlMap.config ）
+FastData.FastMap.InstanceMapResource("Test");
+
 //by Repository
  services.AddTransient<IFastRepository, FastRepository>();
  services.AddTransient<IRedisRepository, RedisRepository>();
