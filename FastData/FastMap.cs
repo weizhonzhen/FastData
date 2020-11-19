@@ -15,6 +15,7 @@ using FastData.CacheModel;
 using FastData.Check;
 using System.Reflection;
 using FastData.Context;
+using System.Xml;
 
 namespace FastData
 {
@@ -87,6 +88,72 @@ namespace FastData
                         BaseTable.Check(query, a.Name, typeInfo.DeclaredProperties.ToList(), typeInfo.GetCustomAttributes().ToList());
                 });
             }
+        }
+        #endregion
+
+        #region 初始化map 3  by Resource
+        public static void InstanceMapResource(string projectName, string dbKey = null)
+        {
+            projectName = projectName.Replace(".dll", "");
+            var config = DataConfig.GetConfig(dbKey, projectName);
+            var db = new DataContext(dbKey);
+            var assembly = Assembly.Load(projectName);
+            var map = new MapConfigModel();
+            using (var resource = assembly.GetManifestResourceStream(string.Format("{0}.SqlMap.config", projectName)))
+            {
+                if (resource != null)
+                {
+                    using (var reader = new StreamReader(resource))
+                    {
+                        var content = reader.ReadToEnd();
+                        var xmlDoc = new XmlDocument();
+                        xmlDoc.LoadXml(content);
+                        var nodelList = xmlDoc.SelectNodes("configuration/MapConfig/SqlMap/Add");
+                        foreach (XmlNode item in nodelList)
+                        {
+                            map.Path.Add(item.Attributes["File"].Value);
+                        }
+                    }
+                }
+                else
+                    map = MapConfig.GetConfig();
+            }
+
+            map.Path.ForEach(a =>
+            {
+                using (var resource = assembly.GetManifestResourceStream(string.Format("{0}.{1}", projectName, a.Replace("/", "."))))
+                {
+                    if (resource != null)
+                    {
+                        using (var reader = new StreamReader(resource))
+                        {
+                            var xml = reader.ReadToEnd();
+                            var info = new FileInfo(a);
+                            var key = BaseSymmetric.Generate(info.FullName);
+                            if (!DbCache.Exists(config.CacheType, key))
+                            {
+                                var temp = new MapXmlModel();
+                                temp.LastWrite = info.LastWriteTime;
+                                temp.FileKey = MapXml.ReadXml(info.FullName, config, info.Name.ToLower().Replace(".xml", ""), xml);
+                                temp.FileName = info.FullName;
+                                if (MapXml.SaveXml(dbKey, key, info, config, db))
+                                    DbCache.Set<MapXmlModel>(config.CacheType, key, temp);
+                            }
+                            else if ((DbCache.Get<MapXmlModel>(config.CacheType, key).LastWrite - info.LastWriteTime).Milliseconds != 0)
+                            {
+                                DbCache.Get<MapXmlModel>(config.CacheType, key).FileKey.ForEach(f => { DbCache.Remove(config.CacheType, f); });
+
+                                var model = new MapXmlModel();
+                                model.LastWrite = info.LastWriteTime;
+                                model.FileKey = MapXml.ReadXml(info.FullName, config, info.Name.ToLower().Replace(".xml", ""), xml);
+                                model.FileName = info.FullName;
+                                if (MapXml.SaveXml(dbKey, key, info, config, db))
+                                    DbCache.Set<MapXmlModel>(config.CacheType, key, model);
+                            }
+                        }
+                    }
+                }
+            });
         }
         #endregion
 
