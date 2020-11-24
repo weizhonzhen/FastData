@@ -4,7 +4,6 @@ using System.Configuration;
 using FastUntility.Base;
 using FastData.Base;
 using FastData.CacheModel;
-using System.Linq;
 
 namespace FastData.Config
 {
@@ -33,13 +32,13 @@ namespace FastData.Config
         /// 获取配置节点
         /// </summary>
         /// <returns></returns>
-        public static MapConfigModel GetConfig()
+        public static MapConfigModel GetConfig(string mapFile= "SqlMap.config")
         {
             try
             {
                 var key = "FastData.Config.SqlMap";
                 var exeConfig = new ExeConfigurationFileMap();
-                exeConfig.ExeConfigFilename = string.Format("{0}SqlMap.config", AppDomain.CurrentDomain.BaseDirectory);
+                exeConfig.ExeConfigFilename = string.Format("{0}{1}", AppDomain.CurrentDomain.BaseDirectory,mapFile);
                 var info = new FileInfo(exeConfig.ExeConfigFilename);
                 
                 if (!DbCache.Exists(CacheType.Web, key))
