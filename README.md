@@ -6,19 +6,19 @@ nuget url : https://www.nuget.org/packages/Fast.Data/
 in Application_Start method
 
 //cache model
-FastMap.InstanceProperties(namespace, dll);
+FastMap.InstanceProperties(namespace, dll,"db.config");
 
 //chache map
-FastMap.InstanceMap(db);
+FastMap.InstanceMap(db,"SqlMap.config","db.config");
 
-//init map cache by Resource （xml file，SqlMap.config ）
-FastData.FastMap.InstanceMapResource("Test");
+//init map cache by Resource （xml file，SqlMap.config,db.config ）
+FastData.FastMap.InstanceMapResource("Test","Test","db.config","SqlMap.config");
 
 //by Repository
  services.AddTransient<IFastRepository, FastRepository>();
  services.AddTransient<IRedisRepository, RedisRepository>();
 
-//web.config
+//web.config or db.config
 <configSections>
     <section name="DataConfig" type="FastData.Config.DataConfig,FastData" />
 </configSections>
