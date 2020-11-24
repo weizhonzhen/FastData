@@ -31,7 +31,7 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceProperties(string nameSpace, string projectName, string dbFile = "db.config")
+        public static void InstanceProperties(string nameSpace, string projectName=null, string dbFile = "db.config")
         {
             var config = DataConfig.GetConfig(null, projectName, dbFile);
 
