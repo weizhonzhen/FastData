@@ -31,9 +31,9 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceProperties(string nameSpace, string projectName)
+        public static void InstanceProperties(string nameSpace, string projectName, string dbFile = "db.config")
         {
-            var config = DataConfig.GetConfig();
+            var config = DataConfig.GetConfig(null, projectName, dbFile);
 
             var assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == projectName.Replace(".dll", ""));
             if (assembly == null)
@@ -68,10 +68,10 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceTable(string nameSpace, string projectName, string dbKey = null)
+        public static void InstanceTable(string nameSpace, string projectName, string dbKey = null, string dbFile = "db.config")
         {
             var query = new DataQuery();
-            query.Config = DataConfig.GetConfig(dbKey);
+            query.Config = DataConfig.GetConfig(dbKey, projectName, dbFile);
             query.Key = dbKey;
 
             MapXml.CreateLogTable(query);
@@ -92,14 +92,14 @@ namespace FastData
         #endregion
 
         #region 初始化map 3  by Resource
-        public static void InstanceMapResource(string projectName, string dbKey = null)
+        public static void InstanceMapResource(string projectName, string dbKey = null, string dbFile = "db.config", string mapFile= "SqlMap.config")
         {
             projectName = projectName.Replace(".dll", "");
-            var config = DataConfig.GetConfig(dbKey, projectName);
+            var config = DataConfig.GetConfig(dbKey, projectName, dbFile);
             var db = new DataContext(dbKey);
             var assembly = Assembly.Load(projectName);
             var map = new MapConfigModel();
-            using (var resource = assembly.GetManifestResourceStream(string.Format("{0}.SqlMap.config", projectName)))
+            using (var resource = assembly.GetManifestResourceStream(string.Format("{0}.{1}", projectName,mapFile)))
             {
                 if (resource != null)
                 {
@@ -116,7 +116,7 @@ namespace FastData
                     }
                 }
                 else
-                    map = MapConfig.GetConfig();
+                    map = MapConfig.GetConfig(mapFile);
             }
 
             map.Path.ForEach(a =>
@@ -162,10 +162,10 @@ namespace FastData
         /// 初始化map 3
         /// </summary>
         /// <returns></returns>
-        public static void InstanceMap(string dbKey = null)
+        public static void InstanceMap(string dbKey = null,string mapFile= "SqlMap.config", string dbFile = "db.config")
         {
-            var list = MapConfig.GetConfig();
-            var config = DataConfig.GetConfig(dbKey);
+            var list = MapConfig.GetConfig(mapFile);
+            var config = DataConfig.GetConfig(dbKey, null, dbFile);
             using (var db = new DataContext(dbKey)) {
                 var query = new DataQuery { Config = config, Key = dbKey };
 
