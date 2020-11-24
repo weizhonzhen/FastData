@@ -3,11 +3,13 @@ using System.Linq;
 using System.Configuration;
 using FastData.Type;
 using FastData.Model;
-using FastUntility.Base;
 using FastData.Base;
-using System;
-using System.IO;
 using FastUntility.Cache;
+using FastUntility.Base;
+using System;
+using System.Reflection;
+using System.IO;
+using System.Xml;
 
 namespace FastData.Config
 {
@@ -111,335 +113,328 @@ namespace FastData.Config
         /// 获取配置节点
         /// </summary>
         /// <returns></returns>
-        public static ConfigModel GetConfig(string key = null)
+        public static ConfigModel GetConfig(string key = null,string projectName=null,string dbFile="db.config")
         {
+            var cacheKey = string.Format("FastData.{0}", dbFile);
             var result = new ConfigModel();
             var list = new List<ConfigModel>();
-            var config = (DataConfig)ConfigurationManager.GetSection("DataConfig");
+            var config = new DataConfig();
 
-            #region Db2
-            if (config.DB2.Count != 0)
+            var assembly = Assembly.Load(projectName);
+            using (var resource = assembly.GetManifestResourceStream(string.Format("{0}.{1}", projectName, dbFile)))
             {
-                var cacheKey = "DataConfig.DB2";
-                
-                if (IsReadCache)
+                if (resource != null)
                 {
-                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
-
-                    if (string.IsNullOrEmpty(key))
-                        result = cacheList.First();
+                    if (BaseCache.Exists(cacheKey))
+                        list = BaseCache.Get<List<ConfigModel>>(cacheKey);
                     else
-                        result = cacheList.Find(a => a.Key == key);
+                    {
+                        using (var reader = new StreamReader(resource))
+                        {
+                            var content = reader.ReadToEnd();
+                            var xmlDoc = new XmlDocument();
+                            xmlDoc.LoadXml(content);
+                            var nodelList = xmlDoc.SelectNodes("configuration/DataConfig");
+                            foreach (XmlNode node in nodelList)
+                            {
+                                foreach (XmlNode leaf in node.ChildNodes)
+                                {
+                                    foreach (XmlNode db in leaf.ChildNodes)
+                                    {
+                                        var item = new ConfigModel();
+                                        if (leaf.Name.ToLower() == DataDbType.DB2.ToLower())
+                                        {
+                                            item.DbType = DataDbType.DB2;
+                                            item.Flag = "@";
+                                            item.ProviderName = Provider.DB2;
+                                        }
+
+                                        if (leaf.Name.ToLower() == DataDbType.Oracle.ToLower())
+                                        {
+                                            item.DbType = DataDbType.Oracle;
+                                            item.Flag = ":";
+                                            item.ProviderName = Provider.Oracle;
+                                        }
+
+                                        if (leaf.Name.ToLower() == DataDbType.MySql.ToLower())
+                                        {
+                                            item.DbType = DataDbType.MySql;
+                                            item.Flag = "?";
+                                            item.ProviderName = Provider.MySql;
+                                        }
+
+                                        if (leaf.Name.ToLower() == DataDbType.SqlServer.ToLower())
+                                        {
+                                            item.DbType = DataDbType.SqlServer;
+                                            item.Flag = "@";
+                                            item.ProviderName = Provider.SqlServer;
+                                        }
+
+                                        if (leaf.Name.ToLower() == DataDbType.SQLite.ToLower())
+                                        {
+                                            item.DbType = DataDbType.SQLite;
+                                            item.Flag = "@";
+                                            item.ProviderName = Provider.SQLite;
+                                        }
+
+                                        if (leaf.Name.ToLower() == DataDbType.PostgreSql.ToLower())
+                                        {
+                                            item.DbType = DataDbType.PostgreSql;
+                                            item.Flag = ":";
+                                            item.ProviderName = Provider.PostgreSql;
+                                        }
+
+                                        if (item.DbType != null)
+                                        {
+                                            item.ConnStr = db.Attributes["ConnStr"]?.Value;
+                                            item.IsOutError = db.Attributes["IsOutError"]?.Value.ToStr().ToLower() == "true" || db.Attributes["IsOutError"]?.Value.ToStr() == null;
+                                            item.IsOutSql = db.Attributes["IsOutSql"]?.Value.ToStr().ToLower() == "true" || db.Attributes["IsOutSql"]?.Value.ToStr() == null;
+                                            item.IsPropertyCache = db.Attributes["IsPropertyCache"]?.Value.ToStr().ToLower() == "true" || db.Attributes["IsPropertyCache"]?.Value.ToStr() == null;
+                                            item.Key = db.Attributes["Key"]?.Value;
+                                            item.DbLinkName = db.Attributes["DbLinkName"]?.Value;
+                                            item.DesignModel = db.Attributes["DesignModel"]?.Value;
+                                            item.IsEncrypt = db.Attributes["IsEncrypt"]?.Value.ToStr().ToLower() == "true";
+                                            item.IsMapSave = db.Attributes["IsMapSave"]?.Value.ToStr().ToLower() == "true";
+                                            item.SqlErrorType = db.Attributes["SqlErrorType"]?.Value;
+                                            item.CacheType = db.Attributes["CacheType"]?.Value;
+                                            item.IsUpdateCache = db.Attributes["IsUpdateCache"]?.Value.ToStr().ToLower() == "true";
+
+                                            item.DesignModel = item.DesignModel == null ? "DbFirst" : item.DesignModel;
+                                            item.CacheType = item.CacheType == null ? "db" : item.CacheType;
+
+                                            list.Add(item);
+                                        }
+                                    }
+                                }
+                            }
+                            BaseCache.Set<List<ConfigModel>>(cacheKey, list);
+                        }
+                    }
                 }
                 else
                 {
-                    foreach (var temp in config.DB2)
+                    if (BaseCache.Exists(cacheKey))
+                        config = BaseCache.Get<DataConfig>(cacheKey);
+                    else
                     {
-                        var item = new ConfigModel();
-                        item.DbType = DataDbType.DB2;
-                        item.Flag = "@";
-                        item.ProviderName = Provider.DB2;
-                        item.ConnStr = (temp as ElementConfig).ConnStr;
-                        item.IsOutError = (temp as ElementConfig).IsOutError;
-                        item.IsOutSql = (temp as ElementConfig).IsOutSql;
-                        item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
-                        item.Key = (temp as ElementConfig).Key;
-                        item.DbLinkName = (temp as ElementConfig).DbLinkName;
-                        item.DesignModel = (temp as ElementConfig).DesignModel;
-                        item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
-                        item.IsMapSave = (temp as ElementConfig).IsMapSave;
-                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
-                        item.CacheType = (temp as ElementConfig).CacheType;
-                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
-                        list.Add(item);
-
-                        if (string.IsNullOrEmpty(key))
-                            result = list.First();
+                        if (dbFile.ToLower() == "web.config")
+                            config = (DataConfig)ConfigurationManager.GetSection("DataConfig");
                         else
-                            result = list.Find(a => a.Key == key);
+                        {
+                            var exeConfig = new ExeConfigurationFileMap();
+                            exeConfig.ExeConfigFilename = string.Format("{0}{1}", AppDomain.CurrentDomain.BaseDirectory, dbFile);
+                            ConfigurationManager.OpenMappedExeConfiguration(exeConfig, ConfigurationUserLevel.None);
+                            config = (DataConfig)ConfigurationManager.GetSection("DataConfig");
+                        }
+                        BaseCache.Set<DataConfig>(cacheKey, config);
                     }
-                    
-                    DbCache.Set<List<ConfigModel>>(CacheType.Web,cacheKey, list);
-                }
-            }
-            #endregion
 
-            #region oracle
-            if (config.Oracle.Count != 0)
-            {
-                var cacheKey = "DataConfig.Oracle";
-
-                if (IsReadCache)
-                {
-                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
-
-                    if (string.IsNullOrEmpty(key))
-                        result = cacheList.First();
-                    else
-                        result = cacheList.Find(a => a.Key == key);
-                }
-                else
-                {
-                    foreach (var temp in config.Oracle)
+                    #region Db2
+                    if (config.DB2.Count != 0)
                     {
-                        var item = new ConfigModel();
-                        item.DbType = DataDbType.Oracle;
-                        item.Flag = ":";
-                        item.ProviderName = Provider.Oracle;
-                        item.ConnStr = (temp as ElementConfig).ConnStr;
-                        item.IsOutError = (temp as ElementConfig).IsOutError;
-                        item.IsOutSql = (temp as ElementConfig).IsOutSql;
-                        item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
-                        item.Key = (temp as ElementConfig).Key;
-                        item.DbLinkName = (temp as ElementConfig).DbLinkName;
-                        item.DesignModel = (temp as ElementConfig).DesignModel;
-                        item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
-                        item.IsMapSave = (temp as ElementConfig).IsMapSave;
-                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
-                        item.CacheType = (temp as ElementConfig).CacheType;
-                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
-                        list.Add(item);
+                        foreach (var temp in config.DB2)
+                        {
+                            var item = new ConfigModel();
+                            item.DbType = DataDbType.DB2;
+                            item.Flag = "@";
+                            item.ProviderName = Provider.DB2;
+                            item.ConnStr = (temp as ElementConfig).ConnStr;
+                            item.IsOutError = (temp as ElementConfig).IsOutError;
+                            item.IsOutSql = (temp as ElementConfig).IsOutSql;
+                            item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
+                            item.Key = (temp as ElementConfig).Key;
+                            item.DbLinkName = (temp as ElementConfig).DbLinkName;
+                            item.DesignModel = (temp as ElementConfig).DesignModel;
+                            item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
+                            item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                            item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                            item.CacheType = (temp as ElementConfig).CacheType;
+                            item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                            list.Add(item);
+                        }
                     }
+                    #endregion
 
-                    if (string.IsNullOrEmpty(key))
-                        result = list.First();
-                    else
-                        result = list.Find(a => a.Key == key);
-
-                    DbCache.Set<List<ConfigModel>>(CacheType.Web, cacheKey, list);
-                }
-            }
-            #endregion
-
-            #region mysql
-            if (config.MySql.Count != 0)
-            {
-                var cacheKey = "DataConfig.MySql";
-
-                if (IsReadCache)
-                {
-                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
-
-                    if (string.IsNullOrEmpty(key))
-                        result = cacheList.First();
-                    else
-                        result = cacheList.Find(a => a.Key == key);
-                }
-                else
-                {
-                    foreach (var temp in config.MySql)
+                    #region oracle
+                    if (config.Oracle.Count != 0)
                     {
-                        var item = new ConfigModel();
-                        item.DbType = DataDbType.MySql;
-                        item.Flag = "?";
-                        item.ProviderName = Provider.MySql;
-                        item.ConnStr = (temp as ElementConfig).ConnStr;
-                        item.IsOutError = (temp as ElementConfig).IsOutError;
-                        item.IsOutSql = (temp as ElementConfig).IsOutSql;
-                        item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
-                        item.Key = (temp as ElementConfig).Key;
-                        item.DbLinkName = (temp as ElementConfig).DbLinkName;
-                        item.DesignModel = (temp as ElementConfig).DesignModel;
-                        item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
-                        item.IsMapSave = (temp as ElementConfig).IsMapSave;
-                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
-                        item.CacheType = (temp as ElementConfig).CacheType;
-                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
-                        list.Add(item);
+                        foreach (var temp in config.Oracle)
+                        {
+                            var item = new ConfigModel();
+                            item.DbType = DataDbType.Oracle;
+                            item.Flag = ":";
+                            item.ProviderName = Provider.Oracle;
+                            item.ConnStr = (temp as ElementConfig).ConnStr;
+                            item.IsOutError = (temp as ElementConfig).IsOutError;
+                            item.IsOutSql = (temp as ElementConfig).IsOutSql;
+                            item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
+                            item.Key = (temp as ElementConfig).Key;
+                            item.DbLinkName = (temp as ElementConfig).DbLinkName;
+                            item.DesignModel = (temp as ElementConfig).DesignModel;
+                            item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
+                            item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                            item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                            item.CacheType = (temp as ElementConfig).CacheType;
+                            item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                            list.Add(item);
+                        }
                     }
+                    #endregion
 
-                    if (string.IsNullOrEmpty(key))
-                        result = list.First();
-                    else
-                        result = list.Find(a => a.Key == key);
-
-                    DbCache.Set<List<ConfigModel>>(CacheType.Web, cacheKey, list);
-                }
-            }
-            #endregion
-
-            #region sqlserver
-            if (config.SqlServer.Count != 0)
-            {
-                var cacheKey = "DataConfig.SqlServer";
-
-                if (IsReadCache)
-                {
-                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
-
-                    if (string.IsNullOrEmpty(key))
-                        result = cacheList.First();
-                    else
-                        result = cacheList.Find(a => a.Key == key);
-                }
-                else
-                {
-                    foreach (var temp in config.SqlServer)
+                    #region mysql
+                    if (config.MySql.Count != 0)
                     {
-                        var item = new ConfigModel();
-                        item.DbType = DataDbType.SqlServer;
-                        item.Flag = "@";
-                        item.ProviderName = Provider.SqlServer;
-                        item.ConnStr = (temp as ElementConfig).ConnStr;
-                        item.IsOutError = (temp as ElementConfig).IsOutError;
-                        item.IsOutSql = (temp as ElementConfig).IsOutSql;
-                        item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
-                        item.Key = (temp as ElementConfig).Key;
-                        item.DbLinkName = (temp as ElementConfig).DbLinkName;
-                        item.DesignModel = (temp as ElementConfig).DesignModel;
-                        item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
-                        item.IsMapSave = (temp as ElementConfig).IsMapSave;
-                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
-                        item.CacheType = (temp as ElementConfig).CacheType;
-                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
-                        list.Add(item);
+                        foreach (var temp in config.MySql)
+                        {
+                            var item = new ConfigModel();
+                            item.DbType = DataDbType.MySql;
+                            item.Flag = "?";
+                            item.ProviderName = Provider.MySql;
+                            item.ConnStr = (temp as ElementConfig).ConnStr;
+                            item.IsOutError = (temp as ElementConfig).IsOutError;
+                            item.IsOutSql = (temp as ElementConfig).IsOutSql;
+                            item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
+                            item.Key = (temp as ElementConfig).Key;
+                            item.DbLinkName = (temp as ElementConfig).DbLinkName;
+                            item.DesignModel = (temp as ElementConfig).DesignModel;
+                            item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
+                            item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                            item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                            item.CacheType = (temp as ElementConfig).CacheType;
+                            item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                            list.Add(item);
+                        }
                     }
+                    #endregion
 
-                    if (string.IsNullOrEmpty(key))
-                        result = list.First();
-                    else
-                        result = list.Find(a => a.Key == key);
-
-                    DbCache.Set<List<ConfigModel>>(CacheType.Web, cacheKey, list);
-                }
-            }
-            #endregion
-
-            #region sqlite
-            if (config.SQLite.Count != 0)
-            {
-                var cacheKey = "DataConfig.SQLite";
-
-                if (IsReadCache)
-                {
-                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
-
-                    if (string.IsNullOrEmpty(key))
-                        result = cacheList.First();
-                    else
-                        result = cacheList.Find(a => a.Key == key);
-                }
-                else
-                {
-                    foreach (var temp in config.SQLite)
+                    #region sqlserver
+                    if (config.SqlServer.Count != 0)
                     {
-                        var item = new ConfigModel();
-                        item.DbType = DataDbType.SQLite;
-                        item.Flag = "@";
-                        item.ProviderName = Provider.SQLite;
-                        item.ConnStr = (temp as ElementConfig).ConnStr;
-                        item.IsOutError = (temp as ElementConfig).IsOutError;
-                        item.IsOutSql = (temp as ElementConfig).IsOutSql;
-                        item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
-                        item.Key = (temp as ElementConfig).Key;
-                        item.DbLinkName = (temp as ElementConfig).DbLinkName;
-                        item.DesignModel = (temp as ElementConfig).DesignModel;
-                        item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
-                        item.IsMapSave = (temp as ElementConfig).IsMapSave;
-                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
-                        item.CacheType = (temp as ElementConfig).CacheType;
-                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
-                        list.Add(item);
+                        foreach (var temp in config.SqlServer)
+                        {
+                            var item = new ConfigModel();
+                            item.DbType = DataDbType.SqlServer;
+                            item.Flag = "@";
+                            item.ProviderName = Provider.SqlServer;
+                            item.ConnStr = (temp as ElementConfig).ConnStr;
+                            item.IsOutError = (temp as ElementConfig).IsOutError;
+                            item.IsOutSql = (temp as ElementConfig).IsOutSql;
+                            item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
+                            item.Key = (temp as ElementConfig).Key;
+                            item.DbLinkName = (temp as ElementConfig).DbLinkName;
+                            item.DesignModel = (temp as ElementConfig).DesignModel;
+                            item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
+                            item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                            item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                            item.CacheType = (temp as ElementConfig).CacheType;
+                            item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                            list.Add(item);
+                        }
                     }
+                    #endregion
 
-                    if (string.IsNullOrEmpty(key))
-                        result = list.First();
-                    else
-                        result = list.Find(a => a.Key == key);
-                    DbCache.Set<List<ConfigModel>>(CacheType.Web, cacheKey, list);
-                }
-            }
-            #endregion
-
-            #region PostgreSql
-            if (config.PostgreSql.Count != 0)
-            {
-                var cacheKey = "DataConfig.PostgreSql";
-
-                if (IsReadCache)
-                {
-                    var cacheList = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
-
-                    if (string.IsNullOrEmpty(key))
-                        result = cacheList.First();
-                    else
-                        result = cacheList.Find(a => a.Key == key);
-                }
-                else
-                {
-                    foreach (var temp in config.PostgreSql)
+                    #region sqlite
+                    if (config.SQLite.Count != 0)
                     {
-                        var item = new ConfigModel();
-                        item.DbType = DataDbType.PostgreSql;
-                        item.Flag = ":";
-                        item.ProviderName = Provider.PostgreSql;
-                        item.ConnStr = (temp as ElementConfig).ConnStr;
-                        item.IsOutError = (temp as ElementConfig).IsOutError;
-                        item.IsOutSql = (temp as ElementConfig).IsOutSql;
-                        item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
-                        item.Key = (temp as ElementConfig).Key;
-                        item.DbLinkName = (temp as ElementConfig).DbLinkName;
-                        item.DesignModel = (temp as ElementConfig).DesignModel;
-                        item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
-                        item.IsMapSave = (temp as ElementConfig).IsMapSave;
-                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
-                        item.CacheType = (temp as ElementConfig).CacheType;
-                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
-                        list.Add(item);
+                        foreach (var temp in config.SQLite)
+                        {
+                            var item = new ConfigModel();
+                            item.DbType = DataDbType.SQLite;
+                            item.Flag = "@";
+                            item.ProviderName = Provider.SQLite;
+                            item.ConnStr = (temp as ElementConfig).ConnStr;
+                            item.IsOutError = (temp as ElementConfig).IsOutError;
+                            item.IsOutSql = (temp as ElementConfig).IsOutSql;
+                            item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
+                            item.Key = (temp as ElementConfig).Key;
+                            item.DbLinkName = (temp as ElementConfig).DbLinkName;
+                            item.DesignModel = (temp as ElementConfig).DesignModel;
+                            item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
+                            item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                            item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                            item.CacheType = (temp as ElementConfig).CacheType;
+                            item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                            list.Add(item);
+                        }
                     }
+                    #endregion
 
-                    if (string.IsNullOrEmpty(key))
-                        result = list.First();
-                    else
-                        result = list.Find(a => a.Key == key);
-                    DbCache.Set<List<ConfigModel>>(CacheType.Web, cacheKey, list);
+                    #region PostgreSql
+                    if (config.PostgreSql.Count != 0)
+                    {
+                        foreach (var temp in config.PostgreSql)
+                        {
+                            var item = new ConfigModel();
+                            item.DbType = DataDbType.PostgreSql;
+                            item.Flag = ":";
+                            item.ProviderName = Provider.PostgreSql;
+                            item.ConnStr = (temp as ElementConfig).ConnStr;
+                            item.IsOutError = (temp as ElementConfig).IsOutError;
+                            item.IsOutSql = (temp as ElementConfig).IsOutSql;
+                            item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
+                            item.Key = (temp as ElementConfig).Key;
+                            item.DbLinkName = (temp as ElementConfig).DbLinkName;
+                            item.DesignModel = (temp as ElementConfig).DesignModel;
+                            item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
+                            item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                            item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                            item.CacheType = (temp as ElementConfig).CacheType;
+                            item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                            list.Add(item);
+                        }
+                    }
+                    #endregion
                 }
-            }
-            #endregion
+            }            
+
+            if (string.IsNullOrEmpty(key))
+                result = list.First();
+            else
+                result = list.Find(a => a.Key == key);
+
+            if (projectName != null)
+                result.IsUpdateCache = false;
 
             return result;
         }
         #endregion
 
-        public static bool DataType(string key = null)
+        public static bool DataType(string key = null, string projectName = null, string dbFile = "db.config")
         {
-            var config = (DataConfig)ConfigurationManager.GetSection("DataConfig");
-
             var result = new List<bool>();
-            result.Add(config.Oracle.Count > 0);
-            result.Add(config.DB2.Count > 0);
-            result.Add(config.SQLite.Count > 0);
-            result.Add(config.SqlServer.Count > 0);
-            result.Add(config.PostgreSql.Count > 0);
-            result.Add(config.MySql.Count > 0);
-
-            return result.Count(a => a == true) > 1;
-        }
-
-        #region 是否从缓存读取
-        /// <summary>
-        /// 是否从缓存读取
-        /// </summary>
-        private static bool IsReadCache
-        {
-            get
+            var cacheKey = string.Format("FastData.{0}", dbFile);
+            var config = new DataConfig();
+            var assembly = Assembly.Load(projectName);
+            using (var resource = assembly.GetManifestResourceStream(string.Format("{0}.{1}", projectName, dbFile)))
             {
-                var fileName = string.Format("{0}Web.config", AppDomain.CurrentDomain.BaseDirectory);
-                var info = new FileInfo(fileName);
-                var fileKey = "DataConfig.File";
-
-                if (DbCache.Exists(CacheType.Web, fileKey))
+                if (resource == null)
                 {
-                    if ((DbCache.Get(CacheType.Web, fileKey).ToDate() - info.LastWriteTime).Minutes != 0)
-                        return false;
-                    else
-                        return true;
+                    if (!BaseCache.Exists(cacheKey))
+                        GetConfig(key, projectName, dbFile);
+
+                    config = BaseCache.Get<DataConfig>(cacheKey);
+                    result.Add(config.Oracle.Count > 0);
+                    result.Add(config.DB2.Count > 0);
+                    result.Add(config.SQLite.Count > 0);
+                    result.Add(config.SqlServer.Count > 0);
+                    result.Add(config.PostgreSql.Count > 0);
+                    result.Add(config.MySql.Count > 0);
                 }
                 else
-                    DbCache.Set(CacheType.Web, fileKey, info.LastWriteTime.ToDate("yyyy-MM-dd HH:mm:ss"));
-                return false;
+                {
+                    if (!BaseCache.Exists(cacheKey))
+                        GetConfig(key, projectName, dbFile);
+
+                    var list = BaseCache.Get<List<ConfigModel>>(cacheKey);
+                    result.Add(list.Count(a => a.DbType == DataDbType.Oracle) > 0);
+                    result.Add(list.Count(a => a.DbType == DataDbType.DB2) > 0);
+                    result.Add(list.Count(a => a.DbType == DataDbType.SQLite) > 0);
+                    result.Add(list.Count(a => a.DbType == DataDbType.SqlServer) > 0);
+                    result.Add(list.Count(a => a.DbType == DataDbType.PostgreSql) > 0);
+                    result.Add(list.Count(a => a.DbType == DataDbType.MySql) > 0);
+                }
             }
+            return result.Count(a => a == true) > 1;
         }
-        #endregion
     }
 }
