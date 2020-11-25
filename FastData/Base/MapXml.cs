@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 using FastData.Type;
 using FastData.Check;
 using FastData.Config;
-using FastUntility.Cache;
 
 namespace FastData.Base
 {
@@ -401,8 +400,8 @@ namespace FastData.Base
             if (type.IndexOf(',') > 0)
             {
                 var key = string.Format("ForEach.{0}", type.Split(',')[1]);
-                if (BaseCache.Exists(key))
-                    assembly = BaseCache.Get<object>(key) as Assembly;
+                if (DbCache.Exists(CacheType.Web, key))
+                    assembly = DbCache.Get<object>(CacheType.Web, key) as Assembly;
                 else
                     assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == type.Split(',')[1]);
                 if (assembly == null)
@@ -411,7 +410,7 @@ namespace FastData.Base
                     return data;
                 else
                 {
-                    BaseCache.Set<object>(key, assembly);
+                    DbCache.Set<object>(CacheType.Web, key, assembly);
                     if (assembly.GetType(type.Split(',')[0]) == null)
                         return data;
 
