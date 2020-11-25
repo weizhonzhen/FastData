@@ -33,8 +33,8 @@ namespace FastData
         /// <param name="dll">dll名称</param>
         public static void InstanceProperties(string nameSpace, string projectName=null, string dbFile = "db.config")
         {
+            FastRedis.RedisInfo.Init(projectName, dbFile);
             var config = DataConfig.GetConfig(null, projectName, dbFile);
-
             var assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == projectName.Replace(".dll", ""));
             if (assembly == null)
                 assembly = Assembly.Load(projectName.Replace(".dll", ""));
@@ -70,6 +70,7 @@ namespace FastData
         /// <param name="dll">dll名称</param>
         public static void InstanceTable(string nameSpace, string projectName, string dbKey = null, string dbFile = "db.config")
         {
+            FastRedis.RedisInfo.Init(projectName, dbFile);
             var query = new DataQuery();
             query.Config = DataConfig.GetConfig(dbKey, projectName, dbFile);
             query.Key = dbKey;
@@ -94,6 +95,7 @@ namespace FastData
         #region 初始化map 3  by Resource
         public static void InstanceMapResource(string projectName, string dbKey = null, string dbFile = "db.config", string mapFile= "SqlMap.config")
         {
+            FastRedis.RedisInfo.Init(projectName, dbFile);
             projectName = projectName.Replace(".dll", "");
             var config = DataConfig.GetConfig(dbKey, projectName, dbFile);
             var db = new DataContext(dbKey);
