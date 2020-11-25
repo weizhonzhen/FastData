@@ -4,7 +4,6 @@ using System.Configuration;
 using FastData.Type;
 using FastData.Model;
 using FastData.Base;
-using FastUntility.Cache;
 using FastUntility.Base;
 using System;
 using System.Reflection;
@@ -120,8 +119,8 @@ namespace FastData.Config
             var list = new List<ConfigModel>();
             var config = new DataConfig();
 
-            if (BaseCache.Exists(cacheKey))
-                list = BaseCache.Get<List<ConfigModel>>(cacheKey);
+            if (DbCache.Exists(CacheType.Web, cacheKey))
+                list = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
             else if (projectName == null)
             {
                 if (dbFile.ToLower() == "web.config")
@@ -380,7 +379,7 @@ namespace FastData.Config
                 }
             }
 
-            BaseCache.Set<List<ConfigModel>>(cacheKey, list);
+            DbCache.Set<List<ConfigModel>>(CacheType.Web, cacheKey, list);
 
             if (string.IsNullOrEmpty(key))
                 result = list.First();
