@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FastRedis.Repository
 {
-    public class RedisRepository:IRedisRepository
+    public class RedisRepository : IRedisRepository
     {
         private int db = 0;
         private IRedisClient Context;
