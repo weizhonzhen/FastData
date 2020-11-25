@@ -113,7 +113,7 @@ namespace FastData.Config
         /// 获取配置节点
         /// </summary>
         /// <returns></returns>
-        public static ConfigModel GetConfig(string key = null,string projectName=null,string dbFile="db.config")
+        public static ConfigModel GetConfig(string key = null, string projectName = null, string dbFile = "db.config")
         {
             var cacheKey = "FastData.db.config";
             var result = new ConfigModel();
@@ -122,6 +122,174 @@ namespace FastData.Config
 
             if (BaseCache.Exists(cacheKey))
                 list = BaseCache.Get<List<ConfigModel>>(cacheKey);
+            else if (projectName == null)
+            {
+                if (dbFile.ToLower() == "web.config")
+                    config = (DataConfig)ConfigurationManager.GetSection("DataConfig");
+                else
+                {
+                    var exeConfig = new ExeConfigurationFileMap();
+                    exeConfig.ExeConfigFilename = string.Format("{0}{1}", AppDomain.CurrentDomain.BaseDirectory, dbFile);
+                    ConfigurationManager.OpenMappedExeConfiguration(exeConfig, ConfigurationUserLevel.None);
+                    config = (DataConfig)ConfigurationManager.GetSection("DataConfig");
+                }
+
+                #region Db2
+                if (config.DB2.Count != 0)
+                {
+                    foreach (var temp in config.DB2)
+                    {
+                        var item = new ConfigModel();
+                        item.DbType = DataDbType.DB2;
+                        item.Flag = "@";
+                        item.ProviderName = Provider.DB2;
+                        item.ConnStr = (temp as ElementConfig).ConnStr;
+                        item.IsOutError = (temp as ElementConfig).IsOutError;
+                        item.IsOutSql = (temp as ElementConfig).IsOutSql;
+                        item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
+                        item.Key = (temp as ElementConfig).Key;
+                        item.DbLinkName = (temp as ElementConfig).DbLinkName;
+                        item.DesignModel = (temp as ElementConfig).DesignModel;
+                        item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
+                        item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                        item.CacheType = (temp as ElementConfig).CacheType;
+                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                        list.Add(item);
+                    }
+                }
+                #endregion
+
+                #region oracle
+                if (config.Oracle.Count != 0)
+                {
+                    foreach (var temp in config.Oracle)
+                    {
+                        var item = new ConfigModel();
+                        item.DbType = DataDbType.Oracle;
+                        item.Flag = ":";
+                        item.ProviderName = Provider.Oracle;
+                        item.ConnStr = (temp as ElementConfig).ConnStr;
+                        item.IsOutError = (temp as ElementConfig).IsOutError;
+                        item.IsOutSql = (temp as ElementConfig).IsOutSql;
+                        item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
+                        item.Key = (temp as ElementConfig).Key;
+                        item.DbLinkName = (temp as ElementConfig).DbLinkName;
+                        item.DesignModel = (temp as ElementConfig).DesignModel;
+                        item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
+                        item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                        item.CacheType = (temp as ElementConfig).CacheType;
+                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                        list.Add(item);
+                    }
+                }
+                #endregion
+
+                #region mysql
+                if (config.MySql.Count != 0)
+                {
+                    foreach (var temp in config.MySql)
+                    {
+                        var item = new ConfigModel();
+                        item.DbType = DataDbType.MySql;
+                        item.Flag = "?";
+                        item.ProviderName = Provider.MySql;
+                        item.ConnStr = (temp as ElementConfig).ConnStr;
+                        item.IsOutError = (temp as ElementConfig).IsOutError;
+                        item.IsOutSql = (temp as ElementConfig).IsOutSql;
+                        item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
+                        item.Key = (temp as ElementConfig).Key;
+                        item.DbLinkName = (temp as ElementConfig).DbLinkName;
+                        item.DesignModel = (temp as ElementConfig).DesignModel;
+                        item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
+                        item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                        item.CacheType = (temp as ElementConfig).CacheType;
+                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                        list.Add(item);
+                    }
+                }
+                #endregion
+
+                #region sqlserver
+                if (config.SqlServer.Count != 0)
+                {
+                    foreach (var temp in config.SqlServer)
+                    {
+                        var item = new ConfigModel();
+                        item.DbType = DataDbType.SqlServer;
+                        item.Flag = "@";
+                        item.ProviderName = Provider.SqlServer;
+                        item.ConnStr = (temp as ElementConfig).ConnStr;
+                        item.IsOutError = (temp as ElementConfig).IsOutError;
+                        item.IsOutSql = (temp as ElementConfig).IsOutSql;
+                        item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
+                        item.Key = (temp as ElementConfig).Key;
+                        item.DbLinkName = (temp as ElementConfig).DbLinkName;
+                        item.DesignModel = (temp as ElementConfig).DesignModel;
+                        item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
+                        item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                        item.CacheType = (temp as ElementConfig).CacheType;
+                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                        list.Add(item);
+                    }
+                }
+                #endregion
+
+                #region sqlite
+                if (config.SQLite.Count != 0)
+                {
+                    foreach (var temp in config.SQLite)
+                    {
+                        var item = new ConfigModel();
+                        item.DbType = DataDbType.SQLite;
+                        item.Flag = "@";
+                        item.ProviderName = Provider.SQLite;
+                        item.ConnStr = (temp as ElementConfig).ConnStr;
+                        item.IsOutError = (temp as ElementConfig).IsOutError;
+                        item.IsOutSql = (temp as ElementConfig).IsOutSql;
+                        item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
+                        item.Key = (temp as ElementConfig).Key;
+                        item.DbLinkName = (temp as ElementConfig).DbLinkName;
+                        item.DesignModel = (temp as ElementConfig).DesignModel;
+                        item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
+                        item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                        item.CacheType = (temp as ElementConfig).CacheType;
+                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                        list.Add(item);
+                    }
+                }
+                #endregion
+
+                #region PostgreSql
+                if (config.PostgreSql.Count != 0)
+                {
+                    foreach (var temp in config.PostgreSql)
+                    {
+                        var item = new ConfigModel();
+                        item.DbType = DataDbType.PostgreSql;
+                        item.Flag = ":";
+                        item.ProviderName = Provider.PostgreSql;
+                        item.ConnStr = (temp as ElementConfig).ConnStr;
+                        item.IsOutError = (temp as ElementConfig).IsOutError;
+                        item.IsOutSql = (temp as ElementConfig).IsOutSql;
+                        item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
+                        item.Key = (temp as ElementConfig).Key;
+                        item.DbLinkName = (temp as ElementConfig).DbLinkName;
+                        item.DesignModel = (temp as ElementConfig).DesignModel;
+                        item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
+                        item.IsMapSave = (temp as ElementConfig).IsMapSave;
+                        item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
+                        item.CacheType = (temp as ElementConfig).CacheType;
+                        item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                        list.Add(item);
+                    }
+                }
+                #endregion
+            }
             else
             {
                 var assembly = Assembly.Load(projectName);
@@ -209,177 +377,10 @@ namespace FastData.Config
                             }
                         }
                     }
-                    else
-                    {
-                        if (dbFile.ToLower() == "web.config")
-                            config = (DataConfig)ConfigurationManager.GetSection("DataConfig");
-                        else
-                        {
-                            var exeConfig = new ExeConfigurationFileMap();
-                            exeConfig.ExeConfigFilename = string.Format("{0}{1}", AppDomain.CurrentDomain.BaseDirectory, dbFile);
-                            ConfigurationManager.OpenMappedExeConfiguration(exeConfig, ConfigurationUserLevel.None);
-                            config = (DataConfig)ConfigurationManager.GetSection("DataConfig");
-                        }
-
-                        #region Db2
-                        if (config.DB2.Count != 0)
-                        {
-                            foreach (var temp in config.DB2)
-                            {
-                                var item = new ConfigModel();
-                                item.DbType = DataDbType.DB2;
-                                item.Flag = "@";
-                                item.ProviderName = Provider.DB2;
-                                item.ConnStr = (temp as ElementConfig).ConnStr;
-                                item.IsOutError = (temp as ElementConfig).IsOutError;
-                                item.IsOutSql = (temp as ElementConfig).IsOutSql;
-                                item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
-                                item.Key = (temp as ElementConfig).Key;
-                                item.DbLinkName = (temp as ElementConfig).DbLinkName;
-                                item.DesignModel = (temp as ElementConfig).DesignModel;
-                                item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
-                                item.IsMapSave = (temp as ElementConfig).IsMapSave;
-                                item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
-                                item.CacheType = (temp as ElementConfig).CacheType;
-                                item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
-                                list.Add(item);
-                            }
-                        }
-                        #endregion
-
-                        #region oracle
-                        if (config.Oracle.Count != 0)
-                        {
-                            foreach (var temp in config.Oracle)
-                            {
-                                var item = new ConfigModel();
-                                item.DbType = DataDbType.Oracle;
-                                item.Flag = ":";
-                                item.ProviderName = Provider.Oracle;
-                                item.ConnStr = (temp as ElementConfig).ConnStr;
-                                item.IsOutError = (temp as ElementConfig).IsOutError;
-                                item.IsOutSql = (temp as ElementConfig).IsOutSql;
-                                item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
-                                item.Key = (temp as ElementConfig).Key;
-                                item.DbLinkName = (temp as ElementConfig).DbLinkName;
-                                item.DesignModel = (temp as ElementConfig).DesignModel;
-                                item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
-                                item.IsMapSave = (temp as ElementConfig).IsMapSave;
-                                item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
-                                item.CacheType = (temp as ElementConfig).CacheType;
-                                item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
-                                list.Add(item);
-                            }
-                        }
-                        #endregion
-
-                        #region mysql
-                        if (config.MySql.Count != 0)
-                        {
-                            foreach (var temp in config.MySql)
-                            {
-                                var item = new ConfigModel();
-                                item.DbType = DataDbType.MySql;
-                                item.Flag = "?";
-                                item.ProviderName = Provider.MySql;
-                                item.ConnStr = (temp as ElementConfig).ConnStr;
-                                item.IsOutError = (temp as ElementConfig).IsOutError;
-                                item.IsOutSql = (temp as ElementConfig).IsOutSql;
-                                item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
-                                item.Key = (temp as ElementConfig).Key;
-                                item.DbLinkName = (temp as ElementConfig).DbLinkName;
-                                item.DesignModel = (temp as ElementConfig).DesignModel;
-                                item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
-                                item.IsMapSave = (temp as ElementConfig).IsMapSave;
-                                item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
-                                item.CacheType = (temp as ElementConfig).CacheType;
-                                item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
-                                list.Add(item);
-                            }
-                        }
-                        #endregion
-
-                        #region sqlserver
-                        if (config.SqlServer.Count != 0)
-                        {
-                            foreach (var temp in config.SqlServer)
-                            {
-                                var item = new ConfigModel();
-                                item.DbType = DataDbType.SqlServer;
-                                item.Flag = "@";
-                                item.ProviderName = Provider.SqlServer;
-                                item.ConnStr = (temp as ElementConfig).ConnStr;
-                                item.IsOutError = (temp as ElementConfig).IsOutError;
-                                item.IsOutSql = (temp as ElementConfig).IsOutSql;
-                                item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
-                                item.Key = (temp as ElementConfig).Key;
-                                item.DbLinkName = (temp as ElementConfig).DbLinkName;
-                                item.DesignModel = (temp as ElementConfig).DesignModel;
-                                item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
-                                item.IsMapSave = (temp as ElementConfig).IsMapSave;
-                                item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
-                                item.CacheType = (temp as ElementConfig).CacheType;
-                                item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
-                                list.Add(item);
-                            }
-                        }
-                        #endregion
-
-                        #region sqlite
-                        if (config.SQLite.Count != 0)
-                        {
-                            foreach (var temp in config.SQLite)
-                            {
-                                var item = new ConfigModel();
-                                item.DbType = DataDbType.SQLite;
-                                item.Flag = "@";
-                                item.ProviderName = Provider.SQLite;
-                                item.ConnStr = (temp as ElementConfig).ConnStr;
-                                item.IsOutError = (temp as ElementConfig).IsOutError;
-                                item.IsOutSql = (temp as ElementConfig).IsOutSql;
-                                item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
-                                item.Key = (temp as ElementConfig).Key;
-                                item.DbLinkName = (temp as ElementConfig).DbLinkName;
-                                item.DesignModel = (temp as ElementConfig).DesignModel;
-                                item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
-                                item.IsMapSave = (temp as ElementConfig).IsMapSave;
-                                item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
-                                item.CacheType = (temp as ElementConfig).CacheType;
-                                item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
-                                list.Add(item);
-                            }
-                        }
-                        #endregion
-
-                        #region PostgreSql
-                        if (config.PostgreSql.Count != 0)
-                        {
-                            foreach (var temp in config.PostgreSql)
-                            {
-                                var item = new ConfigModel();
-                                item.DbType = DataDbType.PostgreSql;
-                                item.Flag = ":";
-                                item.ProviderName = Provider.PostgreSql;
-                                item.ConnStr = (temp as ElementConfig).ConnStr;
-                                item.IsOutError = (temp as ElementConfig).IsOutError;
-                                item.IsOutSql = (temp as ElementConfig).IsOutSql;
-                                item.IsPropertyCache = (temp as ElementConfig).IsPropertyCache;
-                                item.Key = (temp as ElementConfig).Key;
-                                item.DbLinkName = (temp as ElementConfig).DbLinkName;
-                                item.DesignModel = (temp as ElementConfig).DesignModel;
-                                item.IsEncrypt = (temp as ElementConfig).IsEncrypt;
-                                item.IsMapSave = (temp as ElementConfig).IsMapSave;
-                                item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
-                                item.CacheType = (temp as ElementConfig).CacheType;
-                                item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
-                                list.Add(item);
-                            }
-                        }
-                        #endregion
-                    }
                 }
-                BaseCache.Set<List<ConfigModel>>(cacheKey, list);
             }
+
+            BaseCache.Set<List<ConfigModel>>(cacheKey, list);
 
             if (string.IsNullOrEmpty(key))
                 result = list.First();
