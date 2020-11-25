@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using NServiceKit.Redis;
 using System.IO;
+using System.Reflection;
+using System.Configuration;
+using FastRedis.Config;
 
 namespace FastRedis
 {
@@ -11,7 +14,35 @@ namespace FastRedis
     /// </summary>
     public static class RedisInfo
     {
-       
+        /// <summary>
+        /// 资源文件初始化
+        /// </summary>
+        /// <param name="dbFile"></param>
+        public static void Init(string projectName = null,string dbFile = "db.config")
+        {
+            RedisConfig.GetConfig(projectName, dbFile);
+        }
+
+        #region 获取上下文
+        /// <summary>
+        /// 获取上下文
+        /// </summary>
+        /// <returns></returns>
+        public static PooledRedisClientManager Context(int db = 0)
+        {
+            var config = RedisConfig.GetConfig();
+
+            return new PooledRedisClientManager(config.WriteServerList.Split(',')
+             , config.ReadServerList.Split(','), new RedisClientManagerConfig
+             {
+                 DefaultDb = db,
+                 MaxReadPoolSize = config.MaxReadPoolSize,
+                 MaxWritePoolSize = config.MaxWritePoolSize,
+                 AutoStart = config.AutoStart
+             });
+        }
+        #endregion
+
         #region 是否存在
         /// <summary>
         /// 是否存在 
@@ -21,7 +52,7 @@ namespace FastRedis
         {
             try
             {
-                using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
+                using (IRedisClient redis = Context(db).GetClient())
                 {
                     if (string.IsNullOrEmpty(key))
                         return false;
@@ -67,7 +98,7 @@ namespace FastRedis
         {
             try
             {
-                using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
+                using (IRedisClient redis = Context(db).GetClient())
                 {
                     if (string.IsNullOrEmpty(key))
                         return false;
@@ -117,7 +148,7 @@ namespace FastRedis
         {
             try
             {
-                using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
+                using (IRedisClient redis = Context(db).GetClient())
                 {
                     if (string.IsNullOrEmpty(key))
                         return false;
@@ -167,7 +198,7 @@ namespace FastRedis
         {
             try
             {
-                using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
+                using (IRedisClient redis = Context(db).GetClient())
                 {
                     if (string.IsNullOrEmpty(key))
                         return false;
@@ -215,7 +246,7 @@ namespace FastRedis
         {
             try
             {
-                using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
+                using (IRedisClient redis = Context(db).GetClient())
                 {
                     if (string.IsNullOrEmpty(key))
                         return "";
@@ -261,7 +292,7 @@ namespace FastRedis
         {
             try
             {
-                using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
+                using (IRedisClient redis = Context(db).GetClient())
                 {
                     if (string.IsNullOrEmpty(key))
                         return new T();
@@ -306,7 +337,7 @@ namespace FastRedis
         {
             try
             {
-                using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
+                using (IRedisClient redis = Context(db).GetClient())
                 {
                     if (string.IsNullOrEmpty(key))
                         return false;
@@ -351,7 +382,7 @@ namespace FastRedis
         {
             try
             {
-                using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
+                using (IRedisClient redis = Context(db).GetClient())
                 {
                     redis.SetAll<T>(dic);
 
@@ -396,7 +427,7 @@ namespace FastRedis
         {
             try
             {
-                using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
+                using (IRedisClient redis = Context(db).GetClient())
                 {
                     return redis.GetAll<T>(keys);
                 }
@@ -438,7 +469,7 @@ namespace FastRedis
         {
             try
             {
-                using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
+                using (IRedisClient redis = Context(db).GetClient())
                 {
                     redis.RemoveAll(keys);
                     
@@ -483,7 +514,7 @@ namespace FastRedis
         {
             try
             {
-                using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
+                using (IRedisClient redis = Context(db).GetClient())
                 {
                     if (string.IsNullOrEmpty(queueName))
                         return;
@@ -525,7 +556,7 @@ namespace FastRedis
         {
             try
             {
-                using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
+                using (IRedisClient redis = Context(db).GetClient())
                 {
                     if (string.IsNullOrEmpty(queueName))
                         return "";
@@ -573,7 +604,7 @@ namespace FastRedis
         {
             try
             {
-                using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
+                using (IRedisClient redis = Context(db).GetClient())
                 {
                     if (string.IsNullOrEmpty(channel))
                         return;
@@ -620,7 +651,7 @@ namespace FastRedis
         {
             try
             {
-                using (IRedisClient redis = RedisContext.GetContext(db).GetClient())
+                using (IRedisClient redis = Context(db).GetClient())
                 {
                     if (string.IsNullOrEmpty(channel))
                         return;
