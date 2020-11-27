@@ -2,9 +2,8 @@
 using System.Configuration;
 using System.IO;
 using System.Reflection;
+using System.Runtime.Caching;
 using System.Xml;
-using FastUntility.Base;
-using FastUntility.Cache;
 
 namespace FastRedis.Config
 {
@@ -157,6 +156,64 @@ namespace FastRedis.Config
                 base["AutoStart"] = value;
             }
         }
-        #endregion 
+        #endregion
+    }
+
+    internal static class BaseRegular
+    {
+        public static string ToStr(this object strValue)
+        {
+            if (strValue == null)
+                return "";
+            else
+                return strValue.ToString();
+        }
+
+        public static int ToInt(this string str, int defValue)
+        {
+            int tmp = 0;
+            if (Int32.TryParse(str, out tmp))
+                return (int)tmp;
+            else
+                return defValue;
+        }
+    }
+
+    internal static class BaseCache
+    {
+        public static ObjectCache cache = MemoryCache.Default;
+
+        public static void Set<T>(string key, T value, int Hours = 24 * 30 * 12) where T : class, new()
+        {
+            if (!string.IsNullOrEmpty(key))
+            {
+                cache.Remove(key);
+                var policy = new CacheItemPolicy();
+                policy.AbsoluteExpiration = DateTime.Now.AddHours(Hours);
+                cache.Set(key, value, policy);
+            }
+        }
+
+        public static T Get<T>(string key) where T : class, new()
+        {
+            if (!string.IsNullOrEmpty(key))
+            {
+                var result = new T();
+                var obj = cache.Get(key);
+                if (obj != null)
+                    result = (T)obj;
+                return result;
+            }
+            else
+                return new T();
+        }
+
+        public static bool Exists(string key)
+        {
+            if (!string.IsNullOrEmpty(key))
+                return cache.Contains(key);
+            else
+                return false;
+        }
     }
 }
