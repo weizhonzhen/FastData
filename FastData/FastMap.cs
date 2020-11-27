@@ -31,13 +31,14 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceProperties(string nameSpace, string projectName=null, string dbFile = "db.config")
+        public static void InstanceProperties(string nameSpace, string dbFile = "db.config")
         {
-            FastRedis.RedisInfo.Init(projectName, dbFile);
+            var projectName = Assembly.GetCallingAssembly().GetName().Name;
+            FastRedis.RedisInfo.Init(dbFile);
             var config = DataConfig.GetConfig(null, projectName, dbFile);
-            var assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == projectName.Replace(".dll", ""));
+            var assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == projectName);
             if (assembly == null)
-                assembly = Assembly.Load(projectName.Replace(".dll", ""));
+                assembly = Assembly.Load(projectName);
 
             if (assembly != null)
             {
@@ -68,18 +69,19 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceTable(string nameSpace, string projectName, string dbKey = null, string dbFile = "db.config")
+        public static void InstanceTable(string nameSpace, string dbKey = null, string dbFile = "db.config")
         {
-            FastRedis.RedisInfo.Init(projectName, dbFile);
+            var projectName = Assembly.GetCallingAssembly().GetName().Name;
+            FastRedis.RedisInfo.Init(dbFile);
             var query = new DataQuery();
             query.Config = DataConfig.GetConfig(dbKey, projectName, dbFile);
             query.Key = dbKey;
 
             MapXml.CreateLogTable(query);
 
-            var assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == projectName.Replace(".dll", ""));
+            var assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == projectName);
             if (assembly == null)
-                assembly = Assembly.Load(projectName.Replace(".dll", ""));
+                assembly = Assembly.Load(projectName);
 
             if (assembly != null)
             {
@@ -93,10 +95,10 @@ namespace FastData
         #endregion
 
         #region 初始化map 3  by Resource
-        public static void InstanceMapResource(string projectName, string dbKey = null, string dbFile = "db.config", string mapFile= "SqlMap.config")
+        public static void InstanceMapResource(string dbKey = null, string dbFile = "db.config", string mapFile= "SqlMap.config")
         {
-            FastRedis.RedisInfo.Init(projectName, dbFile);
-            projectName = projectName.Replace(".dll", "");
+            var projectName = Assembly.GetCallingAssembly().GetName().Name;
+            FastRedis.RedisInfo.Init(dbFile);
             var config = DataConfig.GetConfig(dbKey, projectName, dbFile);
             var db = new DataContext(dbKey);
             var assembly = Assembly.Load(projectName);

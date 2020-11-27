@@ -10,6 +10,7 @@ using FastData.Model;
 using System.Diagnostics;
 using FastData.Context;
 using System.Data;
+using System.Reflection;
 
 namespace FastData
 {
@@ -53,8 +54,9 @@ namespace FastData
         /// <param name="field">字段</param>
         /// <param name="Key"></param>
         /// <returns></returns>
-        public static DataQuery Query<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> field = null, string key = null, string projectName = null, string dbFile = "db.config")
+        public static DataQuery Query<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> field = null, string key = null,string dbFile = "db.config")
         {
+            var projectName = Assembly.GetCallingAssembly().GetName().Name;
             var result = new DataQuery();
             result.Config = DataConfig.GetConfig(key, projectName, dbFile);
             result.Key = key;
