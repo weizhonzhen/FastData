@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using NServiceKit.Redis;
 using System.IO;
-using System.Reflection;
-using System.Configuration;
 using FastRedis.Config;
+using System.Reflection;
 
 namespace FastRedis
 {
@@ -18,8 +17,9 @@ namespace FastRedis
         /// 资源文件初始化
         /// </summary>
         /// <param name="dbFile"></param>
-        public static void Init(string projectName = null,string dbFile = "db.config")
+        public static void Init(string dbFile = "db.config")
         {
+            var projectName = Assembly.GetCallingAssembly().GetName().Name;
             RedisConfig.GetConfig(projectName, dbFile);
         }
 
