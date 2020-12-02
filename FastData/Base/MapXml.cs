@@ -77,7 +77,8 @@ namespace FastData.Base
                             if (!param.ToList().Exists(a => a.ParameterName.ToLower() == item.ToLower()))
                                 continue;
                             var temp = param.ToList().Find(a => a.ParameterName.ToLower() == item.ToLower());
-                            tempParam.Add(temp);
+                            if (!tempParam.ToList().Exists(a => a.ParameterName == temp.ParameterName))
+                                tempParam.Add(temp);
 
                             var paramKey = string.Format("{0}.{1}.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
                             var conditionKey = string.Format("{0}.{1}.condition.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
