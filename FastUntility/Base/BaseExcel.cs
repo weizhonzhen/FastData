@@ -214,7 +214,17 @@ namespace FastUntility.Base
 
                             model.cell = model.row.CreateCell(j++);
                             model.cell.Row.Height = 420;
-                            model.cell.SetCellValue(temp.Value.ToStr());
+                            if (temp.Value is Dictionary<string, object>)
+                            {
+                                var info = temp.Value as Dictionary<string, object>;
+                                model.sheet.AddMergedRegion(new CellRangeAddress(
+                                    info.GetValue("rowbegin").ToStr().ToInt(0), info.GetValue("rowend").ToStr().ToInt(0),
+                                    info.GetValue("colbegin").ToStr().ToInt(0) - 1, info.GetValue("colend").ToStr().ToInt(0) - 1));
+
+                                model.cell.SetCellValue(info.GetValue("text").ToStr());
+                            }
+                            else
+                                model.cell.SetCellValue(temp.Value.ToStr());
 
                             if (temp.Value.ToStr().Contains("\n"))
                                 model.cell.CellStyle = model.style_n;
