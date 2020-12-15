@@ -123,6 +123,9 @@ namespace FastData
                     map = MapConfig.GetConfig(mapFile);
             }
 
+            if (map.Path == null)
+                return;
+
             map.Path.ForEach(a =>
             {
                 using (var resource = assembly.GetManifestResourceStream(string.Format("{0}.{1}", projectName, a.Replace("/", "."))))
@@ -198,6 +201,9 @@ namespace FastData
                         BaseTable.Check(query, "Data_MapFile", listInfo, listAttribute);
                     }
                 }
+
+                if (list.Path == null)
+                    return;
 
                 list.Path.ForEach(p => {
                     var info = new FileInfo(p);
