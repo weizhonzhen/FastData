@@ -76,16 +76,21 @@ namespace FastData.Config
             var result = new MapConfigModel();
             var config = ConfigurationManager.OpenMappedExeConfiguration(exeConfig, ConfigurationUserLevel.None);
             var item = (MapConfig)config.GetSection("MapConfig");
-            foreach (var temp in item.SqlMap)
+            if (item != null)
             {
-                var path = string.Format("{0}{1}", AppDomain.CurrentDomain.BaseDirectory, (temp as MapElement).File.Replace("/", "\\"));
-                if (File.Exists(path))
-                    result.Path.Add(path);
+                foreach (var temp in item.SqlMap)
+                {
+                    var path = string.Format("{0}{1}", AppDomain.CurrentDomain.BaseDirectory, (temp as MapElement).File.Replace("/", "\\"));
+                    if (File.Exists(path))
+                        result.Path.Add(path);
+                }
+
+                result.LastWrite = info.LastWriteTime;
+
+                return result;
             }
-
-            result.LastWrite = info.LastWriteTime;
-
-            return result;
+            else
+                return new MapConfigModel();
         }
         #endregion
     }
