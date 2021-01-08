@@ -128,9 +128,8 @@ namespace FastData.Config
                 else
                 {
                     var exeConfig = new ExeConfigurationFileMap();
-                    exeConfig.ExeConfigFilename = string.Format("{0}{1}", AppDomain.CurrentDomain.BaseDirectory, dbFile);
-                    ConfigurationManager.OpenMappedExeConfiguration(exeConfig, ConfigurationUserLevel.None);
-                    config = (DataConfig)ConfigurationManager.GetSection("DataConfig");
+                    exeConfig.ExeConfigFilename = string.Format("{0}bin\\{1}", AppDomain.CurrentDomain.BaseDirectory, dbFile);
+                    config = (DataConfig)ConfigurationManager.OpenMappedExeConfiguration(exeConfig, ConfigurationUserLevel.None).GetSection("DataConfig");
                 }
 
                 #region Db2
