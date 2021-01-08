@@ -30,9 +30,8 @@ namespace FastRedis.Config
                 else
                 {
                     var exeConfig = new ExeConfigurationFileMap();
-                    exeConfig.ExeConfigFilename = string.Format("{0}{1}", AppDomain.CurrentDomain.BaseDirectory, dbFile);
-                    ConfigurationManager.OpenMappedExeConfiguration(exeConfig, ConfigurationUserLevel.None);
-                    section = (RedisConfig)ConfigurationManager.GetSection("RedisConfig");
+                    exeConfig.ExeConfigFilename = string.Format("{0}bin\\{1}", AppDomain.CurrentDomain.BaseDirectory, dbFile);
+                    section = (RedisConfig)ConfigurationManager.OpenMappedExeConfiguration(exeConfig, ConfigurationUserLevel.None).GetSection("RedisConfig");
                 }
             }
             else
