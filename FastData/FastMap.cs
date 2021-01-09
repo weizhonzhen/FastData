@@ -34,7 +34,7 @@ namespace FastData
         public static void InstanceProperties(string nameSpace, string dbFile = "db.config")
         {
             var projectName = Assembly.GetCallingAssembly().GetName().Name;
-            FastRedis.RedisInfo.Init(dbFile);
+            FastRedis.RedisInfo.Init(dbFile, projectName);
             var config = DataConfig.GetConfig(null, projectName, dbFile);
             var assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == projectName);
             if (assembly == null)
@@ -72,7 +72,7 @@ namespace FastData
         public static void InstanceTable(string nameSpace, string dbKey = null, string dbFile = "db.config")
         {
             var projectName = Assembly.GetCallingAssembly().GetName().Name;
-            FastRedis.RedisInfo.Init(dbFile);
+            FastRedis.RedisInfo.Init(dbFile, projectName);
             var query = new DataQuery();
             query.Config = DataConfig.GetConfig(dbKey, projectName, dbFile);
             query.Key = dbKey;
@@ -98,7 +98,7 @@ namespace FastData
         public static void InstanceMapResource(string dbKey = null, string dbFile = "db.config", string mapFile= "SqlMap.config")
         {
             var projectName = Assembly.GetCallingAssembly().GetName().Name;
-            FastRedis.RedisInfo.Init(dbFile);
+            FastRedis.RedisInfo.Init(dbFile, projectName);
             var config = DataConfig.GetConfig(dbKey, projectName, dbFile);
             var db = new DataContext(dbKey);
             var assembly = Assembly.Load(projectName);
@@ -170,7 +170,7 @@ namespace FastData
         /// 初始化map 3
         /// </summary>
         /// <returns></returns>
-        public static void InstanceMap(string dbKey = null,string mapFile= "SqlMap.config", string dbFile = "db.config")
+        public static void InstanceMap(string dbKey = null, string dbFile = "db.config", string mapFile= "SqlMap.config")
         {
             var list = MapConfig.GetConfig(mapFile);
             var config = DataConfig.GetConfig(dbKey, null, dbFile);
