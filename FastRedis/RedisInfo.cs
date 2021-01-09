@@ -17,9 +17,10 @@ namespace FastRedis
         /// 资源文件初始化
         /// </summary>
         /// <param name="dbFile"></param>
-        public static void Init(string dbFile = "db.config")
+        public static void Init(string dbFile = "db.config",string projectName=null)
         {
-            var projectName = Assembly.GetCallingAssembly().GetName().Name;
+            if (projectName == null)
+                projectName = Assembly.GetCallingAssembly().GetName().Name;
             RedisConfig.GetConfig(projectName, dbFile);
         }
 
