@@ -220,6 +220,7 @@ namespace FastData.Base
                                         }
                                     case "if":
                                         {
+                                            conditionValue = DbCache.Get(cacheType, conditionValueKey).ToStr();
                                             conditionValue = conditionValue.Replace(temp.ParameterName, temp.Value == null ? null : temp.Value.ToStr());
                                             conditionValue = conditionValue.Replace("#", "\"");
                                             if (BaseCodeDom.GetResult(conditionValue))
