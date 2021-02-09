@@ -72,7 +72,7 @@ namespace FastData.Base
                     if (param != null)
                     {
                         var tempSql = new StringBuilder();
-                        foreach (var item in DbCache.Get<List<string>>(DataConfig.GetConfig().CacheType, string.Format("{0}.param", name.ToLower())))
+                        foreach (var item in DbCache.Get<List<string>>(cacheType, string.Format("{0}.param", name.ToLower())))
                         {
                             if (!param.ToList().Exists(a => a.ParameterName.ToLower() == item.ToLower()))
                                 continue;
@@ -220,10 +220,11 @@ namespace FastData.Base
                                         }
                                     case "if":
                                         {
+                                            var referencesKey = string.Format("{0}.{1}.references.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
                                             conditionValue = DbCache.Get(cacheType, conditionValueKey).ToStr();
                                             conditionValue = conditionValue.Replace(temp.ParameterName, temp.Value == null ? null : temp.Value.ToStr());
                                             conditionValue = conditionValue.Replace("#", "\"");
-                                            if (BaseCodeDom.GetResult(conditionValue))
+                                            if (BaseCodeDom.GetResult(conditionValue, DbCache.Get(cacheType, referencesKey)))
                                             {
                                                 if (paramSql.IndexOf(tempKey) >= 0)
                                                 {
@@ -247,6 +248,7 @@ namespace FastData.Base
                                             var isSuccess = false;
                                             for (int j = 0; j < DbCache.Get(cacheType, paramKey).ToStr().ToInt(0); j++)
                                             {
+                                                var referencesKey = string.Format("{0}.{1}.references.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
                                                 conditionKey = string.Format("{0}.choose.{1}", paramKey, j);
                                                 condition = DbCache.Get(cacheType, conditionKey).ToStr().ToLower();
 
@@ -254,7 +256,7 @@ namespace FastData.Base
                                                 conditionValue = DbCache.Get(cacheType, conditionValueKey).ToStr();
                                                 conditionValue = conditionValue.Replace(temp.ParameterName, temp.Value == null ? null : temp.Value.ToStr());
                                                 conditionValue = conditionValue.Replace("#", "\"");
-                                                if (BaseCodeDom.GetResult(conditionValue))
+                                                if (BaseCodeDom.GetResult(conditionValue, DbCache.Get(cacheType, referencesKey)))
                                                 {
                                                     isSuccess = true;
                                                     if (condition.IndexOf(tempKey) >= 0)
@@ -800,6 +802,13 @@ namespace FastData.Base
                                                 key.Add(string.Format("{0}.{1}.condition.value.{2}", tempKey, dyn.Attributes["property"].Value.ToLower(), i));
                                                 sql.Add(dyn.Attributes["compareValue"].Value.ToLower());
                                             }
+
+                                            //引用dll
+                                            if (dyn.Attributes["references"] != null)
+                                            {
+                                                key.Add(string.Format("{0}.{1}.references.{2}", tempKey, dyn.Attributes["property"].Value.ToLower(), i));
+                                                sql.Add(dyn.Attributes["references"].Value);
+                                            }
                                         }
                                         else
                                         {
@@ -821,6 +830,13 @@ namespace FastData.Base
                                                     //内容
                                                     key.Add(string.Format("{0}.{1}.{2}.choose.{3}", tempKey, dyn.Attributes["property"].Value.ToLower(), i, count));
                                                     sql.Add(string.Format("{0}{1}", child.Attributes["prepend"].Value.ToLower(), child.InnerText));
+
+                                                    //引用dll
+                                                    if (child.Attributes["references"] != null)
+                                                    {
+                                                        key.Add(string.Format("{0}.{1}.{2}.choose.references.{3}", tempKey, dyn.Attributes["property"].Value.ToLower(), i, count));
+                                                        sql.Add(child.Attributes["references"].Value);
+                                                    }
 
                                                     count++;
                                                 }
