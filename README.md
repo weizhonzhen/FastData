@@ -56,6 +56,7 @@ FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config");
                 <isNullOrEmpty prepend=" and " property="roleId">a.roleId=?roleId</isNullOrEmpty>
                 <isNotNullOrEmpty prepend=" and " property="isAdmin">a.isAdmin=?isAdmin</isNotNullOrEmpty>
                 <if condition="areaId>8" prepend=" and " property="areaId">a.areaId=?areaId</if>
+                <if property="est" prepend=" and " condition="!FastUntility.Base.BaseRegular.IsZhString(#est#, false)" references="FastUntility">a=1</if>
                 <choose property="userNo">
                    <condition prepend=" and " property="userNo>5">a.userNo=:userNo and a.userNo=5</condition>
                 </choose>
