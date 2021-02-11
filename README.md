@@ -59,6 +59,7 @@ FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config");
                 <if property="est" prepend=" and " condition="!FastUntility.Base.BaseRegular.IsZhString(#est#, false)" references="FastUntility">a=1</if>
                 <choose property="userNo">
                    <condition prepend=" and " property="userNo>5">a.userNo=:userNo and a.userNo=5</condition>
+                   <other prepend=" and ">a.userNo=:userNo and a.userNo=6</other>
                 </choose>
                 <foreach name="data" field="userId" type="Test.Model.TestModel,Test">
                     select ypxh from base_role where userId=:userId
