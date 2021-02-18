@@ -282,11 +282,16 @@ namespace FastData.Base
                                                 }
                                             }
 
-                                            if (!isSuccess && conditionOther == "")
-                                                tempParam.Remove(temp);
-                                            else
+                                            if (!isSuccess)
                                             {
-                                                if (conditionOther.IndexOf(flagParam) >= 0 && flag != "")
+                                                if (conditionOther == "")
+                                                    tempParam.Remove(temp);
+                                                else if (conditionOther.IndexOf(tempKey) >= 0)
+                                                {
+                                                    tempParam.Remove(temp);
+                                                    tempSql.Append(conditionOther.Replace(tempKey, temp.Value.ToStr()));
+                                                }
+                                                else if (conditionOther.IndexOf(flagParam) < 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
                                                     tempSql.Append(conditionOther.Replace(tempKey, temp.Value.ToStr()));
@@ -294,7 +299,6 @@ namespace FastData.Base
                                                 else
                                                     tempSql.Append(conditionOther);
                                             }
-
                                             break;
                                         }
                                     default:
