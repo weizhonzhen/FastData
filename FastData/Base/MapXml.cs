@@ -286,7 +286,7 @@ namespace FastData.Base
                                                 tempParam.Remove(temp);
                                             else
                                             {
-                                                if (conditionOther.IndexOf(flagParam) < 0 && flag != "")
+                                                if (conditionOther.IndexOf(flagParam) >= 0 && flag != "")
                                                 {
                                                     tempParam.Remove(temp);
                                                     tempSql.Append(conditionOther.Replace(tempKey, temp.Value.ToStr()));
