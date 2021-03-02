@@ -332,7 +332,9 @@ namespace FastData.Base
                 }
                 #endregion
             }
-            param = tempParam.ToArray();
+
+            if (DbCache.Get(cacheType, name.ToLower()).ToInt(0) > 0)
+                param = tempParam.ToArray();
             return sql.ToString();
         }
         #endregion
