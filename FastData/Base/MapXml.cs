@@ -339,8 +339,16 @@ namespace FastData.Base
             {
                 foreach (var item in param)
                 {
-                    var temp = string.Format("{0}{1}", flag, item.ParameterName).ToLower();
-                    if (sql.ToString().ToLower().IndexOf(temp) >= 0)
+                    var tempKey = string.Format("#{0}#", item.ParameterName).ToLower();
+                    var flagParam = string.Format("{0}{1}", flag, item.ParameterName).ToLower();
+
+                    if (sql.ToString().ToLower().IndexOf(tempKey) >= 0)
+                    {
+                        var tempSql = sql.ToString().ToLower().Replace(tempKey, item.Value.ToStr());
+                        sql.Clear();
+                        sql.Append(tempSql);
+                    }
+                    else if (sql.ToString().ToLower().IndexOf(flagParam) >= 0 && flag != "")
                         tempParam.Add(item);
                 }
                 param = tempParam.ToArray();
@@ -721,6 +729,10 @@ namespace FastData.Base
                             //name
                             if (temp.Attributes["name"] != null)
                                 name.Add(string.Format("{0}.remark", tempKey), temp.Attributes["name"].Value.ToStr());
+
+                            //log
+                            if (temp.Attributes["log"] != null)
+                                name.Add(string.Format("{0}.log", tempKey), temp.Attributes["log"].Value.ToStr());
 
                             foreach (XmlNode node in temp.ChildNodes)
                             {
