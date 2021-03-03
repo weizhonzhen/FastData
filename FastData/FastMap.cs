@@ -251,7 +251,7 @@ namespace FastData
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = MapXml.GetMapSql(name, ref param,db,key);
-                var result = FastRead.ExecuteSql<T>(sql, param,db,key);
+                var result = FastRead.ExecuteSql<T>(sql, param,db,key, IsMapLog(name));
                 if (MapXml.MapIsForEach(name, config))
                 {
                     if (db == null)
@@ -324,9 +324,8 @@ namespace FastData
 
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
-                var sql = MapXml.GetMapSql(name, ref param,db,key);
-                
-                return FastWrite.ExecuteSql(sql, param, db, key);
+                var sql = MapXml.GetMapSql(name, ref param,db,key);                
+                return FastWrite.ExecuteSql(sql, param, db, key, IsMapLog(name));
             }
             else
                 return new WriteReturn();
@@ -384,18 +383,18 @@ namespace FastData
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = MapXml.GetMapSql(name, ref param,db,key);
-                
-                var result = FastRead.ExecuteSql(sql, param, db, key);
+                var result = FastRead.ExecuteSql(sql, param, db, key, IsMapLog(name));
 
                 if (MapXml.MapIsForEach(name, config))
                 {
                     if (db == null)
                     {
-                        using(var tempDb =new DataContext(key)){
-                        for (var i = 1; i < MapXml.MapForEachCount(name, config); i++)
+                        using (var tempDb = new DataContext(key))
                         {
-                            result = MapXml.MapForEach(result, name, tempDb, key, config,i);
-                        }
+                            for (var i = 1; i < MapXml.MapForEachCount(name, config); i++)
+                            {
+                                result = MapXml.MapForEach(result, name, tempDb, key, config, i);
+                            }
                         }
                     }
                     else
@@ -453,7 +452,7 @@ namespace FastData
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        private static PageResult ExecuteSqlPage(PageModel pModel, string sql, DbParameter[] param, DataContext db = null, string key = null)
+        private static PageResult ExecuteSqlPage(PageModel pModel, string sql, DbParameter[] param, DataContext db = null, string key = null,bool isOutSql=false)
         {
             var result = new DataReturn();
             var config = DataConfig.GetConfig(key);
@@ -463,8 +462,9 @@ namespace FastData
 
             if (db == null)
             {
-                using(var tempDb =new DataContext(key)){
-                result = tempDb.GetPageSql(pModel, sql, param);
+                using (var tempDb = new DataContext(key))
+                {
+                    result = tempDb.GetPageSql(pModel, sql, param);
                 }
             }
             else
@@ -472,6 +472,7 @@ namespace FastData
 
             stopwatch.Stop();
 
+            config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
             DbLog.LogSql(config.IsOutSql, result.Sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.PageResult;
@@ -491,18 +492,18 @@ namespace FastData
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = MapXml.GetMapSql(name, ref param,db,key);
-                
-                var result = ExecuteSqlPage(pModel, sql, param, db, key);
+                var result = ExecuteSqlPage(pModel, sql, param, db, key, IsMapLog(name));
 
                 if (MapXml.MapIsForEach(name, config))
                 {
                     if (db == null)
                     {
-                        using(var tempDb =new DataContext(key)){
-                        for (var i = 1; i < MapXml.MapForEachCount(name, config); i++)
+                        using (var tempDb = new DataContext(key))
                         {
-                            result.list = MapXml.MapForEach(result.list, name, tempDb, key, config,i);
-                        }
+                            for (var i = 1; i < MapXml.MapForEachCount(name, config); i++)
+                            {
+                                result.list = MapXml.MapForEach(result.list, name, tempDb, key, config, i);
+                            }
                         }
                     }
                     else
@@ -560,7 +561,7 @@ namespace FastData
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        private static PageResult<T> ExecuteSqlPage<T>(PageModel pModel, string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class, new()
+        private static PageResult<T> ExecuteSqlPage<T>(PageModel pModel, string sql, DbParameter[] param, DataContext db = null, string key = null,bool isOutSql=false) where T : class, new()
         {
             var result = new DataReturn<T>();
             var config = DataConfig.GetConfig(key);
@@ -570,8 +571,9 @@ namespace FastData
 
             if (db == null)
             {
-                using(var tempDb =new DataContext(key)){
-                result = tempDb.GetPageSql<T>(pModel, sql, param);
+                using (var tempDb = new DataContext(key))
+                {
+                    result = tempDb.GetPageSql<T>(pModel, sql, param);
                 }
             }
             else
@@ -579,6 +581,7 @@ namespace FastData
 
             stopwatch.Stop();
 
+            config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
             DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.pageResult;
@@ -598,18 +601,18 @@ namespace FastData
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = MapXml.GetMapSql(name, ref param,db,key);
-
-                var result = ExecuteSqlPage<T>(pModel, sql, param,db,key);
+                var result = ExecuteSqlPage<T>(pModel, sql, param,db,key, IsMapLog(name));
 
                 if (MapXml.MapIsForEach(name, config))
                 {
                     if (db == null)
                     {
-                        using(var tempDb =new DataContext(key)){
-                        for (var i = 1; i < MapXml.MapForEachCount(name, config); i++)
+                        using (var tempDb = new DataContext(key))
                         {
-                            result.list = MapXml.MapForEach<T>(result.list, name, tempDb, config,i);
-                        }
+                            for (var i = 1; i < MapXml.MapForEachCount(name, config); i++)
+                            {
+                                result.list = MapXml.MapForEach<T>(result.list, name, tempDb, config, i);
+                            }
                         }
                     }
                     else
@@ -734,6 +737,13 @@ namespace FastData
         public static string MapRemark(string name)
         {
             return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.remark", name.ToLower()));
+        }
+        #endregion
+
+        #region 获取map日志
+        public static bool IsMapLog(string name)
+        {
+            return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.log", name.ToLower())).ToLower() == "true";
         }
         #endregion
 

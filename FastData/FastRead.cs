@@ -633,7 +633,7 @@ namespace FastData
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static List<T> ExecuteSql<T>(string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class, new()
+        public static List<T> ExecuteSql<T>(string sql, DbParameter[] param, DataContext db = null, string key = null,bool isOutSql=false) where T : class, new()
         {
             ConfigModel config = null;
             var result = new DataReturn<T>();
@@ -657,6 +657,7 @@ namespace FastData
 
             stopwatch.Stop();
 
+            config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
             DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.list;
@@ -952,7 +953,7 @@ namespace FastData
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static List<Dictionary<string, object>> ExecuteSql(string sql, DbParameter[] param, DataContext db = null, string key = null)
+        public static List<Dictionary<string, object>> ExecuteSql(string sql, DbParameter[] param, DataContext db = null, string key = null,bool isOutSql=false)
         {
             ConfigModel config = null;
             var result = new DataReturn();
@@ -976,6 +977,7 @@ namespace FastData
 
             stopwatch.Stop();
 
+            config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
             DbLog.LogSql(config.IsOutSql, result.Sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.DicList;
