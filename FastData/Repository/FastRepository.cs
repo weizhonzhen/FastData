@@ -36,7 +36,7 @@ namespace FastData.Repository
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
-                var result = FastRead.ExecuteSql<T>(sql, param, db, key);
+                var result = FastRead.ExecuteSql<T>(sql, param, db, key, IsMapLog(name));
                 if (MapXml.MapIsForEach(name, config))
                 {
                     if (db == null)
@@ -109,8 +109,7 @@ namespace FastData.Repository
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
-
-                var result = FastRead.ExecuteSql(sql, param, db, key);
+                var result = FastRead.ExecuteSql(sql, param, db, key, IsMapLog(name));
 
                 if (MapXml.MapIsForEach(name, config))
                 {
@@ -185,8 +184,7 @@ namespace FastData.Repository
             if (DbCache.Exists(config.CacheType, name.ToLower()))
             {
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
-
-                return FastWrite.ExecuteSql(sql, param, db, key);
+                return FastWrite.ExecuteSql(sql, param, db, key, IsMapLog(name));
             }
             else
                 return new WriteReturn();
@@ -236,7 +234,7 @@ namespace FastData.Repository
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        private PageResult ExecuteSqlPage(PageModel pModel, string sql, DbParameter[] param, DataContext db = null, string key = null)
+        private PageResult ExecuteSqlPage(PageModel pModel, string sql, DbParameter[] param, DataContext db = null, string key = null,bool isOutSql=false)
         {
             var result = new DataReturn();
             var config = DataConfig.GetConfig(key);
@@ -256,6 +254,7 @@ namespace FastData.Repository
 
             stopwatch.Stop();
 
+            config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
             DbLog.LogSql(config.IsOutSql, result.Sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.PageResult;
@@ -277,7 +276,7 @@ namespace FastData.Repository
             {
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
 
-                var result = ExecuteSqlPage(pModel, sql, param, db, key);
+                var result = ExecuteSqlPage(pModel, sql, param, db, key, IsMapLog(name));
 
                 if (MapXml.MapIsForEach(name, config))
                 {
@@ -346,7 +345,7 @@ namespace FastData.Repository
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        private PageResult<T> ExecuteSqlPage<T>(PageModel pModel, string sql, DbParameter[] param, DataContext db = null, string key = null) where T : class, new()
+        private PageResult<T> ExecuteSqlPage<T>(PageModel pModel, string sql, DbParameter[] param, DataContext db = null, string key = null,bool isOutSql=false) where T : class, new()
         {
             var result = new DataReturn<T>();
             var config = DataConfig.GetConfig(key);
@@ -366,6 +365,7 @@ namespace FastData.Repository
 
             stopwatch.Stop();
 
+            config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
             DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.pageResult;
@@ -387,7 +387,7 @@ namespace FastData.Repository
             {
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
 
-                var result = ExecuteSqlPage<T>(pModel, sql, param, db, key);
+                var result = ExecuteSqlPage<T>(pModel, sql, param, db, key, IsMapLog(name));
 
                 if (MapXml.MapIsForEach(name, config))
                 {
@@ -629,6 +629,13 @@ namespace FastData.Repository
         public string MapRemark(string name)
         {
             return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.remark", name.ToLower()));
+        }
+        #endregion
+
+        #region 获取map日志
+        public bool IsMapLog(string name)
+        {
+            return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.log", name.ToLower())).ToLower() == "true";
         }
         #endregion
 

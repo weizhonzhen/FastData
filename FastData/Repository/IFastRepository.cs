@@ -65,6 +65,8 @@ namespace FastData.Repository
 
         bool IsExists(string name);
 
+        bool IsMapLog(string name);
+
         string MapRemark(string name);
 
         string MapParamRemark(string name, string param);
