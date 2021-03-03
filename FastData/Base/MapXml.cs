@@ -333,7 +333,18 @@ namespace FastData.Base
                 #endregion
             }
 
-            param = tempParam.ToArray();
+            if (DbCache.Get<List<string>>(cacheType, string.Format("{0}.param", name.ToLower())).Count > 0)
+                param = tempParam.ToArray();
+            else
+            {
+                foreach (var item in param)
+                {
+                    var temp = string.Format("{0}{1}", flag, item.ParameterName).ToLower();
+                    if (sql.ToString().ToLower().IndexOf(temp) >= 0)
+                        tempParam.Add(item);
+                }
+                param = tempParam.ToArray();
+            }
             return sql.ToString();
         }
         #endregion
