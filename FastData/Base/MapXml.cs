@@ -17,7 +17,7 @@ using FastData.Config;
 
 namespace FastData.Base
 {
-    internal static class MapXml
+    public static class MapXml
     {
         #region froeach数量
         /// <summary>
