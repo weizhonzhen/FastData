@@ -836,6 +836,18 @@ namespace FastData
             return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.{1}.existsmap", name.ToLower(), param.ToLower()));
         }
         #endregion
+
+        #region 获取db配置文件
+        /// <summary>
+        /// 获取db配置文件
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static ConfigModel DbConfig(string name)
+        {
+            return DataConfig.GetConfig(name);
+        }
+        #endregion
     }
 }
 
