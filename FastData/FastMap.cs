@@ -748,7 +748,7 @@ namespace FastData
         #region 获取map日志
         public static bool IsMapLog(string name)
         {
-            return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.log", name.ToLower())).ToLower() == "true";
+            return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.log", name.ToLower())).ToStr().ToLower() == "true";
         }
         #endregion
 
