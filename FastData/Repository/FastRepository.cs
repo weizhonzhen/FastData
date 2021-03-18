@@ -715,6 +715,12 @@ namespace FastData.Repository
         }
         #endregion
 
+        #region 获取db配置文件
+        public ConfigModel DbConfig(string name)
+        {
+            return DataConfig.GetConfig(name);
+        }
+        #endregion
 
         #region 批量增加
         /// <summary>

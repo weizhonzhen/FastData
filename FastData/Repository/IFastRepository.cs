@@ -81,6 +81,8 @@ namespace FastData.Repository
 
         string MapExistsMap(string name, string param);
 
+        ConfigModel DbConfig(string name);
+
         WriteReturn AddList<T>(List<T> list, string key = null, bool IsTrans = false, bool isLog = true) where T : class, new();
 
         Task<WriteReturn> AddListAsy<T>(List<T> list, string key = null, bool IsTrans = false, bool isLog = true) where T : class, new();
