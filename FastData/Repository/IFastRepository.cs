@@ -63,6 +63,8 @@ namespace FastData.Repository
 
         string MapType(string name);
 
+        string MapView(string name);
+
         bool IsExists(string name);
 
         bool IsMapLog(string name);
