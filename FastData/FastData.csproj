@@ -9,10 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FastData</RootNamespace>
     <AssemblyName>FastData</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworksVersion>v4.5;v4.6;v4.7;v4.8</TargetFrameworksVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>52bb2e23</NuGetPackageImportStamp>
     <TargetFrameworkProfile />
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,6 +24,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\FastData.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -60,12 +63,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\BaseCodeDom.cs" />
-    <Compile Include="Base\BaseContext.cs" />
     <Compile Include="Base\BaseDataReader.cs" />
     <Compile Include="Base\BaseExecute.cs" />
     <Compile Include="Base\BaseField.cs" />
     <Compile Include="Base\DbCache.cs" />
     <Compile Include="Base\DbLogTable.cs" />
+    <Compile Include="Base\MapXml.cs" />
     <Compile Include="Base\Provider.cs" />
     <Compile Include="Check\CheckModel.cs" />
     <Compile Include="Base\Config.cs" />
@@ -102,21 +105,16 @@
     <Compile Include="CacheModel\PropertyModel.cs" />
     <Compile Include="CacheModel\TableModel.cs" />
     <Compile Include="Model\VisitModel.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
+    <Compile Include="Model\XmlModel.cs" />
     <Compile Include="Property\ColumnAttribute.cs" />
     <Compile Include="Property\DynamicGet.cs" />
     <Compile Include="Property\DynamicSet.cs" />
     <Compile Include="Property\PropertyCache.cs" />
     <Compile Include="Property\TableAttribute.cs" />
+    <Compile Include="Repository\FastRepository.cs" />
+    <Compile Include="Repository\IFastRepository.cs" />
+    <Compile Include="Repository\IQuery.cs" />
+    <Compile Include="Repository\Query.cs" />
     <Compile Include="Type\DataDbType.cs" />
     <Compile Include="Base\DbLog.cs" />
     <Compile Include="Base\BaseModel.cs" />
@@ -124,6 +122,9 @@
     <Compile Include="Base\VisitExpression.cs" />
     <Compile Include="Model\OracleColumn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastRedis\FastRedis.csproj">
@@ -134,19 +135,6 @@
       <Project>{209cd228-0837-467d-b869-0db31af04362}</Project>
       <Name>FastUntility</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
