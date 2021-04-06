@@ -447,11 +447,7 @@ namespace FastData.Base
         /// <returns></returns>
         public static List<string> PrimaryKey(ConfigModel config, DbCommand cmd, string tableName)
         {
-            var key = string.Format("{0}.Primary.Key", tableName);
             var list = new List<string>();
-
-            if (DbCache.Exists(config.CacheType, key))
-                return DbCache.Get<List<string>>(config.CacheType, key);
 
             if (config.DbType == DataDbType.Oracle)
                 cmd.CommandText = string.Format("select a.COLUMN_NAME from all_cons_columns a,all_constraints b where a.constraint_name = b.constraint_name and b.constraint_type = 'P' and b.table_name = '{0}'", tableName.ToUpper());
@@ -477,7 +473,6 @@ namespace FastData.Base
                 }
 
                 dr.Close();
-                DbCache.Set<List<string>>(config.CacheType, key, list,8);
                 return list;
             }
         }
