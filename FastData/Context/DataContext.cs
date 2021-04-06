@@ -872,7 +872,10 @@ namespace FastData.Context
                 if (optionModel.IsSuccess)
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, optionModel.Sql);
                 else
+                {
                     result.writeReturn.IsSuccess = false;
+                    result.writeReturn.Message = optionModel.Message;
+                }
 
                 if (isTrans && result.writeReturn.IsSuccess)
                     SubmitTrans();
@@ -920,7 +923,7 @@ namespace FastData.Context
                 if (isTrans)
                     BeginTrans();
 
-                update = BaseModel.UpdateToSql<T>(model, config, field);
+                update = BaseModel.UpdateToSql<T>(model, config, field,cmd);
 
                 if (update.IsSuccess)
                 {
@@ -944,7 +947,10 @@ namespace FastData.Context
                         result.writeReturn.IsSuccess = false;
                 }
                 else
+                {
+                    result.writeReturn.Message = update.Message;
                     result.writeReturn.IsSuccess = false;
+                }
 
                 if (isTrans && result.writeReturn.IsSuccess)
                     SubmitTrans();
