@@ -209,7 +209,7 @@ namespace FastData.Base
                         DbLogTable.LogException(item.Config, ex, "ToPageDataReader", "");
                     else
                         DbLog.LogException(true, item.Config.DbType, ex, "ToPageDataReader", "");
-                });
+                }).ConfigureAwait(false);
                 return null;
             }
         }
@@ -256,7 +256,7 @@ namespace FastData.Base
                         DbLogTable.LogException(item.Config, ex, "ToPageCount", "");
                     else
                         DbLog.LogException(true, item.Config.DbType, ex, "ToPageCount", "");
-                });
+                }).ConfigureAwait(false);
 
                 return 0;
             }
@@ -291,7 +291,7 @@ namespace FastData.Base
                         DbLogTable.LogException(config, ex, "ToPageCountSql", "");
                     else
                         DbLog.LogException(config.IsOutError,config.DbType, ex, "ToPageCountSql", "");
-                });
+                }).ConfigureAwait(false);
                 return 0;
             }
         }
@@ -350,7 +350,7 @@ namespace FastData.Base
                         DbLogTable.LogException(config, ex, "ToPageDataReaderSql", "");
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "ToPageDataReaderSql", "");
-                });
+                }).ConfigureAwait(false);
                 return null;
             }
         }

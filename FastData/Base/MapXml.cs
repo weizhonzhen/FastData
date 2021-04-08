@@ -714,7 +714,7 @@ namespace FastData.Base
                             if (Array.Exists(result.key.ToArray(), element => element == tempKey))
                             {
                                 result.isSuccess = false;
-                                Task.Run(() => { BaseLog.SaveLog(string.Format("xml文件:{0},存在相同键:{1}", path, tempKey), "MapKeyExists"); });
+                                Task.Run(() => { BaseLog.SaveLog(string.Format("xml文件:{0},存在相同键:{1}", path, tempKey), "MapKeyExists"); }).ConfigureAwait(false);
                             }
                             result.key.Add(tempKey);
                             result.sql.Add(temp.ChildNodes.Count.ToString());
@@ -936,7 +936,7 @@ namespace FastData.Base
                         DbLogTable.LogException(config, ex, "InstanceMap", "GetXmlList");
                     else
                         DbLog.LogException(true, "InstanceMap", ex, "GetXmlList", "");
-                });
+                }).ConfigureAwait(false);
                 result.isSuccess = false;
                 return result;
             }
