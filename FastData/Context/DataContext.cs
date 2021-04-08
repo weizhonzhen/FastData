@@ -74,7 +74,7 @@ namespace FastData.Context
                         DbLogTable.LogException(config, ex, "DataContext", "");
                     else
                         DbLog.LogException(true,  this.config.DbType, ex, "DataContext", "");
-                });
+                }).ConfigureAwait(false);
             }
         }
         #endregion
@@ -155,7 +155,7 @@ namespace FastData.Context
                         DbLogTable.LogException<T>(config, ex, "GetList<T>", "");
                     else
                         DbLog.LogException<T>(item.Config.IsOutError, item.Config.DbType, ex, "GetList<T>", result.sql);
-                });
+                }).ConfigureAwait(false);
                 return result;
             }
         }
@@ -210,7 +210,7 @@ namespace FastData.Context
                         DbLogTable.LogException<T>(config, ex, "GetPage<T>", "");
                     else
                         DbLog.LogException<T>(item.Config.IsOutError, item.Config.DbType, ex, "GetPage<T>", result.sql);
-                });
+                }).ConfigureAwait(false);
             }
 
             return result;
@@ -266,7 +266,7 @@ namespace FastData.Context
                         DbLogTable.LogException(item.Config, ex, "GetPage", result.Sql);
                     else
                         DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetPage", result.Sql);
-                });
+                }).ConfigureAwait(false);
             }
 
             return result;
@@ -323,7 +323,7 @@ namespace FastData.Context
                         DbLogTable.LogException(config, ex, "GetPageSql", result.Sql);
                     else
                         DbLog.LogException(config.IsOutError,config.DbType, ex, "GetPageSql", result.Sql);
-                });
+                }).ConfigureAwait(false);
             }
 
             return result;
@@ -378,7 +378,7 @@ namespace FastData.Context
                         DbLogTable.LogException(config, ex, "GetPageSql", result.sql);
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "GetPageSql", result.sql);
-                });
+                }).ConfigureAwait(false);
             }
 
             return result;
@@ -459,7 +459,7 @@ namespace FastData.Context
                         DbLogTable.LogException(config, ex, "GetJson", result.Sql);
                     else
                         DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetJson", result.Sql);
-                });
+                }).ConfigureAwait(false);
                 return result;
             }
         }
@@ -526,7 +526,7 @@ namespace FastData.Context
                         DbLogTable.LogException(config, ex, "GetCount", result.Sql);
                     else
                         DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetCount", result.Sql);
-                });
+                }).ConfigureAwait(false);
                 return result;
             }
         }
@@ -567,7 +567,7 @@ namespace FastData.Context
                         DbLogTable.LogException<T>(config, ex, "ExecuteSql<T>", "");
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "ExecuteSql<T>", result.sql);
-                });
+                }).ConfigureAwait(false);
             }
 
             return result;
@@ -613,7 +613,7 @@ namespace FastData.Context
                         DbLogTable.LogException(config, ex, "ExecuteSql", result.Sql);
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "ExecuteSql", result.Sql);
-                });
+                }).ConfigureAwait(false);
             }
 
             return result;
@@ -697,7 +697,7 @@ namespace FastData.Context
                         DbLogTable.LogException(config, ex, "GetDic", result.Sql);
                     else
                         DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetDic", result.Sql);
-                });
+                }).ConfigureAwait(false);
                 return result;
             }
         }
@@ -777,7 +777,7 @@ namespace FastData.Context
                         DbLogTable.LogException(config, ex, "GetDataTable", result.Sql);
                     else
                         DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetDataTable", result.Sql);
-                });
+                }).ConfigureAwait(false);
                 return result;
             }
         }
@@ -831,7 +831,7 @@ namespace FastData.Context
                         DbLogTable.LogException<T>(config, ex, "Delete<T>", "");
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Delete<T>", result.sql);
-                });
+                }).ConfigureAwait(false);
 
                 if (isTrans)
                     RollbackTrans();
@@ -893,7 +893,7 @@ namespace FastData.Context
                         DbLogTable.LogException<T>(config, ex, "Delete<T>", "");
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Delete<T>", result.sql);
-                });
+                }).ConfigureAwait(false);
 
                 result.writeReturn.IsSuccess = false;
                 result.writeReturn.Message = ex.Message;
@@ -965,7 +965,7 @@ namespace FastData.Context
                         DbLogTable.LogException<T>(config, ex, "Update<T>", "");
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Update<T>", result.sql);
-                });
+                }).ConfigureAwait(false);
                 result.writeReturn.IsSuccess = false;
                 result.writeReturn.Message = ex.Message;
 
@@ -1028,7 +1028,7 @@ namespace FastData.Context
                         DbLogTable.LogException<T>(config, ex, "UpdateModel<T>", "");
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "UpdateModel<T>", result.sql);
-                });
+                }).ConfigureAwait(false);
                 result.writeReturn.IsSuccess = false;
                 result.writeReturn.Message = ex.Message;
             }
@@ -1099,7 +1099,7 @@ namespace FastData.Context
                         DbLogTable.LogException<T>(config, ex, "UpdateList<T>", "");
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "UpdateList<T>", result.sql);
-                });
+                }).ConfigureAwait(false);
                 result.writeReturn.IsSuccess = false;
                 result.writeReturn.Message = ex.Message;
             }
@@ -1154,7 +1154,7 @@ namespace FastData.Context
                         DbLogTable.LogException<T>(config, ex, "Add<T>", "");
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Add<T>", result.sql);
-                });
+                }).ConfigureAwait(false);
 
                 if (isTrans && result.writeReturn.IsSuccess)
                     SubmitTrans();
@@ -1326,7 +1326,7 @@ namespace FastData.Context
                         DbLogTable.LogException<T>(config, ex, "AddList<T>", "");
                     else
                         DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "AddList<T>", result.sql);
-                });
+                }).ConfigureAwait(false);
             }
 
             return result;
@@ -1375,7 +1375,7 @@ namespace FastData.Context
                         DbLogTable.LogException(config, ex, "ExecuteSql", result.Sql);
                     else
                         DbLog.LogException(config.IsOutError, config.DbType, ex, "ExecuteSql", result.Sql);
-                });
+                }).ConfigureAwait(false);
                 result.writeReturn.IsSuccess = false;
                 result.writeReturn.Message = ex.Message;
             }
