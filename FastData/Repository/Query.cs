@@ -180,12 +180,12 @@ namespace FastData.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override async Task<List<T>> ToListAsy<T>(DataContext db = null, bool isOutSql = false)
+        public override Task<List<T>> ToListAsy<T>(DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return ToList<T>(db,isOutSql);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return ToList<T>(db, isOutSql);
+           });
         }
         #endregion
 
@@ -198,7 +198,7 @@ namespace FastData.Repository
         /// <returns></returns>
         public override Lazy<List<T>> ToLazyList<T>(DataContext db = null, bool isOutSql = false)
         {
-            return new Lazy<List<T>>(() => ToList<T>(db,isOutSql));
+            return new Lazy<List<T>>(() => ToList<T>(db, isOutSql));
         }
         #endregion
 
@@ -209,12 +209,12 @@ namespace FastData.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override async Task<Lazy<List<T>>> ToLazyListAsy<T>(DataContext db = null, bool isOutSql = false)
+        public override Task<Lazy<List<T>>> ToLazyListAsy<T>(DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return new Lazy<List<T>>(() => ToList<T>(db,isOutSql));
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return new Lazy<List<T>>(() => ToList<T>(db, isOutSql));
+           });
         }
         #endregion
 
@@ -259,12 +259,12 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override async Task<string> ToJsonAsy(DataContext db = null, bool isOutSql = false)
+        public override Task<string> ToJsonAsy(DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return ToJson(db,isOutSql);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return ToJson(db, isOutSql);
+           });
         }
         #endregion
 
@@ -276,7 +276,7 @@ namespace FastData.Repository
         /// <returns></returns>
         public override Lazy<string> ToLazyJson(DataContext db = null, bool isOutSql = false)
         {
-            return new Lazy<string>(() => ToJson(db,isOutSql));
+            return new Lazy<string>(() => ToJson(db, isOutSql));
         }
         #endregion
 
@@ -286,12 +286,12 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override async Task<Lazy<string>> ToLazyJsonAsy(DataContext db = null, bool isOutSql = false)
+        public override Task<Lazy<string>> ToLazyJsonAsy(DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return new Lazy<string>(() => ToJson(db,isOutSql));
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return new Lazy<string>(() => ToJson(db, isOutSql));
+           });
         }
         #endregion
 
@@ -340,12 +340,12 @@ namespace FastData.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override async Task<T> ToItemAsy<T>(DataContext db = null, bool isOutSql = false)
+        public override Task<T> ToItemAsy<T>(DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return ToItem<T>(db,isOutSql);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return ToItem<T>(db, isOutSql);
+           });
         }
         #endregion
 
@@ -358,7 +358,7 @@ namespace FastData.Repository
         /// <returns></returns>
         public override Lazy<T> ToLazyItem<T>(DataContext db = null, bool isOutSql = false)
         {
-            return new Lazy<T>(() => ToItem<T>(db,isOutSql));
+            return new Lazy<T>(() => ToItem<T>(db, isOutSql));
         }
         #endregion
 
@@ -369,12 +369,12 @@ namespace FastData.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override async Task<Lazy<T>> ToLazyItemAsy<T>(DataContext db = null, bool isOutSql = false)
+        public override Task<Lazy<T>> ToLazyItemAsy<T>(DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return new Lazy<T>(() => ToItem<T>(db,isOutSql));
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return new Lazy<T>(() => ToItem<T>(db, isOutSql));
+           });
         }
         #endregion
 
@@ -420,12 +420,12 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override async Task<int> ToCountAsy<T, T1>(DataContext db = null, bool isOutSql = false)
+        public override Task<int> ToCountAsy<T, T1>(DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return ToCount(db,isOutSql);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return ToCount(db, isOutSql);
+           });
         }
         #endregion
 
@@ -474,12 +474,12 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public override async Task<PageResult<T>> ToPageAsy<T>(PageModel pModel, DataContext db = null, bool isOutSql = false)
+        public override Task<PageResult<T>> ToPageAsy<T>(PageModel pModel, DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return ToPage<T>(pModel, db,isOutSql);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return ToPage<T>(pModel, db, isOutSql);
+           });
         }
         #endregion
 
@@ -493,7 +493,7 @@ namespace FastData.Repository
         /// <returns></returns>
         public override Lazy<PageResult<T>> ToLazyPage<T>(PageModel pModel, DataContext db = null, bool isOutSql = false)
         {
-            return new Lazy<PageResult<T>>(() => ToPage<T>(pModel, db,isOutSql));
+            return new Lazy<PageResult<T>>(() => ToPage<T>(pModel, db, isOutSql));
         }
         #endregion
 
@@ -505,12 +505,12 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public override async Task<Lazy<PageResult<T>>> ToLazyPageAsy<T>(PageModel pModel, DataContext db = null, bool isOutSql = false)
+        public override Task<Lazy<PageResult<T>>> ToLazyPageAsy<T>(PageModel pModel, DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return new Lazy<PageResult<T>>(() => ToPage<T>(pModel, db,isOutSql));
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return new Lazy<PageResult<T>>(() => ToPage<T>(pModel, db, isOutSql));
+           });
         }
         #endregion
 
@@ -557,12 +557,12 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public override async Task<PageResult> ToPageAsy(PageModel pModel, DataContext db = null, bool isOutSql = false)
+        public override Task<PageResult> ToPageAsy(PageModel pModel, DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return ToPage(pModel, db,isOutSql);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return ToPage(pModel, db, isOutSql);
+           });
         }
         #endregion
 
@@ -576,7 +576,7 @@ namespace FastData.Repository
         /// <returns></returns>
         public override Lazy<PageResult> ToLazyPage(PageModel pModel, DataContext db = null, bool isOutSql = false)
         {
-            return new Lazy<PageResult>(() => ToPage(pModel, db,isOutSql));
+            return new Lazy<PageResult>(() => ToPage(pModel, db, isOutSql));
         }
         #endregion
 
@@ -587,12 +587,12 @@ namespace FastData.Repository
         /// <param name="item"></param>
         /// <param name="pModel"></param>
         /// <returns></returns>
-        public override async Task<Lazy<PageResult>> ToLazyPageAsy(PageModel pModel, DataContext db = null, bool isOutSql = false)
+        public override Task<Lazy<PageResult>> ToLazyPageAsy(PageModel pModel, DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return new Lazy<PageResult>(() => ToPage(pModel, db,isOutSql));
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return new Lazy<PageResult>(() => ToPage(pModel, db, isOutSql));
+           });
         }
         #endregion
 
@@ -638,12 +638,12 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override async Task<DataTable> ToDataTableAsy(DataContext db = null, bool isOutSql = false)
+        public override Task<DataTable> ToDataTableAsy(DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return ToDataTable(db,isOutSql);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return ToDataTable(db, isOutSql);
+           });
         }
         #endregion
 
@@ -655,7 +655,7 @@ namespace FastData.Repository
         /// <returns></returns>
         public override Lazy<DataTable> ToLazyDataTable(DataContext db = null, bool isOutSql = false)
         {
-            return new Lazy<DataTable>(() => ToDataTable(db,isOutSql));
+            return new Lazy<DataTable>(() => ToDataTable(db, isOutSql));
         }
         #endregion
 
@@ -665,12 +665,12 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override async Task<Lazy<DataTable>> ToLazyDataTableAsy(DataContext db = null, bool isOutSql = false)
+        public override Task<Lazy<DataTable>> ToLazyDataTableAsy(DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return new Lazy<DataTable>(() => ToDataTable(db,isOutSql));
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return new Lazy<DataTable>(() => ToDataTable(db, isOutSql));
+           });
         }
         #endregion
 
@@ -715,12 +715,12 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override async Task<List<Dictionary<string, object>>> ToDicsAsy(DataContext db = null, bool isOutSql = false)
+        public override Task<List<Dictionary<string, object>>> ToDicsAsy(DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return ToDics(db,isOutSql);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return ToDics(db, isOutSql);
+           });
         }
         #endregion
 
@@ -732,7 +732,7 @@ namespace FastData.Repository
         /// <returns></returns>
         public override Lazy<List<Dictionary<string, object>>> ToLazyDics(DataContext db = null, bool isOutSql = false)
         {
-            return new Lazy<List<Dictionary<string, object>>>(() => ToDics(db,isOutSql));
+            return new Lazy<List<Dictionary<string, object>>>(() => ToDics(db, isOutSql));
         }
         #endregion
 
@@ -742,12 +742,12 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override async Task<Lazy<List<Dictionary<string, object>>>> ToLazyDicsAsy(DataContext db = null, bool isOutSql = false)
+        public override Task<Lazy<List<Dictionary<string, object>>>> ToLazyDicsAsy(DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return new Lazy<List<Dictionary<string, object>>>(() => ToDics(db,isOutSql));
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return new Lazy<List<Dictionary<string, object>>>(() => ToDics(db, isOutSql));
+           });
         }
         #endregion
 
@@ -793,12 +793,12 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override async Task<Dictionary<string, object>> ToDicAsy(DataContext db = null, bool isOutSql = false)
+        public override Task<Dictionary<string, object>> ToDicAsy(DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return ToDic(db,isOutSql);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return ToDic(db, isOutSql);
+           });
         }
         #endregion
 
@@ -810,7 +810,7 @@ namespace FastData.Repository
         /// <returns></returns>
         public override Lazy<Dictionary<string, object>> ToLazyDic(DataContext db = null, bool isOutSql = false)
         {
-            return new Lazy<Dictionary<string, object>>(() => ToDic(db,isOutSql));
+            return new Lazy<Dictionary<string, object>>(() => ToDic(db, isOutSql));
         }
         #endregion
 
@@ -820,12 +820,12 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override async Task<Lazy<Dictionary<string, object>>> ToLazyDicAsy(DataContext db = null, bool isOutSql = false)
+        public override Task<Lazy<Dictionary<string, object>>> ToLazyDicAsy(DataContext db = null, bool isOutSql = false)
         {
-            return await Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
-                return new Lazy<Dictionary<string, object>>(() => ToDic(db,isOutSql));
-            }).ConfigureAwait(false);
+                return new Lazy<Dictionary<string, object>>(() => ToDic(db, isOutSql));
+            });
         }
         #endregion
     }
