@@ -453,6 +453,7 @@ namespace FastRedis
             catch (RedisException ex)
             {
                 SaveLog(ex, "RemoveDic", keys.ToString());
+                return false;
             }
         }
         #endregion
