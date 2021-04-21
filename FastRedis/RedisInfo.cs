@@ -17,7 +17,7 @@ namespace FastRedis
         /// 资源文件初始化
         /// </summary>
         /// <param name="dbFile"></param>
-        public static void Init(string dbFile = "db.config",string projectName=null)
+        public static void Init(string dbFile = "db.config", string projectName = null)
         {
             if (projectName == null)
                 projectName = Assembly.GetCallingAssembly().GetName().Name;
@@ -63,10 +63,7 @@ namespace FastRedis
             }
             catch (RedisException ex)
             {
-                Task.Factory.StartNew(() =>
-                {
-                    SaveLog(ex, "Exists", key);
-                });
+                SaveLog(ex, "Exists", key);
                 return false;
             }
         }
@@ -77,15 +74,15 @@ namespace FastRedis
         /// 是否存在 asy
         /// </summary>
         /// <returns></returns>
-        public static async Task<bool> ExistsAsy(string key, int db = 0)
+        public static Task<bool> ExistsAsy(string key, int db = 0)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return Exists(key,db);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return Exists(key, db);
+           });
         }
         #endregion
-        
+
         #region 设置值 item
         /// <summary>
         /// 设置值 item
@@ -95,7 +92,7 @@ namespace FastRedis
         /// <param name="model">值</param>
         /// <param name="hours">存期限</param>
         /// <returns></returns>
-        public static bool Set<T>(string key, T model, int hours = 24*30*12, int db = 0)
+        public static bool Set<T>(string key, T model, int hours = 24 * 30 * 12, int db = 0)
         {
             try
             {
@@ -109,10 +106,7 @@ namespace FastRedis
             }
             catch (RedisException ex)
             {
-                Task.Factory.StartNew(() =>
-                {
-                    SaveLog<T>(ex, "Set<T>");
-                });
+                SaveLog<T>(ex, "Set<T>");
                 return false;
             }
         }
@@ -127,12 +121,12 @@ namespace FastRedis
         /// <param name="model">值</param>
         /// <param name="hours">存期限</param>
         /// <returns></returns>
-        public static async Task<bool> SetAsy<T>(string key, T model, int hours = 24*30*12, int db = 0)
+        public static Task<bool> SetAsy<T>(string key, T model, int hours = 24 * 30 * 12, int db = 0)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return Set<T>(key, model, hours,db);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return Set<T>(key, model, hours, db);
+           });
         }
         #endregion
 
@@ -145,7 +139,7 @@ namespace FastRedis
         /// <param name="model">值</param>
         /// <param name="hours">存期限</param>
         /// <returns></returns>
-        public static bool Set(string key, string model, int hours = 24*30*12, int db = 0)
+        public static bool Set(string key, string model, int hours = 24 * 30 * 12, int db = 0)
         {
             try
             {
@@ -159,10 +153,7 @@ namespace FastRedis
             }
             catch (RedisException ex)
             {
-                Task.Factory.StartNew(() =>
-                {
-                    SaveLog(ex, "Set",key);
-                });
+                SaveLog(ex, "Set", key);
                 return false;
             }
         }
@@ -177,15 +168,15 @@ namespace FastRedis
         /// <param name="model">值</param>
         /// <param name="hours">存期限</param>
         /// <returns></returns>
-        public static async Task<bool> SetAsy(string key, string model, int hours = 24*30*12, int db = 0)
+        public static Task<bool> SetAsy(string key, string model, int hours = 24 * 30 * 12, int db = 0)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return Set(key, model, hours,db);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return Set(key, model, hours, db);
+           });
         }
         #endregion
-        
+
         #region 设置值 item
         /// <summary>
         /// 设置值 item
@@ -209,10 +200,7 @@ namespace FastRedis
             }
             catch (RedisException ex)
             {
-                Task.Factory.StartNew(() =>
-                {
-                    SaveLog(ex, "Set", key);
-                });
+                SaveLog(ex, "Set", key);
                 return false;
             }
         }
@@ -227,15 +215,15 @@ namespace FastRedis
         /// <param name="model">值</param>
         /// <param name="Minutes">存期限</param>
         /// <returns></returns>
-        public static async Task<bool> SetAsy(string key, string model, double Minutes, int db = 0)
+        public static Task<bool> SetAsy(string key, string model, double Minutes, int db = 0)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return Set(key, model, Minutes, db);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return Set(key, model, Minutes, db);
+           });
         }
         #endregion
-        
+
         #region 获取值 item
         /// <summary>
         /// 获取值 item
@@ -257,10 +245,7 @@ namespace FastRedis
             }
             catch (RedisException ex)
             {
-                Task.Factory.StartNew(() =>
-                {
-                    SaveLog(ex, "Get",key);
-                });
+                SaveLog(ex, "Get", key);
                 return "";
             }
         }
@@ -273,12 +258,12 @@ namespace FastRedis
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="key">键</param>
         /// <returns></returns>
-        public static async Task<string> GetAsy(string key, int db = 0)
+        public static Task<string> GetAsy(string key, int db = 0)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return Get(key,db);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return Get(key, db);
+           });
         }
         #endregion
 
@@ -289,7 +274,7 @@ namespace FastRedis
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="key">键</param>
         /// <returns></returns>
-        public static T Get<T>(string key, int db = 0) where T : class,new()
+        public static T Get<T>(string key, int db = 0) where T : class, new()
         {
             try
             {
@@ -303,10 +288,7 @@ namespace FastRedis
             }
             catch (RedisException ex)
             {
-                Task.Factory.StartNew(() =>
-                {
-                    SaveLog<T>(ex, "Get<T>");
-                });
+                SaveLog<T>(ex, "Get<T>");
                 return new T();
             }
         }
@@ -319,12 +301,12 @@ namespace FastRedis
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="key">键</param>
         /// <returns></returns>
-        public static async Task<T> GetAsy<T>(string key, int db = 0) where T : class,new()
+        public static Task<T> GetAsy<T>(string key, int db = 0) where T : class, new()
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return Get<T>(key,db);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return Get<T>(key, db);
+           });
         }
         #endregion
 
@@ -348,10 +330,7 @@ namespace FastRedis
             }
             catch (RedisException ex)
             {
-                Task.Factory.StartNew(() =>
-                {
-                    SaveLog(ex, "RemoveItem", key);
-                });
+                SaveLog(ex, "RemoveItem", key);
                 return false;
             }
         }
@@ -363,15 +342,15 @@ namespace FastRedis
         /// </summary>
         /// <param name="key">键</param>
         /// <returns></returns>
-        public static async Task<bool> RemoveAsy(string key, int db = 0)
+        public static Task<bool> RemoveAsy(string key, int db = 0)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return Remove(key,db);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return Remove(key, db);
+           });
         }
-        #endregion                
-        
+        #endregion
+
         #region 设置值 Dic
         /// <summary>
         /// 设置值 Dic
@@ -392,10 +371,7 @@ namespace FastRedis
             }
             catch (RedisException ex)
             {
-                Task.Factory.StartNew(() =>
-                {
-                    SaveLog<T>(ex, "SetDic<T>");
-                });
+                SaveLog<T>(ex, "SetDic<T>");
                 return false;
             }
         }
@@ -408,12 +384,12 @@ namespace FastRedis
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="dic">字典</param>
         /// <returns></returns>
-        public static async Task<bool> SetDicAsy<T>(Dictionary<string, T> dic, int db = 0)
+        public static Task<bool> SetDicAsy<T>(Dictionary<string, T> dic, int db = 0)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return SetDic<T>(dic,db);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return SetDic<T>(dic, db);
+           });
         }
         #endregion
 
@@ -424,7 +400,7 @@ namespace FastRedis
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="keys">键</param>
         /// <returns></returns>
-        public static IDictionary<string, T> GetDic<T>(string[] keys, int db = 0) where T : class,new()
+        public static IDictionary<string, T> GetDic<T>(string[] keys, int db = 0) where T : class, new()
         {
             try
             {
@@ -435,15 +411,12 @@ namespace FastRedis
             }
             catch (RedisException ex)
             {
-                Task.Factory.StartNew(() =>
-                {
-                    SaveLog<T>(ex, "GetDic<T>");
-                });
+                SaveLog<T>(ex, "GetDic<T>");
                 return new Dictionary<string, T>();
             }
         }
         #endregion
-        
+
         #region 获取值 dic asy
         /// <summary>
         /// 获取值 dic asy
@@ -451,12 +424,12 @@ namespace FastRedis
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="keys">键</param>
         /// <returns></returns>
-        public static async Task<IDictionary<string, T>> GetDicAsy<T>(string[] keys, int db = 0) where T : class,new()
+        public static Task<IDictionary<string, T>> GetDicAsy<T>(string[] keys, int db = 0) where T : class, new()
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return GetDic<T>(keys,db);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return GetDic<T>(keys, db);
+           });
         }
         #endregion
 
@@ -473,17 +446,13 @@ namespace FastRedis
                 using (IRedisClient redis = Context(db).GetClient())
                 {
                     redis.RemoveAll(keys);
-                    
+
                     return true;
                 }
             }
             catch (RedisException ex)
             {
-                Task.Factory.StartNew(() =>
-                {
-                    SaveLog(ex, "RemoveDic", keys.ToString());
-                });
-                return false;
+                SaveLog(ex, "RemoveDic", keys.ToString());
             }
         }
         #endregion
@@ -494,12 +463,12 @@ namespace FastRedis
         /// </summary>
         /// <param name="keys">键</param>
         /// <returns></returns>
-        public static async Task<bool> RemoveDicAsy(string[] keys, int db = 0)
+        public static Task<bool> RemoveDicAsy(string[] keys, int db = 0)
         {
-            return await Task.Factory.StartNew(() =>
-            {
-                return RemoveDic(keys,db);
-            }).ConfigureAwait(false);
+            return Task.Run(() =>
+           {
+               return RemoveDic(keys, db);
+           });
         }
         #endregion
 
@@ -525,10 +494,7 @@ namespace FastRedis
             }
             catch (RedisException ex)
             {
-                Task.Factory.StartNew(() =>
-                {
-                    SaveLog(ex, "Send", "");
-                });
+                SaveLog(ex, "Send", "");
             }
         }
         #endregion
@@ -542,7 +508,7 @@ namespace FastRedis
         /// <param name="db"></param>
         public static void SendAsy(string queueName, string message, int db = 0)
         {
-            Task.Factory.StartNew(() =>
+            Task.Run(() =>
             {
                 Send(queueName, message, db);
             }).ConfigureAwait(false);
@@ -567,10 +533,7 @@ namespace FastRedis
             }
             catch (RedisException ex)
             {
-                Task.Factory.StartNew(() =>
-                {
-                    SaveLog(ex, "Receive", "");
-                });
+                SaveLog(ex, "Receive", "");
 
                 return "";
             }
@@ -584,15 +547,15 @@ namespace FastRedis
         /// <param name="queueName">队列名称</param>
         /// <param name="message">消息</param>
         /// <param name="db"></param>
-        public static async Task<string> ReceiveAsy(string queueName, int db = 0)
+        public static Task<string> ReceiveAsy(string queueName, int db = 0)
         {
-            return await Task.Factory.StartNew(() =>
-            {
+            return Task.Run(() =>
+           {
                return Receive(queueName, db);
-            }).ConfigureAwait(false);
+           });
         }
         #endregion
-        
+
 
         #region 发布消息(发布者订阅者模式)
         /// <summary>
@@ -615,10 +578,7 @@ namespace FastRedis
             }
             catch (RedisException ex)
             {
-                Task.Factory.StartNew(() =>
-                {
-                    SaveLog(ex, "Publish", "");
-                });
+                SaveLog(ex, "Publish", "");
             }
         }
         #endregion
@@ -632,10 +592,10 @@ namespace FastRedis
         /// <param name="db"></param>
         public static void PublishAsy(string channel, string message, int db = 0)
         {
-            Task.Factory.StartNew(() =>
+            Task.Run(() =>
             {
                 Publish(channel, message, db);
-            }).ConfigureAwait(false);
+            });
         }
         #endregion
 
@@ -670,10 +630,7 @@ namespace FastRedis
             }
             catch (RedisException ex)
             {
-                Task.Factory.StartNew(() =>
-                {
-                    SaveLog(ex, "Receive", "");
-                });
+                SaveLog(ex, "Receive", "");
             }
         }
         #endregion
@@ -684,7 +641,7 @@ namespace FastRedis
         /// </summary>
         public static void ReceiveAsy(string channel, Action<string, string> message, Action<string> subscribe = null, Action<string> unSubscribe = null, int db = 0)
         {
-            Task.Factory.StartNew(() =>
+            Task.Run(() =>
             {
                 Receive(channel, message, subscribe, unSubscribe, db);
             }).ConfigureAwait(false);
@@ -704,7 +661,7 @@ namespace FastRedis
             SaveLog(string.Format("方法：{0},对象：{1},出错详情：{2}", CurrentMethod, typeof(T).Name, ex.ToString()), "redis_exp");
         }
         #endregion
-        
+
         #region 出错日志
         /// <summary>
         /// 出错日志
