@@ -121,6 +121,9 @@ namespace FastData.Property
                     }
                 });
 
+                if (temp.IsKey && temp.IsNull)
+                    temp.IsNull = false;
+
                 list.Add(temp);
             });
             
