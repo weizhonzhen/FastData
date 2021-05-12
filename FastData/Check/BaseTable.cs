@@ -714,6 +714,14 @@ namespace FastData.Check
                 }
 
             }
+
+            result.Column.ForEach(a =>
+            {
+                if (a.DataType.ToLower() == "nchar" || a.DataType.ToLower() == "nvarchar"
+                || a.DataType.ToLower() == "nvarchar2" || a.DataType.ToLower() == "ntext" || a.DataType.ToLower() == "nclob")
+                    a.Length = a.Length / 2;
+            });
+
             return result;
         }
         #endregion
