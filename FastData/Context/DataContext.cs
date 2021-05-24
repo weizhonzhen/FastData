@@ -68,13 +68,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException(config, ex, "DataContext", "");
-                    else
-                        DbLog.LogException(true,  this.config.DbType, ex, "DataContext", "");
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "DataContext", "");
+                else
+                    DbLog.LogException(true, this.config.DbType, ex, "DataContext", "");
             }
         }
         #endregion
@@ -149,13 +146,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException<T>(config, ex, "GetList<T>", "");
-                    else
-                        DbLog.LogException<T>(item.Config.IsOutError, item.Config.DbType, ex, "GetList<T>", result.sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException<T>(config, ex, "GetList<T>", "");
+                else
+                    DbLog.LogException<T>(item.Config.IsOutError, item.Config.DbType, ex, "GetList<T>", result.sql);
                 return result;
             }
         }
@@ -204,13 +198,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException<T>(config, ex, "GetPage<T>", "");
-                    else
-                        DbLog.LogException<T>(item.Config.IsOutError, item.Config.DbType, ex, "GetPage<T>", result.sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException<T>(config, ex, "GetPage<T>", "");
+                else
+                    DbLog.LogException<T>(item.Config.IsOutError, item.Config.DbType, ex, "GetPage<T>", result.sql);
             }
 
             return result;
@@ -241,7 +232,7 @@ namespace FastData.Context
                         pModel.TotalPage = pModel.TotalRecord / pModel.PageSize;
                     else
                         pModel.TotalPage = (pModel.TotalRecord / pModel.PageSize) + 1;
- 
+
                     if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
@@ -260,13 +251,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (item.Config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException(item.Config, ex, "GetPage", result.Sql);
-                    else
-                        DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetPage", result.Sql);
-                }).ConfigureAwait(false);
+                if (item.Config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(item.Config, ex, "GetPage", result.Sql);
+                else
+                    DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetPage", result.Sql);
             }
 
             return result;
@@ -298,7 +286,7 @@ namespace FastData.Context
                     else
                         pModel.TotalPage = (pModel.TotalRecord / pModel.PageSize) + 1;
 
-                     if (pModel.PageId > pModel.TotalPage)
+                    if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
                     Dispose(cmd);
@@ -317,13 +305,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException(config, ex, "GetPageSql", result.Sql);
-                    else
-                        DbLog.LogException(config.IsOutError,config.DbType, ex, "GetPageSql", result.Sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "GetPageSql", result.Sql);
+                else
+                    DbLog.LogException(config.IsOutError, config.DbType, ex, "GetPageSql", result.Sql);
             }
 
             return result;
@@ -354,7 +339,7 @@ namespace FastData.Context
                         pModel.TotalPage = pModel.TotalRecord / pModel.PageSize;
                     else
                         pModel.TotalPage = (pModel.TotalRecord / pModel.PageSize) + 1;
-                    
+
                     if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
@@ -372,13 +357,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException(config, ex, "GetPageSql", result.sql);
-                    else
-                        DbLog.LogException(config.IsOutError, config.DbType, ex, "GetPageSql", result.sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "GetPageSql", result.sql);
+                else
+                    DbLog.LogException(config.IsOutError, config.DbType, ex, "GetPageSql", result.sql);
             }
 
             return result;
@@ -453,13 +435,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException(config, ex, "GetJson", result.Sql);
-                    else
-                        DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetJson", result.Sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "GetJson", result.Sql);
+                else
+                    DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetJson", result.Sql);
                 return result;
             }
         }
@@ -520,13 +499,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException(config, ex, "GetCount", result.Sql);
-                    else
-                        DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetCount", result.Sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "GetCount", result.Sql);
+                else
+                    DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetCount", result.Sql);
                 return result;
             }
         }
@@ -561,13 +537,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException<T>(config, ex, "ExecuteSql<T>", "");
-                    else
-                        DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "ExecuteSql<T>", result.sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException<T>(config, ex, "ExecuteSql<T>", "");
+                else
+                    DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "ExecuteSql<T>", result.sql);
             }
 
             return result;
@@ -607,13 +580,11 @@ namespace FastData.Context
             {
                 result.writeReturn.IsSuccess = false;
                 result.writeReturn.Message = ex.Message;
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException(config, ex, "ExecuteSql", result.Sql);
-                    else
-                        DbLog.LogException(config.IsOutError, config.DbType, ex, "ExecuteSql", result.Sql);
-                }).ConfigureAwait(false);
+
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "ExecuteSql", result.Sql);
+                else
+                    DbLog.LogException(config.IsOutError, config.DbType, ex, "ExecuteSql", result.Sql);
             }
 
             return result;
@@ -663,7 +634,7 @@ namespace FastData.Context
 
                 if (item.Predicate[0].Param.Count != 0)
                     param.AddRange(item.Predicate[0].Param);
-                
+
                 if (item.GroupBy.Count > 0)
                     sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
 
@@ -680,7 +651,7 @@ namespace FastData.Context
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
                 if (item.Take == 1)
-                    result.Dic = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle).FirstOrDefault()??new Dictionary<string, object>();
+                    result.Dic = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle).FirstOrDefault() ?? new Dictionary<string, object>();
                 else
                     result.DicList = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle);
 
@@ -691,13 +662,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException(config, ex, "GetDic", result.Sql);
-                    else
-                        DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetDic", result.Sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "GetDic", result.Sql);
+                else
+                    DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetDic", result.Sql);
                 return result;
             }
         }
@@ -746,7 +714,7 @@ namespace FastData.Context
 
                 if (item.Predicate[0].Param.Count != 0)
                     param.AddRange(item.Predicate[0].Param);
-                
+
                 if (item.GroupBy.Count > 0)
                     sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
 
@@ -771,13 +739,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException(config, ex, "GetDataTable", result.Sql);
-                    else
-                        DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetDataTable", result.Sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "GetDataTable", result.Sql);
+                else
+                    DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, "GetDataTable", result.Sql);
                 return result;
             }
         }
@@ -825,13 +790,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException<T>(config, ex, "Delete<T>", "");
-                    else
-                        DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Delete<T>", result.sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException<T>(config, ex, "Delete<T>", "");
+                else
+                    DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Delete<T>", result.sql);
 
                 if (isTrans)
                     RollbackTrans();
@@ -887,13 +849,10 @@ namespace FastData.Context
                 if (isTrans)
                     RollbackTrans();
 
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException<T>(config, ex, "Delete<T>", "");
-                    else
-                        DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Delete<T>", result.sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException<T>(config, ex, "Delete<T>", "");
+                else
+                    DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Delete<T>", result.sql);
 
                 result.writeReturn.IsSuccess = false;
                 result.writeReturn.Message = ex.Message;
@@ -923,7 +882,7 @@ namespace FastData.Context
                 if (isTrans)
                     BeginTrans();
 
-                update = BaseModel.UpdateToSql<T>(model, config, field,cmd);
+                update = BaseModel.UpdateToSql<T>(model, config, field, cmd);
 
                 if (update.IsSuccess)
                 {
@@ -959,13 +918,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException<T>(config, ex, "Update<T>", "");
-                    else
-                        DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Update<T>", result.sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException<T>(config, ex, "Update<T>", "");
+                else
+                    DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Update<T>", result.sql);
                 result.writeReturn.IsSuccess = false;
                 result.writeReturn.Message = ex.Message;
 
@@ -1022,13 +978,10 @@ namespace FastData.Context
                 if (isTrans)
                     RollbackTrans();
 
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException<T>(config, ex, "UpdateModel<T>", "");
-                    else
-                        DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "UpdateModel<T>", result.sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException<T>(config, ex, "UpdateModel<T>", "");
+                else
+                    DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "UpdateModel<T>", result.sql);
                 result.writeReturn.IsSuccess = false;
                 result.writeReturn.Message = ex.Message;
             }
@@ -1093,13 +1046,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException<T>(config, ex, "UpdateList<T>", "");
-                    else
-                        DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "UpdateList<T>", result.sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException<T>(config, ex, "UpdateList<T>", "");
+                else
+                    DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "UpdateList<T>", result.sql);
                 result.writeReturn.IsSuccess = false;
                 result.writeReturn.Message = ex.Message;
             }
@@ -1148,13 +1098,10 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException<T>(config, ex, "Add<T>", "");
-                    else
-                        DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Add<T>", result.sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException<T>(config, ex, "Add<T>", "");
+                else
+                    DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Add<T>", result.sql);
 
                 if (isTrans && result.writeReturn.IsSuccess)
                     SubmitTrans();
@@ -1231,7 +1178,8 @@ namespace FastData.Context
                         param.ParameterName = a.Name;
                         sql.AppendFormat("{0}{1},", config.Flag, a.Name);
 
-                        list.ForEach(l => {
+                        list.ForEach(l =>
+                        {
                             var value = dyn.GetValue(l, a.Name, true);
                             if (value == null)
                                 value = DBNull.Value;
@@ -1320,13 +1268,11 @@ namespace FastData.Context
             {
                 if (IsTrans)
                     RollbackTrans();
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException<T>(config, ex, "AddList<T>", "");
-                    else
-                        DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "AddList<T>", result.sql);
-                }).ConfigureAwait(false);
+
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException<T>(config, ex, "AddList<T>", "");
+                else
+                    DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "AddList<T>", result.sql);
             }
 
             return result;
@@ -1358,7 +1304,7 @@ namespace FastData.Context
                 if (param != null)
                     cmd.Parameters.AddRange(param);
 
-                result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, sql,IsProcedure);
+                result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, sql, IsProcedure);
 
                 if (isTrans && result.writeReturn.IsSuccess)
                     SubmitTrans();
@@ -1370,12 +1316,10 @@ namespace FastData.Context
                 if (isTrans)
                     RollbackTrans();
 
-                Task.Run(() => {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException(config, ex, "ExecuteSql", result.Sql);
-                    else
-                        DbLog.LogException(config.IsOutError, config.DbType, ex, "ExecuteSql", result.Sql);
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "ExecuteSql", result.Sql);
+                else
+                    DbLog.LogException(config.IsOutError, config.DbType, ex, "ExecuteSql", result.Sql);
                 result.writeReturn.IsSuccess = false;
                 result.writeReturn.Message = ex.Message;
             }
