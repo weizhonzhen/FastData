@@ -34,7 +34,8 @@ namespace FastData.Base
                     #region 无返回列
                     var list = PropertyCache.GetPropertyInfo<T>(config.IsPropertyCache);
 
-                    PropertyCache.GetPropertyInfo<T>(config.IsPropertyCache).ForEach(p => {
+                    PropertyCache.GetPropertyInfo<T>(config.IsPropertyCache).ForEach(p =>
+                    {
                         if (list.Exists(a => a.Name == p.Name))
                             queryFields.Add(string.Format("{0}.{1}", predicate.Parameters[0].Name, p.Name));
                         else
@@ -49,7 +50,8 @@ namespace FastData.Base
                 else
                 {
                     #region 有返回列
-                    (field.Body as NewExpression).Arguments.ToList().ForEach(a => {
+                    (field.Body as NewExpression).Arguments.ToList().ForEach(a =>
+                    {
                         if (a is MethodCallExpression)
                         {
                             var methodName = "";
@@ -95,18 +97,15 @@ namespace FastData.Base
                 }
 
                 result.Field = string.Join(",", queryFields);
-                
+
                 return result;
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException<T>(config, ex, "QueryField<T>", "");
-                    else
-                        DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "QueryField<T>", "");
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException<T>(config, ex, "QueryField<T>", "");
+                else
+                    DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "QueryField<T>", "");
 
                 return new FieldModel
                 {
@@ -135,7 +134,8 @@ namespace FastData.Base
                 {
                     var list = PropertyCache.GetPropertyInfo<T1>(config.IsPropertyCache);
 
-                    PropertyCache.GetPropertyInfo<T1>(config.IsPropertyCache).ForEach(p => {
+                    PropertyCache.GetPropertyInfo<T1>(config.IsPropertyCache).ForEach(p =>
+                    {
                         if (list.Exists(a => a.Name == a.Name))
                             queryFields.Add(string.Format("{0}.{1}", predicate.Parameters[1].Name, p.Name));
                         else
@@ -149,7 +149,8 @@ namespace FastData.Base
                 }
 
                 var i = 0;
-                (field.Body as NewExpression).Arguments.ToList().ForEach(a =>{
+                (field.Body as NewExpression).Arguments.ToList().ForEach(a =>
+                {
                     if (a is MethodCallExpression)
                     {
                         var methodName = "";
@@ -200,13 +201,11 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException(config, ex, "QueryField<T1,T2,T>", "");
-                    else
-                        DbLog.LogException(config.IsOutError, config.DbType, ex, "QueryField<T1,T2,T>", "");
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "QueryField<T1,T2,T>", "");
+                else
+                    DbLog.LogException(config.IsOutError, config.DbType, ex, "QueryField<T1,T2,T>", "");
+
                 return new FieldModel { Field = "*" };
             }
         }
@@ -224,7 +223,8 @@ namespace FastData.Base
             try
             {
                 var result = new List<string>();
-                (field.Body as NewExpression).Arguments.ToList().ForEach(a => {
+                (field.Body as NewExpression).Arguments.ToList().ForEach(a =>
+                {
                     var asName = ((a as MemberExpression).Expression as ParameterExpression).Name;
                     result.Add(string.Format("{0}.{1}", asName, (a as MemberExpression).Member.Name));
                 });
@@ -233,13 +233,10 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException(config, ex, "GroupBy<T>", "");
-                    else
-                        DbLog.LogException(config.IsOutError, config.DbType, ex, "GroupBy<T>", "");
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "GroupBy<T>", "");
+                else
+                    DbLog.LogException(config.IsOutError, config.DbType, ex, "GroupBy<T>", "");
 
                 return new List<string>();
             }
@@ -260,7 +257,8 @@ namespace FastData.Base
             try
             {
                 var result = new List<string>();
-                (field.Body as NewExpression).Arguments.ToList().ForEach(a => {
+                (field.Body as NewExpression).Arguments.ToList().ForEach(a =>
+                {
                     var asName = ((a as MemberExpression).Expression as ParameterExpression).Name;
                     result.Add(string.Format("{0}.{1} {2}", asName, (a as MemberExpression).Member.Name, isDesc ? "desc" : "asc"));
                 });
@@ -269,13 +267,11 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                        DbLogTable.LogException(config, ex, "OrderBy<T>", "");
-                    else
-                        DbLog.LogException(config.IsOutError, config.DbType, ex, "OrderBy<T>", "");
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "OrderBy<T>", "");
+                else
+                    DbLog.LogException(config.IsOutError, config.DbType, ex, "OrderBy<T>", "");
+
                 return new List<string>();
             }
         }
