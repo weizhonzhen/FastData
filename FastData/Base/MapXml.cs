@@ -353,6 +353,12 @@ namespace FastData.Base
                 }
                 param = tempParam.ToArray();
             }
+
+            if (!sql.ToString().Contains(flag))
+            {
+                tempParam.Clear();
+                param = tempParam.ToArray();
+            }
             return sql.ToString();
         }
         #endregion
@@ -930,13 +936,11 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                Task.Run(() =>
-                {
-                    if (config.SqlErrorType == SqlErrorType.Db)
-                        DbLogTable.LogException(config, ex, "InstanceMap", "GetXmlList");
-                    else
-                        DbLog.LogException(true, "InstanceMap", ex, "GetXmlList", "");
-                }).ConfigureAwait(false);
+                if (config.SqlErrorType == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "InstanceMap", "GetXmlList");
+                else
+                    DbLog.LogException(true, "InstanceMap", ex, "GetXmlList", "");
+
                 result.isSuccess = false;
                 return result;
             }
