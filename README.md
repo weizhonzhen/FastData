@@ -26,6 +26,10 @@ FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config");
     <section name="DataConfig" type="FastData.Config.DataConfig,FastData" />
 </configSections>
 
+//aop by EventHandler
+FastMap.After += (s, e) =>{ };
+FastMap.Before += (s, e) =>{  };
+
   <DataConfig>
     <Oracle>
       <Add ConnStr="connstr" IsOutSql="true" IsOutError="true" DesignModel="DbFirst" SqlErrorType="db" CacheType="web"  Key="OraTestDb" />
@@ -153,9 +157,7 @@ FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config");
   </MapConfig>
 </configuration>
 
-  FastMap.After += (s, e) =>{ };
-
-  FastMap.Before += (s, e) =>{      };
+ 
  
 
 ```
