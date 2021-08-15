@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Text;
 using System.Data.Common;
 using FastUntility.Page;
@@ -13,19 +12,22 @@ using FastData.Config;
 using System.Linq.Expressions;
 using System.Data;
 using FastData.Property;
+using FastData.Aop;
 
 namespace FastData.Context
 {
     public class DataContext : IDisposable
     {
         //变量
+        public Aop.IFastAop fastAop;
         public ConfigModel config;
         private DbConnection conn;
         private DbCommand cmd;
         private DbTransaction trans;
 
         private void Dispose(DbCommand cmd)
-        {            
+        {
+            if (cmd == null) return;
             if (cmd.Parameters != null && config.DbType == DataDbType.Oracle)
                 foreach (var param in cmd.Parameters)
                 {
@@ -65,6 +67,13 @@ namespace FastData.Context
                 conn.ConnectionString = this.config.ConnStr;
                 conn.Open();
                 cmd = conn.CreateCommand();
+                fastAop = new FastAop();
+
+                if (FastMap.After != null)
+                    fastAop.After += FastMap.After;
+
+                if (FastMap.Before != null)
+                    fastAop.Before += FastMap.Before;
             }
             catch (Exception ex)
             {
@@ -86,6 +95,7 @@ namespace FastData.Context
             var param = new List<DbParameter>();
             var result = new DataReturn<T>();
             var sql = new StringBuilder();
+            object data;
 
             try
             {
@@ -133,15 +143,28 @@ namespace FastData.Context
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
 
+                var before = new BeforeEventArgs(config.DbType, item.Table, sql.ToString(), param);
+                fastAop.BeforeHandler?.Invoke(this, before);
+
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
                 if (item.Take == 1)
+                {
                     result.item = BaseDataReader.ToList<T>(dr, item.Config, item.AsName).FirstOrDefault<T>() ?? new T();
+                    data = result.item;
+                }
                 else
+                {
                     result.list = BaseDataReader.ToList<T>(dr, item.Config, item.AsName);
+                    data = result.list;
+                }
 
                 dr.Close();
                 dr.Dispose();
+
+                var after = new AfterEventArgs(config.DbType, item.Table, sql.ToString(), param, data);
+                fastAop.AfterHandler?.Invoke(this, after);
+
                 return result;
             }
             catch (Exception ex)
@@ -183,10 +206,16 @@ namespace FastData.Context
                     if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
+                    var before = new BeforeEventArgs(config.DbType, item.Table, sql.ToString(), param);
+                    fastAop.BeforeHandler?.Invoke(this, before);
+
                     Dispose(cmd);
                     var dr = BaseExecute.ToPageDataReader(item, cmd, pModel, ref sql);
                     result.pageResult.list = BaseDataReader.ToList<T>(dr, item.Config, item.AsName);
                     result.sql = sql;
+
+                    var after = new AfterEventArgs(config.DbType, item.Table, sql.ToString(), param, result.pageResult.list);
+                    fastAop.AfterHandler?.Invoke(this, after);
 
                     dr.Close();
                     dr.Dispose();
@@ -236,10 +265,16 @@ namespace FastData.Context
                     if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
+                    var before = new BeforeEventArgs(config.DbType, item.Table, sql.ToString(), param);
+                    fastAop.BeforeHandler?.Invoke(this, before);
+
                     Dispose(cmd);
                     var dr = BaseExecute.ToPageDataReader(item, cmd, pModel, ref sql);
                     result.PageResult.list = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle);
                     result.Sql = sql;
+
+                    var after = new AfterEventArgs(config.DbType, item.Table, sql.ToString(), param, result.PageResult.list);
+                    fastAop.AfterHandler?.Invoke(this, after);
 
                     dr.Close();
                     dr.Dispose();
@@ -289,11 +324,17 @@ namespace FastData.Context
                     if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
+                    var before = new BeforeEventArgs(config.DbType, null , sql.ToString(), param.ToList());
+                    fastAop.BeforeHandler?.Invoke(this, before);
+
                     Dispose(cmd);
                     var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql);
 
                     result.PageResult.list = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle);
                     result.Sql = string.Format("count:{0},page:{1}", countSql, pageSql);
+
+                    var after = new AfterEventArgs(config.DbType, null, sql.ToString(), param.ToList(), result.PageResult.list);
+                    fastAop.AfterHandler?.Invoke(this, after);
 
                     dr.Close();
                     dr.Dispose();
@@ -343,11 +384,17 @@ namespace FastData.Context
                     if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
+                    var before = new BeforeEventArgs(config.DbType, null, sql.ToString(), param.ToList());
+                    fastAop.BeforeHandler?.Invoke(this, before);
+
                     Dispose(cmd);
                     var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql);
 
                     result.pageResult.list = BaseDataReader.ToList<T>(dr, config, null);
                     result.sql = string.Format("count:{0},page:{1}", countSql, pageSql);
+
+                    var after = new AfterEventArgs(config.DbType, null, sql.ToString(), param.ToList(), result.pageResult.list);
+                    fastAop.AfterHandler?.Invoke(this, after);
 
                     dr.Close();
                     dr.Dispose();
@@ -424,9 +471,15 @@ namespace FastData.Context
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
 
+                var before = new BeforeEventArgs(config.DbType, item.Table, sql.ToString(), param.ToList());
+                fastAop.BeforeHandler?.Invoke(this, before);
+
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
                 result.Json = BaseJson.DataReaderToJson(dr, config.DbType == DataDbType.Oracle);
+
+                var after = new AfterEventArgs(config.DbType, item.Table, sql.ToString(), param.ToList(), result.Json);
+                fastAop.AfterHandler?.Invoke(this, after);
 
                 dr.Close();
                 dr.Dispose();
@@ -488,12 +541,18 @@ namespace FastData.Context
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
 
+                var before = new BeforeEventArgs(config.DbType, item.Table, sql.ToString(), param.ToList());
+                fastAop.BeforeHandler?.Invoke(this, before);
+
                 var dt = BaseExecute.ToDataTable(cmd, sql.ToString());
 
                 if (dt.Rows.Count > 0)
                     result.Count = dt.Rows[0][0].ToString().ToInt(0);
                 else
                     result.Count = 0;
+
+                var after = new AfterEventArgs(config.DbType, item.Table, sql.ToString(), param.ToList(), result.Count);
+                fastAop.AfterHandler?.Invoke(this, after);
 
                 return result;
             }
@@ -528,9 +587,15 @@ namespace FastData.Context
                 if (param != null)
                     cmd.Parameters.AddRange(param.ToArray());
 
+                var before = new BeforeEventArgs(config.DbType, null, sql.ToString(), param.ToList());
+                fastAop.BeforeHandler?.Invoke(this, before);
+
                 var dr = BaseExecute.ToDataReader(cmd, sql);
 
                 result.list = BaseDataReader.ToList<T>(dr, config);
+
+                var after = new AfterEventArgs(config.DbType, null, sql.ToString(), param.ToList(), result.list);
+                fastAop.AfterHandler?.Invoke(this, after);
 
                 dr.Close();
                 dr.Dispose();
@@ -569,10 +634,17 @@ namespace FastData.Context
                 if (param != null)
                     cmd.Parameters.AddRange(param.ToArray());
 
+                var before = new BeforeEventArgs(config.DbType, null, sql.ToString(), param.ToList());
+                fastAop.BeforeHandler?.Invoke(this, before);
+
                 var dr = BaseExecute.ToDataReader(cmd, sql);
 
                 result.DicList = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle);
                 result.writeReturn.IsSuccess = true;
+
+                var after = new AfterEventArgs(config.DbType, null, sql.ToString(), param.ToList(), result.DicList);
+                fastAop.AfterHandler?.Invoke(this, after);
+
                 dr.Close();
                 dr.Dispose();
             }
@@ -601,6 +673,7 @@ namespace FastData.Context
             var param = new List<DbParameter>();
             var result = new DataReturn();
             var sql = new StringBuilder();
+            object data;
 
             try
             {
@@ -648,15 +721,27 @@ namespace FastData.Context
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
 
+                var before = new BeforeEventArgs(config.DbType, item.Table, sql.ToString(), param);
+                fastAop.BeforeHandler?.Invoke(this, before);
+
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
                 if (item.Take == 1)
+                {
                     result.Dic = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle).FirstOrDefault() ?? new Dictionary<string, object>();
+                    data = result.Dic;
+                }
                 else
+                {
                     result.DicList = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle);
+                    data = result.DicList;
+                }
 
                 dr.Close();
                 dr.Dispose();
+
+                var after = new AfterEventArgs(config.DbType, item.Table, sql.ToString(), param, data);
+                fastAop.AfterHandler?.Invoke(this, after);
 
                 return result;
             }
@@ -728,9 +813,15 @@ namespace FastData.Context
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
 
+                var before = new BeforeEventArgs(config.DbType, item.Table, sql.ToString(), param);
+                fastAop.BeforeHandler?.Invoke(this, before);
+
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
                 result.Table.Load(dr);
+
+                var after = new AfterEventArgs(config.DbType, item.Table, sql.ToString(), param, result.Table);
+                fastAop.AfterHandler?.Invoke(this, after);
 
                 dr.Close();
                 dr.Dispose();
@@ -760,6 +851,7 @@ namespace FastData.Context
             var result = new DataReturn<T>();
             var sql = new StringBuilder();
             var visitModel = new VisitModel();
+            var tableName = new List<string>();
 
             try
             {
@@ -778,6 +870,10 @@ namespace FastData.Context
                 if (visitModel.Param.Count != 0)
                     cmd.Parameters.AddRange(visitModel.Param.ToArray());
 
+                tableName.Add(typeof(T).Name);
+                var before = new BeforeEventArgs(config.DbType, tableName, sql.ToString(), visitModel.Param,false);
+                fastAop.BeforeHandler?.Invoke(this, before);
+
                 if (visitModel.IsSuccess)
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, sql.ToString());
                 else
@@ -787,6 +883,9 @@ namespace FastData.Context
                     SubmitTrans();
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
+
+                var after = new AfterEventArgs(config.DbType, tableName, sql.ToString(), visitModel.Param, result.writeReturn.IsSuccess,false);
+                fastAop.AfterHandler?.Invoke(this, after);
             }
             catch (Exception ex)
             {
@@ -816,6 +915,7 @@ namespace FastData.Context
         {
             var result = new DataReturn<T>();
             var optionModel = new OptionModel();
+            var tableName = new List<string>();
 
             try
             {
@@ -831,6 +931,10 @@ namespace FastData.Context
                 if (optionModel.Param.Count != 0)
                     cmd.Parameters.AddRange(optionModel.Param.ToArray());
 
+                tableName.Add(typeof(T).Name);
+                var before = new BeforeEventArgs(config.DbType, tableName, optionModel.Sql, optionModel.Param, false);
+                fastAop.BeforeHandler?.Invoke(this, before);
+
                 if (optionModel.IsSuccess)
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, optionModel.Sql);
                 else
@@ -843,6 +947,9 @@ namespace FastData.Context
                     SubmitTrans();
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
+
+                var after = new AfterEventArgs(config.DbType, tableName, optionModel.Sql, optionModel.Param, result.writeReturn.IsSuccess, false);
+                fastAop.AfterHandler?.Invoke(this, after);
             }
             catch (Exception ex)
             {
@@ -876,6 +983,7 @@ namespace FastData.Context
             var result = new DataReturn<T>();
             var visitModel = new VisitModel();
             var update = new OptionModel();
+            var tableName = new List<string>();
 
             try
             {
@@ -900,6 +1008,10 @@ namespace FastData.Context
 
                     result.sql = ParameterToSql.ObjectParamToSql(Parameter.ParamMerge(update.Param, visitModel.Param), sql, config);
 
+                    tableName.Add(typeof(T).Name);
+                    var before = new BeforeEventArgs(config.DbType, tableName, sql.ToString(), Parameter.ParamMerge(update.Param, visitModel.Param), false);
+                    fastAop.BeforeHandler?.Invoke(this, before);
+
                     if (visitModel.IsSuccess)
                         result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, sql);
                     else
@@ -915,6 +1027,9 @@ namespace FastData.Context
                     SubmitTrans();
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
+
+                var after = new AfterEventArgs(config.DbType, tableName, sql.ToString(), Parameter.ParamMerge(update.Param, visitModel.Param), result.writeReturn.IsSuccess, false);
+                fastAop.AfterHandler?.Invoke(this, after);
             }
             catch (Exception ex)
             {
@@ -946,6 +1061,7 @@ namespace FastData.Context
         {
             var result = new DataReturn<T>();
             var update = new OptionModel();
+            var tableName = new List<string>();
             try
             {
 
@@ -960,6 +1076,11 @@ namespace FastData.Context
                         cmd.Parameters.AddRange(update.Param.ToArray());
 
                     result.sql = ParameterToSql.ObjectParamToSql(update.Param, update.Sql, config);
+
+                    tableName.Add(typeof(T).Name);
+                    var before = new BeforeEventArgs(config.DbType, tableName, result.sql, update.Param, false);
+                    fastAop.BeforeHandler?.Invoke(this, before);
+
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, update.Sql);
                 }
                 else
@@ -972,6 +1093,9 @@ namespace FastData.Context
                     SubmitTrans();
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
+
+                var after = new AfterEventArgs(config.DbType, tableName, result.sql, update.Param, result.writeReturn.IsSuccess, false);
+                fastAop.AfterHandler?.Invoke(this, after);
             }
             catch (Exception ex)
             {
@@ -1004,6 +1128,7 @@ namespace FastData.Context
         {
             var result = new DataReturn<T>();
             var update = new OptionModel();
+            var tableName = new List<string>();
             try
             {
                 if (list.Count == 0)
@@ -1030,12 +1155,19 @@ namespace FastData.Context
                             adapter.InsertCommand.Parameters.AddRange(update.Param.ToArray());
 
                         result.sql = ParameterToSql.ObjectParamToSql(update.Param, update.Sql, config);
+                        
+                        tableName.Add(typeof(T).Name);
+                        var before = new BeforeEventArgs(config.DbType, tableName, update.Sql, update.Param, false);
+                        fastAop.BeforeHandler?.Invoke(this, before);
 
                         result.writeReturn.IsSuccess = adapter.Update(update.table) > 0;
                         if (result.writeReturn.IsSuccess)
                             SubmitTrans();
                         else
                             RollbackTrans();
+
+                        var after = new AfterEventArgs(config.DbType, tableName, update.Sql, update.Param, result.writeReturn.IsSuccess, false);
+                        fastAop.AfterHandler?.Invoke(this, after);
                     }
                 }
                 else
@@ -1069,6 +1201,7 @@ namespace FastData.Context
         {
             var result = new DataReturn<T>();
             var insert = new OptionModel();
+            var tableName = new List<string>();
 
             try
             {
@@ -1086,10 +1219,17 @@ namespace FastData.Context
                     if (insert.Param.Count != 0)
                         cmd.Parameters.AddRange(insert.Param.ToArray());
 
+                    tableName.Add(typeof(T).Name);
+                    var before = new BeforeEventArgs(config.DbType, tableName, insert.Sql, insert.Param, false);
+                    fastAop.BeforeHandler?.Invoke(this, before);
+
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, insert.Sql);
 
                     if (isTrans)
                         SubmitTrans();
+
+                    var after = new AfterEventArgs(config.DbType, tableName, insert.Sql, insert.Param, result.writeReturn.IsSuccess, false);
+                    fastAop.AfterHandler?.Invoke(this, after);
 
                     return result;
                 }
@@ -1129,6 +1269,7 @@ namespace FastData.Context
             var result = new DataReturn<T>();
             var sql = new StringBuilder();
             var dyn = new Property.DynamicGet<T>();
+            var tableName = new List<string>();
 
             try
             {
@@ -1192,6 +1333,11 @@ namespace FastData.Context
 
                     sql.Append(")");
                     cmd.CommandText = sql.ToString().Replace(",)", ")");
+
+                    tableName.Add(typeof(T).Name);
+                    var before = new BeforeEventArgs(config.DbType, tableName, cmd.CommandText, null, false);
+                    fastAop.BeforeHandler?.Invoke(this, before);
+
                     result.writeReturn.IsSuccess = cmd.ExecuteNonQuery() > 0;
 
                     if (!isLog)
@@ -1235,7 +1381,13 @@ namespace FastData.Context
                             break;
                         }
                     }
+
                     cmd.CommandText = CommandParam.GetTvps<T>();
+
+                    tableName.Add(typeof(T).Name);
+                    var before = new BeforeEventArgs(config.DbType, tableName, cmd.CommandText, null, false);
+                    fastAop.BeforeHandler?.Invoke(this, before);
+
                     result.writeReturn.IsSuccess = cmd.ExecuteNonQuery() > 0;
                     #endregion
                 }
@@ -1245,6 +1397,11 @@ namespace FastData.Context
                     #region mysql
                     Dispose(cmd);
                     cmd.CommandText = CommandParam.GetMySql<T>(list);
+
+                    tableName.Add(typeof(T).Name);
+                    var before = new BeforeEventArgs(config.DbType, tableName, cmd.CommandText, null, false);
+                    fastAop.BeforeHandler?.Invoke(this, before);
+
                     result.writeReturn.IsSuccess = cmd.ExecuteNonQuery() > 0;
                     #endregion
                 }
@@ -1263,6 +1420,9 @@ namespace FastData.Context
                     SubmitTrans();
                 else if (result.writeReturn.IsSuccess == false && IsTrans)
                     RollbackTrans();
+
+                var after = new AfterEventArgs(config.DbType, tableName, cmd.CommandText, null, result.writeReturn.IsSuccess, false);
+                fastAop.AfterHandler?.Invoke(this, after);
             }
             catch (Exception ex)
             {
@@ -1304,12 +1464,18 @@ namespace FastData.Context
                 if (param != null)
                     cmd.Parameters.AddRange(param);
 
+                var before = new BeforeEventArgs(config.DbType, null, sql, param?.ToList(), false);
+                fastAop.BeforeHandler?.Invoke(this, before);
+
                 result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, sql, IsProcedure);
 
                 if (isTrans && result.writeReturn.IsSuccess)
                     SubmitTrans();
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
+
+                var after = new AfterEventArgs(config.DbType, null, sql, param?.ToList(), result.writeReturn.IsSuccess, false);
+                fastAop.AfterHandler?.Invoke(this, after);
             }
             catch (Exception ex)
             {
