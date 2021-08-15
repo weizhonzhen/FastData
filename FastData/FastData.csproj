@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>52bb2e23</NuGetPackageImportStamp>
     <TargetFrameworkProfile />
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -92,6 +92,10 @@
     <Compile Include="FastMap.cs" />
     <Compile Include="FastRead.cs" />
     <Compile Include="FastWrite.cs" />
+    <Compile Include="Filter\AfterEventArgs.cs" />
+    <Compile Include="Filter\BeforeEventArgs.cs" />
+    <Compile Include="Filter\FastAop.cs" />
+    <Compile Include="Filter\IFastAop.cs" />
     <Compile Include="Model\ColumnComments.cs" />
     <Compile Include="Model\ColumnType.cs" />
     <Compile Include="Model\CompareModel.cs" />

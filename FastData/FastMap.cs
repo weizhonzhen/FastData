@@ -16,6 +16,7 @@ using FastData.Check;
 using System.Reflection;
 using FastData.Context;
 using System.Xml;
+using FastData.Filter;
 
 namespace FastData
 {
@@ -24,6 +25,10 @@ namespace FastData
     /// </summary>
     public static class FastMap
     {
+        public static EventHandler<AfterEventArgs> After;
+
+        public static EventHandler<BeforeEventArgs> Before;
+
         #region 初始化model成员 1
         /// <summary>
         /// 初始化model成员 1
