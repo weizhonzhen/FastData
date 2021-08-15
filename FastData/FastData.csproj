@@ -92,10 +92,10 @@
     <Compile Include="FastMap.cs" />
     <Compile Include="FastRead.cs" />
     <Compile Include="FastWrite.cs" />
-    <Compile Include="Filter\AfterEventArgs.cs" />
-    <Compile Include="Filter\BeforeEventArgs.cs" />
-    <Compile Include="Filter\FastAop.cs" />
-    <Compile Include="Filter\IFastAop.cs" />
+    <Compile Include="Aop\AfterEventArgs.cs" />
+    <Compile Include="Aop\BeforeEventArgs.cs" />
+    <Compile Include="Aop\FastAop.cs" />
+    <Compile Include="Aop\IFastAop.cs" />
     <Compile Include="Model\ColumnComments.cs" />
     <Compile Include="Model\ColumnType.cs" />
     <Compile Include="Model\CompareModel.cs" />
