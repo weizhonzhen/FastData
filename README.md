@@ -153,7 +153,9 @@ FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config");
   </MapConfig>
 </configuration>
 
- 
+  FastMap.After += (s, e) =>{ };
+
+  FastMap.Before += (s, e) =>{      };
  
 
 ```
