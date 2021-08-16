@@ -5,6 +5,11 @@ code firest ,db first ,map
 nuget url : https://www.nuget.org/packages/Fast.Data/
 in Application_Start method
 
+//aop by EventHandler
+FastMap.After += (s, e) =>{ };
+FastMap.Before += (s, e) =>{  };
+FastMap.Map += (s, e) =>{  };
+
 //cache model
 FastMap.InstanceProperties(namespace, "db.config");
 
@@ -26,9 +31,6 @@ FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config");
     <section name="DataConfig" type="FastData.Config.DataConfig,FastData" />
 </configSections>
 
-//aop by EventHandler
-FastMap.After += (s, e) =>{ };
-FastMap.Before += (s, e) =>{  };
 
   <DataConfig>
     <Oracle>
