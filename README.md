@@ -6,10 +6,24 @@ nuget url : https://www.nuget.org/packages/Fast.Data/
 in Application_Start method
 
 //aop by EventHandler
-FastMap.After += (s, e) =>{ };
-FastMap.Before += (s, e) =>{  };
-FastMap.Map += (s, e) =>{  };
+    public class TestAop : IFastAop
+    {
+        public void After(AfterContext context)
+        {
+           // throw new NotImplementedException();
+        }
 
+        public void Before(BeforeContext context)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void Map(MapContext context)
+        {
+            //throw new NotImplementedException();
+        }
+    }
+    
 //cache model
 FastMap.InstanceProperties(namespace, "db.config");
 
