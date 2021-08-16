@@ -1,18 +1,11 @@
-﻿using System;
-
-namespace FastData.Aop
+﻿namespace FastData.Aop
 {
     public interface IFastAop
     {
-        event EventHandler<AfterEventArgs> After;
-        EventHandler<AfterEventArgs> AfterHandler { get; }
+        void Map(MapContext context);
 
-        EventHandler<BeforeEventArgs> BeforeHandler { get; }
+        void Before(BeforeContext context);
 
-        event EventHandler<BeforeEventArgs> Before;
-
-        EventHandler<MapEventArgs> MapHandler { get; }
-
-        event EventHandler<MapEventArgs> Map;
+        void After(AfterContext context);
     }
 }
