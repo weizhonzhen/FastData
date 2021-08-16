@@ -62,7 +62,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Aop\MapEventArgs.cs" />
+    <Compile Include="Aop\AfterContext.cs" />
+    <Compile Include="Aop\BeforeContext.cs" />
+    <Compile Include="Aop\MapContext.cs" />
     <Compile Include="Base\BaseCodeDom.cs" />
     <Compile Include="Base\BaseDataReader.cs" />
     <Compile Include="Base\BaseExecute.cs" />
@@ -93,9 +95,6 @@
     <Compile Include="FastMap.cs" />
     <Compile Include="FastRead.cs" />
     <Compile Include="FastWrite.cs" />
-    <Compile Include="Aop\AfterEventArgs.cs" />
-    <Compile Include="Aop\BeforeEventArgs.cs" />
-    <Compile Include="Aop\FastAop.cs" />
     <Compile Include="Aop\IFastAop.cs" />
     <Compile Include="Model\ColumnComments.cs" />
     <Compile Include="Model\ColumnType.cs" />

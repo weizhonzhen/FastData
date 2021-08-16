@@ -25,10 +25,7 @@ namespace FastData
     /// </summary>
     public static class FastMap
     {
-        public static IFastAop fastAop = new FastAop();
-        public static EventHandler<MapEventArgs> Map;
-        public static EventHandler<AfterEventArgs> After;
-        public static EventHandler<BeforeEventArgs> Before;
+        public static IFastAop fastAop;
 
         #region 初始化model成员 1
         /// <summary>
@@ -37,11 +34,9 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceProperties(string nameSpace, string dbFile = "db.config")
+        public static void InstanceProperties(string nameSpace, string dbFile = "db.config", IFastAop aop = null)
         {
-            if (FastMap.Map != null)
-                fastAop.Map += FastMap.Map;
-
+            fastAop = aop;
             var projectName = Assembly.GetCallingAssembly().GetName().Name;
             FastRedis.RedisInfo.Init(dbFile, projectName);
             var config = DataConfig.GetConfig(null, projectName, dbFile);
@@ -78,11 +73,9 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceTable(string nameSpace, string dbKey = null, string dbFile = "db.config")
+        public static void InstanceTable(string nameSpace, string dbKey = null, string dbFile = "db.config", IFastAop aop = null)
         {
-            if (FastMap.Map != null)
-                fastAop.Map += FastMap.Map;
-
+            fastAop = aop;
             var projectName = Assembly.GetCallingAssembly().GetName().Name;
             FastRedis.RedisInfo.Init(dbFile, projectName);
             var query = new DataQuery();
@@ -107,11 +100,9 @@ namespace FastData
         #endregion
 
         #region 初始化map 3  by Resource
-        public static void InstanceMapResource(string dbKey = null, string dbFile = "db.config", string mapFile = "SqlMap.config")
+        public static void InstanceMapResource(string dbKey = null, string dbFile = "db.config", string mapFile = "SqlMap.config", IFastAop aop =null)
         {
-            if (FastMap.Map != null)
-                fastAop.Map += FastMap.Map;
-
+            fastAop = aop;
             var projectName = Assembly.GetCallingAssembly().GetName().Name;
             FastRedis.RedisInfo.Init(dbFile, projectName);
             var config = DataConfig.GetConfig(dbKey, projectName, dbFile);
@@ -187,11 +178,9 @@ namespace FastData
         /// 初始化map 3
         /// </summary>
         /// <returns></returns>
-        public static void InstanceMap(string dbKey = null, string dbFile = "db.config", string mapFile = "SqlMap.config")
-        {
-            if (FastMap.Map != null)
-                fastAop.Map += FastMap.Map;
-
+        public static void InstanceMap(string dbKey = null, string dbFile = "db.config", string mapFile = "SqlMap.config", IFastAop aop = null)
+        {        
+            fastAop = aop;
             var list = MapConfig.GetConfig(mapFile);
             var config = DataConfig.GetConfig(dbKey, null, dbFile);
             using (var db = new DataContext(dbKey))
@@ -271,8 +260,7 @@ namespace FastData
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
 
-                var map = new MapEventArgs(config.DbType, name, sql, param?.ToList());
-                fastAop.MapHandler?.Invoke(key, map);
+                AopMap(name, sql, param, config);
 
                 var result = FastRead.ExecuteSql<T>(sql, param, db, key, isOutSql);
                 if (MapXml.MapIsForEach(name, config))
@@ -294,8 +282,7 @@ namespace FastData
             }
             else
             {
-                var map = new MapEventArgs(config.DbType, name, "", param?.ToList());
-                fastAop.MapHandler?.Invoke(key, map);
+                AopMap(name, "", param, config);
                 return new List<T>();
             }
         }
@@ -354,15 +341,13 @@ namespace FastData
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
 
-                var map = new MapEventArgs(config.DbType, name, sql, param?.ToList());
-                fastAop.MapHandler?.Invoke(key, map);
+                AopMap(name, sql, param, config);
 
                 return FastWrite.ExecuteSql(sql, param, db, key, isOutSql);
             }
             else
             {
-                var map = new MapEventArgs(config.DbType, name, "", param?.ToList());
-                fastAop.MapHandler?.Invoke(key, map);
+                AopMap(name, "", param, config);
 
                 return new WriteReturn();
             }
@@ -422,8 +407,7 @@ namespace FastData
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
 
-                var map = new MapEventArgs(config.DbType, name, sql, param?.ToList());
-                fastAop.MapHandler?.Invoke(null, map);
+                AopMap(name, sql, param, config);
 
                 var result = FastRead.ExecuteSql(sql, param, db, key, isOutSql);
 
@@ -447,8 +431,7 @@ namespace FastData
             }
             else
             {
-                var map = new MapEventArgs(config.DbType, name, "", param?.ToList());
-                fastAop.MapHandler?.Invoke(null, map);
+                AopMap(name, "", param, config);
                 return new List<Dictionary<string, object>>();
             }
         }
@@ -540,8 +523,7 @@ namespace FastData
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
 
-                var map = new MapEventArgs(config.DbType, name, sql, param?.ToList());
-                fastAop.MapHandler?.Invoke(key, map);
+                AopMap(name, sql, param, config);
 
                 var result = ExecuteSqlPage(pModel, sql, param, db, key, isOutSql);
 
@@ -565,8 +547,7 @@ namespace FastData
             }
             else
             {
-                var map = new MapEventArgs(config.DbType, name, "", param?.ToList());
-                fastAop.MapHandler?.Invoke(key, map);
+                AopMap(name, "", param, config);
                 return new PageResult();
             }
         }
@@ -658,8 +639,7 @@ namespace FastData
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
 
-                var map = new MapEventArgs(config.DbType, name, sql, param?.ToList());
-                fastAop.MapHandler?.Invoke(key, map);
+                AopMap(name, sql, param, config);
 
                 var result = ExecuteSqlPage<T>(pModel, sql, param, db, key, isOutSql);
 
@@ -682,8 +662,7 @@ namespace FastData
             }
             else
             {
-                var map = new MapEventArgs(config.DbType, name, "", param?.ToList());
-                fastAop.MapHandler?.Invoke(key, map);
+                AopMap(name, "", param, config);
                 return new PageResult<T>();
             }
         }
@@ -909,6 +888,31 @@ namespace FastData
             return DataConfig.GetConfig(name);
         }
         #endregion
+
+
+        /// <summary>
+        /// aop
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="name"></param>
+        /// <param name="param"></param>
+        /// <param name="config"></param>
+        private static void AopMap(string mapName, string sql, DbParameter[] param, ConfigModel config)
+        {
+            if (fastAop != null)
+            {
+                var context = new MapContext();
+                context.mapName = mapName;
+                context.sql = sql;
+
+                if (param != null)
+                    context.param = param.ToList();
+
+                context.dbType = config.DbType;
+
+                fastAop.Map(context);
+            }
+        }
     }
 }
 
