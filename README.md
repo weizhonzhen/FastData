@@ -25,7 +25,7 @@ in Application_Start method
     }
     
 //cache model
-FastMap.InstanceProperties(namespace, "db.config");
+FastMap.InstanceProperties(namespace, "db.config",new TestAop());
 
 //chache map
 FastMap.InstanceMap(dbkey,"SqlMap.config","db.config",new TestAop());
