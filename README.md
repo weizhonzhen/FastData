@@ -28,10 +28,10 @@ in Application_Start method
 FastMap.InstanceProperties(namespace, "db.config");
 
 //chache map
-FastMap.InstanceMap(dbkey,"SqlMap.config","db.config");
+FastMap.InstanceMap(dbkey,"SqlMap.config","db.config",new TestAop());
 
-//init map cache by Resource （xml file，SqlMap.config,db.config ）
-FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config");
+//init map cache by Resource （xml file，SqlMap.config,db.config ,new TestAop()）
+FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config",new TestAop());
 
 //by Repository
  services.AddTransient<IFastRepository, FastRepository>();
