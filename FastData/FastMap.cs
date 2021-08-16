@@ -353,10 +353,19 @@ namespace FastData
             {
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
+
+                var map = new MapEventArgs(config.DbType, name, sql, param?.ToList());
+                fastAop.MapHandler?.Invoke(key, map);
+
                 return FastWrite.ExecuteSql(sql, param, db, key, isOutSql);
             }
             else
+            {
+                var map = new MapEventArgs(config.DbType, name, "", param?.ToList());
+                fastAop.MapHandler?.Invoke(key, map);
+
                 return new WriteReturn();
+            }
         }
         #endregion
 
@@ -530,6 +539,10 @@ namespace FastData
             {
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
+
+                var map = new MapEventArgs(config.DbType, name, sql, param?.ToList());
+                fastAop.MapHandler?.Invoke(key, map);
+
                 var result = ExecuteSqlPage(pModel, sql, param, db, key, isOutSql);
 
                 if (MapXml.MapIsForEach(name, config))
@@ -551,7 +564,11 @@ namespace FastData
                 return result;
             }
             else
+            {
+                var map = new MapEventArgs(config.DbType, name, "", param?.ToList());
+                fastAop.MapHandler?.Invoke(key, map);
                 return new PageResult();
+            }
         }
         #endregion
 
@@ -640,6 +657,10 @@ namespace FastData
             {
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
+
+                var map = new MapEventArgs(config.DbType, name, sql, param?.ToList());
+                fastAop.MapHandler?.Invoke(key, map);
+
                 var result = ExecuteSqlPage<T>(pModel, sql, param, db, key, isOutSql);
 
                 if (MapXml.MapIsForEach(name, config))
@@ -660,7 +681,11 @@ namespace FastData
                 return result;
             }
             else
+            {
+                var map = new MapEventArgs(config.DbType, name, "", param?.ToList());
+                fastAop.MapHandler?.Invoke(key, map);
                 return new PageResult<T>();
+            }
         }
         #endregion
 
