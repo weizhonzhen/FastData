@@ -25,8 +25,9 @@ namespace FastData
     /// </summary>
     public static class FastMap
     {
+        public static IFastAop fastAop = new FastAop();
+        public static EventHandler<MapEventArgs> Map;
         public static EventHandler<AfterEventArgs> After;
-
         public static EventHandler<BeforeEventArgs> Before;
 
         #region 初始化model成员 1
@@ -38,6 +39,9 @@ namespace FastData
         /// <param name="dll">dll名称</param>
         public static void InstanceProperties(string nameSpace, string dbFile = "db.config")
         {
+            if (FastMap.Map != null)
+                fastAop.Map += FastMap.Map;
+
             var projectName = Assembly.GetCallingAssembly().GetName().Name;
             FastRedis.RedisInfo.Init(dbFile, projectName);
             var config = DataConfig.GetConfig(null, projectName, dbFile);
@@ -76,6 +80,9 @@ namespace FastData
         /// <param name="dll">dll名称</param>
         public static void InstanceTable(string nameSpace, string dbKey = null, string dbFile = "db.config")
         {
+            if (FastMap.Map != null)
+                fastAop.Map += FastMap.Map;
+
             var projectName = Assembly.GetCallingAssembly().GetName().Name;
             FastRedis.RedisInfo.Init(dbFile, projectName);
             var query = new DataQuery();
@@ -102,6 +109,9 @@ namespace FastData
         #region 初始化map 3  by Resource
         public static void InstanceMapResource(string dbKey = null, string dbFile = "db.config", string mapFile = "SqlMap.config")
         {
+            if (FastMap.Map != null)
+                fastAop.Map += FastMap.Map;
+
             var projectName = Assembly.GetCallingAssembly().GetName().Name;
             FastRedis.RedisInfo.Init(dbFile, projectName);
             var config = DataConfig.GetConfig(dbKey, projectName, dbFile);
@@ -179,6 +189,9 @@ namespace FastData
         /// <returns></returns>
         public static void InstanceMap(string dbKey = null, string dbFile = "db.config", string mapFile = "SqlMap.config")
         {
+            if (FastMap.Map != null)
+                fastAop.Map += FastMap.Map;
+
             var list = MapConfig.GetConfig(mapFile);
             var config = DataConfig.GetConfig(dbKey, null, dbFile);
             using (var db = new DataContext(dbKey))
@@ -257,6 +270,10 @@ namespace FastData
             {
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
+
+                var map = new MapEventArgs(config.DbType, name, sql, param?.ToList());
+                fastAop.MapHandler?.Invoke(key, map);
+
                 var result = FastRead.ExecuteSql<T>(sql, param, db, key, isOutSql);
                 if (MapXml.MapIsForEach(name, config))
                 {
@@ -276,7 +293,11 @@ namespace FastData
                 return result;
             }
             else
+            {
+                var map = new MapEventArgs(config.DbType, name, "", param?.ToList());
+                fastAop.MapHandler?.Invoke(key, map);
                 return new List<T>();
+            }
         }
         #endregion
 
@@ -391,6 +412,10 @@ namespace FastData
             {
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
+
+                var map = new MapEventArgs(config.DbType, name, sql, param?.ToList());
+                fastAop.MapHandler?.Invoke(null, map);
+
                 var result = FastRead.ExecuteSql(sql, param, db, key, isOutSql);
 
                 if (MapXml.MapIsForEach(name, config))
@@ -412,7 +437,11 @@ namespace FastData
                 return result;
             }
             else
+            {
+                var map = new MapEventArgs(config.DbType, name, "", param?.ToList());
+                fastAop.MapHandler?.Invoke(null, map);
                 return new List<Dictionary<string, object>>();
+            }
         }
         #endregion
 

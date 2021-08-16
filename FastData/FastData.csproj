@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Aop\MapEventArgs.cs" />
     <Compile Include="Base\BaseCodeDom.cs" />
     <Compile Include="Base\BaseDataReader.cs" />
     <Compile Include="Base\BaseExecute.cs" />
