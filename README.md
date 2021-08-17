@@ -22,6 +22,11 @@ in Application_Start method
         {
             //throw new NotImplementedException();
         }
+        
+         public void Exception(Exception ex, string name)
+         {
+            throw new NotImplementedException();
+         }
     }
     
 //cache model
