@@ -936,6 +936,9 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
+                if (FastMap.fastAop != null)
+                    FastMap.fastAop.Exception(ex, path + "Parsing xml");
+
                 if (config.SqlErrorType == SqlErrorType.Db)
                     DbLogTable.LogException(config, ex, "InstanceMap", "GetXmlList");
                 else
