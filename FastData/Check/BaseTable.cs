@@ -83,6 +83,9 @@ namespace FastData.Check
             }
             catch (Exception ex)
             {
+                if (FastMap.fastAop != null)
+                    FastMap.fastAop.Exception(ex, "Code First table ： " + tableName);
+
                 if (item.Config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException(item.Config, ex, string.Format("Check_{0}", tableName), "");
                 else
