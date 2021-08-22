@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using FastData.Type;
 using FastData.Check;
 using FastData.Config;
+using FastData.Aop;
 
 namespace FastData.Base
 {
@@ -491,7 +492,7 @@ namespace FastData.Base
                             param.Add(tempParam);
                         }
 
-                        var tempData = db.ExecuteSql(sql, param.ToArray(), false);
+                        var tempData = db.ExecuteSqlList(sql, param.ToArray(), false,false);
 
                         foreach (var temp in tempData.DicList)
                         {
@@ -937,7 +938,13 @@ namespace FastData.Base
             catch (Exception ex)
             {
                 if (FastMap.fastAop != null)
-                    FastMap.fastAop.Exception(ex, path + "Parsing xml");
+                {
+                    var context = new ExceptionContext();
+                    context.ex = ex;
+                    context.name = "Parsing xml";
+                    context.type = AopType.ParsingXml;
+                    FastMap.fastAop.Exception(context);
+                }
 
                 if (config.SqlErrorType == SqlErrorType.Db)
                     DbLogTable.LogException(config, ex, "InstanceMap", "GetXmlList");
