@@ -63,8 +63,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aop\AfterContext.cs" />
+    <Compile Include="Aop\AopEnum.cs" />
     <Compile Include="Aop\BeforeContext.cs" />
-    <Compile Include="Aop\MapContext.cs" />
+    <Compile Include="Aop\ExceptionContext.cs" />
+    <Compile Include="Aop\MapAfterContext.cs" />
+    <Compile Include="Aop\MapBeforeContext.cs" />
     <Compile Include="Base\BaseCodeDom.cs" />
     <Compile Include="Base\BaseDataReader.cs" />
     <Compile Include="Base\BaseExecute.cs" />

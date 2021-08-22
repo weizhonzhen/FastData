@@ -974,13 +974,13 @@ namespace FastData
             {
                 using (var tempDb = new DataContext(key))
                 {
-                    result = tempDb.ExecuteSql(sql, param, false);
+                    result = tempDb.ExecuteSqlList(sql, param, false);
                     config = tempDb.config;
                 }
             }
             else
             {
-                result = db.ExecuteSql(sql, param, false);
+                result = db.ExecuteSqlList(sql, param, false);
                 config = db.config;
             }
 

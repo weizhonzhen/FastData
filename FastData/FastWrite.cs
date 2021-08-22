@@ -416,18 +416,19 @@ namespace FastData
             {
                 using (var tempDb = new DataContext(key))
                 {
-                    result = tempDb.ExecuteSql(sql, param, false);
                     config = tempDb.config;
+                    config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
+                    result = tempDb.ExecuteSql(sql, param, false,config.IsOutSql);
                 }
             }
             else
             {
-                result = db.ExecuteSql(sql, param, false);
                 config = db.config;
+                config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
+                result = db.ExecuteSql(sql, param, false, config.IsOutSql);
             }
 
             stopwatch.Stop();
-            config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
             DbLog.LogSql(config.IsOutSql, result.Sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
 
             return result.writeReturn;
