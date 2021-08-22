@@ -18,9 +18,14 @@ in Application_Start method
             //throw new NotImplementedException();
         }
 
-        public void Map(MapContext context)
+        public void MapAfter(MapAfterContext context)
         {
-            //throw new NotImplementedException();
+            throw new NotImplementedException();
+        }
+
+        public void MapBefore(MapBeforeContext context)
+        {
+            throw new NotImplementedException();
         }
         
          public void Exception(Exception ex, string name)
