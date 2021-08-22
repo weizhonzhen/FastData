@@ -46,7 +46,7 @@ namespace FastData.Context
         /// <param name="name"></param>
         /// <param name="param"></param>
         /// <param name="config"></param>
-        private void AopBefore(List<string> tableName, string sql, List<DbParameter> param, ConfigModel config, bool isRead)
+        private void AopBefore(List<string> tableName, string sql, List<DbParameter> param, ConfigModel config, bool isRead, AopType type)
         {
             if (FastMap.fastAop != null)
             {
@@ -75,7 +75,7 @@ namespace FastData.Context
         /// <param name="name"></param>
         /// <param name="param"></param>
         /// <param name="config"></param>
-        private void AopAfter(List<string> tableName, string sql, List<DbParameter> param, ConfigModel config, bool isRead, object result)
+        private void AopAfter(List<string> tableName, string sql, List<DbParameter> param, ConfigModel config, bool isRead, AopType type, object result)
         {
             if (FastMap.fastAop != null)
             {
@@ -103,10 +103,17 @@ namespace FastData.Context
         /// </summary>
         /// <param name="ex"></param>
         /// <param name="name"></param>
-        private void AopException(Exception ex, string name)
+        private void AopException(Exception ex, string name, ConfigModel config, AopType type)
         {
             if (FastMap.fastAop != null)
-                FastMap.fastAop.Exception(ex, name);
+            {
+                var context = new ExceptionContext();
+                context.dbType = context.dbType;
+                context.ex = ex;
+                context.name = name;
+                context.type = type;
+                FastMap.fastAop.Exception(context);
+            }
         }
 
 
@@ -140,7 +147,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                AopException(ex, "DataContext :" + key);
+                AopException(ex, "DataContext :" + key,config,AopType.DataContext);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException(config, ex, "DataContext", "");
@@ -208,7 +215,7 @@ namespace FastData.Context
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
 
-                AopBefore(item.Table, sql.ToString(), param, config, true);
+                AopBefore(item.Table, sql.ToString(), param, config, true,AopType.Query_List_Lambda);
 
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
@@ -226,13 +233,13 @@ namespace FastData.Context
                 dr.Close();
                 dr.Dispose();
 
-                AopAfter(item.Table, sql.ToString(), param, config, true, data);
+                AopAfter(item.Table, sql.ToString(), param, config, true, AopType.Query_List_Lambda, data);
 
                 return result;
             }
             catch (Exception ex)
             {
-                AopException(ex, "to List tableName:" + typeof(T).Name);
+                AopException(ex, "to List tableName:" + typeof(T).Name,config, AopType.Query_List_Lambda);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "GetList<T>", "");
@@ -271,14 +278,14 @@ namespace FastData.Context
                     if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
-                    AopBefore(item.Table, sql.ToString(), param, config, true);
+                    AopBefore(item.Table, sql.ToString(), param, config, true,AopType.Query_Page_Lambda_Model);
 
                     Dispose(cmd);
                     var dr = BaseExecute.ToPageDataReader(item, cmd, pModel, ref sql);
                     result.pageResult.list = BaseDataReader.ToList<T>(dr, item.Config, item.AsName);
                     result.sql = sql;
 
-                    AopAfter(item.Table, sql.ToString(), param, config, true, result.pageResult.list);
+                    AopAfter(item.Table, sql.ToString(), param, config, true, AopType.Query_Page_Lambda_Model, result.pageResult.list);
 
                     dr.Close();
                     dr.Dispose();
@@ -290,7 +297,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                AopException(ex, "to Page tableName:" + typeof(T).Name);
+                AopException(ex, "to Page tableName:" + typeof(T).Name,config, AopType.Query_Page_Lambda_Model);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "GetPage<T>", "");
@@ -330,7 +337,7 @@ namespace FastData.Context
                     if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
-                    AopBefore(item.Table, sql.ToString(), param, config, true);
+                    AopBefore(item.Table, sql.ToString(), param, config, true,AopType.Query_Page_Lambda_Dic);
 
                     Dispose(cmd);
                     var dr = BaseExecute.ToPageDataReader(item, cmd, pModel, ref sql);
@@ -340,7 +347,7 @@ namespace FastData.Context
                     dr.Close();
                     dr.Dispose();
 
-                    AopAfter(item.Table, sql.ToString(), param, config, true, result.PageResult.list);
+                    AopAfter(item.Table, sql.ToString(), param, config, true, AopType.Query_Page_Lambda_Dic, result.PageResult.list);
                 }
                 else
                     result.PageResult.list = new List<Dictionary<string, object>>();
@@ -349,7 +356,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                AopException(ex, "to Page");
+                AopException(ex, "to Page",config, AopType.Query_Page_Lambda_Dic);
 
                 if (item.Config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException(item.Config, ex, "GetPage", result.Sql);
@@ -366,7 +373,7 @@ namespace FastData.Context
         /// 获取分页
         /// </summary>
         /// <returns></returns>
-        public DataReturn GetPageSql(PageModel pModel, string sql, DbParameter[] param)
+        public DataReturn GetPageSql(PageModel pModel, string sql, DbParameter[] param,bool isAop=true)
         {
             var result = new DataReturn();
             var countSql = "";
@@ -389,7 +396,8 @@ namespace FastData.Context
                     if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
-                    AopBefore(null, sql.ToString(), param?.ToList(), config, true);
+                    if (isAop)
+                        AopBefore(null, sql.ToString(), param?.ToList(), config, true,AopType.Query_Page_Lambda_Dic);
 
                     Dispose(cmd);
                     var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql);
@@ -400,7 +408,8 @@ namespace FastData.Context
                     dr.Close();
                     dr.Dispose();
 
-                    AopAfter(null, sql.ToString(), param?.ToList(), config, true, result.PageResult.list);
+                    if(isAop)
+                        AopAfter(null, sql.ToString(), param?.ToList(), config, true, AopType.Query_Page_Lambda_Dic, result.PageResult.list);
                 }
                 else
                     result.PageResult.list = new List<Dictionary<string, object>>();
@@ -409,7 +418,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                AopException(ex, "to Page sql");
+                AopException(ex, "to Page sql",config, AopType.Query_Page_Lambda_Dic);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException(config, ex, "GetPageSql", result.Sql);
@@ -426,7 +435,7 @@ namespace FastData.Context
         /// 获取分页
         /// </summary>
         /// <returns></returns>
-        public DataReturn<T> GetPageSql<T>(PageModel pModel, string sql, DbParameter[] param) where T : class, new()
+        public DataReturn<T> GetPageSql<T>(PageModel pModel, string sql, DbParameter[] param,bool isAop=true) where T : class, new()
         {
             var result = new DataReturn<T>();
             var countSql = "";
@@ -449,7 +458,8 @@ namespace FastData.Context
                     if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
-                    AopBefore(null, sql.ToString(), param?.ToList(), config, true);
+                    if (isAop)
+                        AopBefore(null, sql.ToString(), param?.ToList(), config, true,AopType.Query_Page_Lambda_Model);
 
                     Dispose(cmd);
                     var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql);
@@ -460,14 +470,15 @@ namespace FastData.Context
                     dr.Close();
                     dr.Dispose();
 
-                    AopAfter(null, sql.ToString(), param?.ToList(), config, true, result.pageResult.list);
+                    if (isAop)
+                        AopAfter(null, sql.ToString(), param?.ToList(), config, true, AopType.Query_Page_Lambda_Model, result.pageResult.list);
                 }
 
                 result.pageResult.pModel = pModel;
             }
             catch (Exception ex)
             {
-                AopException(ex, "to Page tableName:" + typeof(T).Name);
+                AopException(ex, "to Page tableName:" + typeof(T).Name,config, AopType.Query_Page_Lambda_Model);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException(config, ex, "GetPageSql", result.sql);
@@ -536,7 +547,7 @@ namespace FastData.Context
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
 
-                AopBefore(null, sql.ToString(), param?.ToList(), config, true);
+                AopBefore(null, sql.ToString(), param?.ToList(), config, true,AopType.Query_Json_Lambda);
 
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
@@ -545,13 +556,13 @@ namespace FastData.Context
                 dr.Close();
                 dr.Dispose();
 
-                AopAfter(null, sql.ToString(), param?.ToList(), config, true, result.Json);
+                AopAfter(null, sql.ToString(), param?.ToList(), config, true, AopType.Query_Json_Lambda, result.Json);
 
                 return result;
             }
             catch (Exception ex)
             {
-                AopException(ex, "to Json");
+                AopException(ex, "to Json",config, AopType.Query_Json_Lambda);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException(config, ex, "GetJson", result.Sql);
@@ -606,7 +617,7 @@ namespace FastData.Context
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
 
-                AopBefore(null, sql.ToString(), param?.ToList(), config, true);
+                AopBefore(null, sql.ToString(), param?.ToList(), config, true,AopType.Query_Json_Lambda);
 
                 var dt = BaseExecute.ToDataTable(cmd, sql.ToString());
 
@@ -615,13 +626,13 @@ namespace FastData.Context
                 else
                     result.Count = 0;
 
-                AopAfter(null, sql.ToString(), param?.ToList(), config, true, result.Count);
+                AopAfter(null, sql.ToString(), param?.ToList(), config, true, AopType.Query_Json_Lambda, result.Count);
 
                 return result;
             }
             catch (Exception ex)
             {
-                AopException(ex, "to Count");
+                AopException(ex, "to Count",config, AopType.Query_Json_Lambda);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException(config, ex, "GetCount", result.Sql);
@@ -652,7 +663,7 @@ namespace FastData.Context
                 if (param != null)
                     cmd.Parameters.AddRange(param.ToArray());
 
-                AopBefore(null, sql.ToString(), param?.ToList(), config, true);
+                AopBefore(null, sql.ToString(), param?.ToList(), config, true,AopType.Execute_Sql_Model);
 
                 var dr = BaseExecute.ToDataReader(cmd, sql);
 
@@ -661,11 +672,11 @@ namespace FastData.Context
                 dr.Close();
                 dr.Dispose();
 
-                AopAfter(null, sql.ToString(), param?.ToList(), config, true, result.list);
+                AopAfter(null, sql.ToString(), param?.ToList(), config, true, AopType.Execute_Sql_Model, result.list);
             }
             catch (Exception ex)
             {
-                AopException(ex, "ExecuteSql tableName:" + typeof(T).Name);
+                AopException(ex, "ExecuteSql tableName:" + typeof(T).Name,config, AopType.Execute_Sql_Model);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "ExecuteSql<T>", "");
@@ -682,7 +693,7 @@ namespace FastData.Context
         /// 执行sql
         /// </summary>
         /// <returns></returns>
-        public DataReturn ExecuteSql(string sql, DbParameter[] param=null,bool isLog=false)
+        public DataReturn ExecuteSqlList(string sql, DbParameter[] param=null,bool isLog=false,bool isAop=true)
         {
             var result = new DataReturn();
             try
@@ -699,7 +710,8 @@ namespace FastData.Context
                 if (param != null)
                     cmd.Parameters.AddRange(param.ToArray());
 
-                AopBefore(null, sql.ToString(), param?.ToList(), config, true);
+                if(isAop)
+                    AopBefore(null, sql.ToString(), param?.ToList(), config, true,AopType.Execute_Sql_Dic);
 
                 var dr = BaseExecute.ToDataReader(cmd, sql);
 
@@ -709,19 +721,20 @@ namespace FastData.Context
                 dr.Close();
                 dr.Dispose();
 
-                AopAfter(null, sql.ToString(), param?.ToList(), config, true, result.writeReturn.IsSuccess);
+                if (isAop)
+                    AopAfter(null, sql.ToString(), param?.ToList(), config, true, AopType.Execute_Sql_Dic, result.writeReturn.IsSuccess);
             }
             catch (Exception ex)
             {
-                AopException(ex, "Execute Sql");
+                AopException(ex, "Execute Sql",config, AopType.Execute_Sql_Dic);
 
                 result.writeReturn.IsSuccess = false;
                 result.writeReturn.Message = ex.Message;
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
-                    DbLogTable.LogException(config, ex, "ExecuteSql", result.Sql);
+                    DbLogTable.LogException(config, ex, "ExecuteSqlList", result.Sql);
                 else
-                    DbLog.LogException(config.IsOutError, config.DbType, ex, "ExecuteSql", result.Sql);
+                    DbLog.LogException(config.IsOutError, config.DbType, ex, "ExecuteSqlList", result.Sql);
             }
 
             return result;
@@ -786,7 +799,7 @@ namespace FastData.Context
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
 
-                AopBefore(item.Table, sql.ToString(), param, config, true);
+                AopBefore(item.Table, sql.ToString(), param, config, true,AopType.Query_Dic_Lambda);
 
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
@@ -804,13 +817,13 @@ namespace FastData.Context
                 dr.Close();
                 dr.Dispose();
 
-                AopAfter(item.Table, sql.ToString(), param, config, true, data);
+                AopAfter(item.Table, sql.ToString(), param, config, true, AopType.Query_Dic_Lambda, data);
 
                 return result;
             }
             catch (Exception ex)
             {
-                AopException(ex, "to Dic");
+                AopException(ex, "to Dic",config, AopType.Query_Dic_Lambda);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException(config, ex, "GetDic", result.Sql);
@@ -878,7 +891,7 @@ namespace FastData.Context
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
 
-                AopBefore(item.Table, sql.ToString(), param, config, true);
+                AopBefore(item.Table, sql.ToString(), param, config, true,AopType.Query_DataTable_Lambda);
 
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
@@ -887,13 +900,13 @@ namespace FastData.Context
                 dr.Close();
                 dr.Dispose();
 
-                AopAfter(item.Table, sql.ToString(), param, config, true, result.Table);
+                AopAfter(item.Table, sql.ToString(), param, config, true, AopType.Query_DataTable_Lambda, result.Table);
 
                 return result;
             }
             catch (Exception ex)
             {
-                AopException(ex, "to DataTable");
+                AopException(ex, "to DataTable",config, AopType.Query_DataTable_Lambda);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException(config, ex, "GetDataTable", result.Sql);
@@ -936,7 +949,7 @@ namespace FastData.Context
                     cmd.Parameters.AddRange(visitModel.Param.ToArray());
 
                 tableName.Add(typeof(T).Name);
-                AopBefore(tableName, sql.ToString(), visitModel.Param, config, false);
+                AopBefore(tableName, sql.ToString(), visitModel.Param, config, false,AopType.Delete_Lambda);
 
                 if (visitModel.IsSuccess)
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, sql.ToString());
@@ -948,11 +961,11 @@ namespace FastData.Context
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
 
-                AopAfter(tableName, sql.ToString(), visitModel.Param, config, false, result.writeReturn.IsSuccess);
+                AopAfter(tableName, sql.ToString(), visitModel.Param, config, false, AopType.Delete_Lambda, result.writeReturn.IsSuccess);
             }
             catch (Exception ex)
             {
-                AopException(ex, "Delete by Lambda tableName"+typeof(T).Name);
+                AopException(ex, "Delete by Lambda tableName"+typeof(T).Name,config, AopType.Delete_Lambda);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "Delete<T>", "");
@@ -997,7 +1010,7 @@ namespace FastData.Context
                     cmd.Parameters.AddRange(optionModel.Param.ToArray());
 
                 tableName.Add(typeof(T).Name);
-                AopBefore(tableName, optionModel.Sql, optionModel.Param, config, false);
+                AopBefore(tableName, optionModel.Sql, optionModel.Param, config, false,AopType.Delete_PrimaryKey);
 
                 if (optionModel.IsSuccess)
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, optionModel.Sql);
@@ -1012,11 +1025,11 @@ namespace FastData.Context
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
 
-                AopAfter(tableName, optionModel.Sql, optionModel.Param, config, false, result.writeReturn.IsSuccess);
+                AopAfter(tableName, optionModel.Sql, optionModel.Param, config, false, AopType.Delete_PrimaryKey, result.writeReturn.IsSuccess);
             }
             catch (Exception ex)
             {
-                AopException(ex, "Delete by Primary Key tableName" + typeof(T).Name);
+                AopException(ex, "Delete by Primary Key tableName" + typeof(T).Name,config, AopType.Delete_PrimaryKey);
 
                 if (isTrans)
                     RollbackTrans();
@@ -1074,7 +1087,7 @@ namespace FastData.Context
                     result.sql = ParameterToSql.ObjectParamToSql(Parameter.ParamMerge(update.Param, visitModel.Param), sql, config);
 
                     tableName.Add(typeof(T).Name);
-                    AopBefore(tableName, sql, Parameter.ParamMerge(update.Param, visitModel.Param), config, false);
+                    AopBefore(tableName, sql, Parameter.ParamMerge(update.Param, visitModel.Param), config, false,AopType.Update_Lambda);
 
                     if (visitModel.IsSuccess)
                         result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, sql);
@@ -1092,11 +1105,11 @@ namespace FastData.Context
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
 
-                AopAfter(tableName, sql, Parameter.ParamMerge(update.Param, visitModel.Param), config, false, result.writeReturn.IsSuccess);
+                AopAfter(tableName, sql, Parameter.ParamMerge(update.Param, visitModel.Param), config, false, AopType.Update_Lambda, result.writeReturn.IsSuccess);
             }
             catch (Exception ex)
             {
-                AopException(ex, "Update by Lambda tableName:" + typeof(T).Name);
+                AopException(ex, "Update by Lambda tableName:" + typeof(T).Name,config, AopType.Update_Lambda);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "Update<T>", "");
@@ -1143,7 +1156,7 @@ namespace FastData.Context
                     result.sql = ParameterToSql.ObjectParamToSql(update.Param, update.Sql, config);
 
                     tableName.Add(typeof(T).Name);
-                    AopBefore(tableName, update.Sql, update.Param, config, false);
+                    AopBefore(tableName, update.Sql, update.Param, config, false,AopType.Update_PrimaryKey);
 
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, update.Sql);
                 }
@@ -1158,11 +1171,11 @@ namespace FastData.Context
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
 
-                AopAfter(tableName, update.Sql, update.Param, config, false, result.writeReturn.IsSuccess);
+                AopAfter(tableName, update.Sql, update.Param, config, false, AopType.Update_PrimaryKey, result.writeReturn.IsSuccess);
             }
             catch (Exception ex)
             {
-                AopException(ex, "Update by Primary Key tableName:" + typeof(T).Name);
+                AopException(ex, "Update by Primary Key tableName:" + typeof(T).Name,config, AopType.Update_PrimaryKey);
 
                 if (isTrans)
                     RollbackTrans();
@@ -1222,7 +1235,7 @@ namespace FastData.Context
                         result.sql = ParameterToSql.ObjectParamToSql(update.Param, update.Sql, config);
                         
                         tableName.Add(typeof(T).Name);
-                        AopBefore(tableName, update.Sql, update.Param, config, false);
+                        AopBefore(tableName, update.Sql, update.Param, config, false,AopType.UpdateList);
 
                         result.writeReturn.IsSuccess = adapter.Update(update.table) > 0;
                         if (result.writeReturn.IsSuccess)
@@ -1230,7 +1243,7 @@ namespace FastData.Context
                         else
                             RollbackTrans();
 
-                        AopAfter(tableName, update.Sql, update.Param, config, false, result.writeReturn.IsSuccess);
+                        AopAfter(tableName, update.Sql, update.Param, config, false, AopType.UpdateList, result.writeReturn.IsSuccess);
                     }
                 }
                 else
@@ -1241,7 +1254,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                AopException(ex, "Update List tableName:" + typeof(T).Name);
+                AopException(ex, "Update List tableName:" + typeof(T).Name,config, AopType.UpdateList);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "UpdateList<T>", "");
@@ -1285,14 +1298,14 @@ namespace FastData.Context
                         cmd.Parameters.AddRange(insert.Param.ToArray());
 
                     tableName.Add(typeof(T).Name);
-                    AopBefore(tableName, insert.Sql, insert.Param, config, false);
+                    AopBefore(tableName, insert.Sql, insert.Param, config, false,AopType.Add);
 
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, insert.Sql);
 
                     if (isTrans)
                         SubmitTrans();
 
-                    AopAfter(tableName, insert.Sql, insert.Param, config, false, result.writeReturn.IsSuccess);
+                    AopAfter(tableName, insert.Sql, insert.Param, config, false, AopType.Add, result.writeReturn.IsSuccess);
 
                     return result;
                 }
@@ -1301,7 +1314,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                AopException(ex, "Add tableName: " + typeof(T).Name);
+                AopException(ex, "Add tableName: " + typeof(T).Name,config, AopType.Add);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "Add<T>", "");
@@ -1400,7 +1413,7 @@ namespace FastData.Context
                     cmd.CommandText = sql.ToString().Replace(",)", ")");
 
                     tableName.Add(typeof(T).Name);
-                    AopBefore(tableName, cmd.CommandText, null, config, false);
+                    AopBefore(tableName, cmd.CommandText, null, config, false, AopType.AddList);
 
                     result.writeReturn.IsSuccess = cmd.ExecuteNonQuery() > 0;
 
@@ -1449,7 +1462,7 @@ namespace FastData.Context
                     cmd.CommandText = CommandParam.GetTvps<T>();
 
                     tableName.Add(typeof(T).Name);
-                    AopBefore(tableName, cmd.CommandText, null, config, false);
+                    AopBefore(tableName, cmd.CommandText, null, config, false, AopType.AddList);
 
                     result.writeReturn.IsSuccess = cmd.ExecuteNonQuery() > 0;
                     #endregion
@@ -1462,7 +1475,7 @@ namespace FastData.Context
                     cmd.CommandText = CommandParam.GetMySql<T>(list);
 
                     tableName.Add(typeof(T).Name);
-                    AopBefore(tableName, cmd.CommandText, null, config, false);
+                    AopBefore(tableName, cmd.CommandText, null, config, false, AopType.AddList);
 
                     result.writeReturn.IsSuccess = cmd.ExecuteNonQuery() > 0;
                     #endregion
@@ -1483,11 +1496,11 @@ namespace FastData.Context
                 else if (result.writeReturn.IsSuccess == false && IsTrans)
                     RollbackTrans();
 
-                AopAfter(tableName, cmd.CommandText, null, config, false, result.writeReturn.IsSuccess);
+                AopAfter(tableName, cmd.CommandText, null, config, false, AopType.AddList, result.writeReturn.IsSuccess);
             }
             catch (Exception ex)
             {
-                AopException(ex, "Add List tableName:" + typeof(T).Name);
+                AopException(ex, "Add List tableName:" + typeof(T).Name,config,AopType.AddList);
 
                 if (IsTrans)
                     RollbackTrans();
@@ -1507,7 +1520,7 @@ namespace FastData.Context
         /// 执行sql
         /// </summary>
         /// <returns></returns>
-        public DataReturn ExecuteSql(string sql, DbParameter[] param = null, bool isTrans = false, bool isLog = false, bool IsProcedure = false)
+        public DataReturn ExecuteSql(string sql, DbParameter[] param = null, bool isTrans = false, bool isLog = false, bool IsProcedure = false,bool isAop=true)
         {
             var result = new DataReturn();
             try
@@ -1527,7 +1540,8 @@ namespace FastData.Context
                 if (param != null)
                     cmd.Parameters.AddRange(param);
 
-                AopBefore(null, sql, param?.ToList(), config, false);
+                if (isAop)
+                    AopBefore(null, sql, param?.ToList(), config, false,AopType.Execute_Sql_Bool);
 
                 result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, sql, IsProcedure);
 
@@ -1536,11 +1550,12 @@ namespace FastData.Context
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
 
-                AopAfter(null, sql, param?.ToList(), config, false, result.writeReturn.IsSuccess);
+                if (isAop)
+                    AopAfter(null, sql, param?.ToList(), config, false, AopType.Execute_Sql_Bool, result.writeReturn.IsSuccess);
             }
             catch (Exception ex)
             {
-                AopException(ex, "Excute Sql");
+                AopException(ex, "Excute Sql",config, AopType.Execute_Sql_Bool);
 
                 if (isTrans)
                     RollbackTrans();
