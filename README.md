@@ -115,6 +115,9 @@ FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config",new TestA
         param.Add(new OracleParameter { ParameterName = "userid", Value = "dd5c99f2-0892-4179-83db-c2ccf243104c" });
         var tt = FastMap.Query<TestResult>("Patient.Test", param.ToArray(), null, "test");
         
+        //Navigate
+        var data = FastRead.Query<TestResult>(a => a.USERID != "" , null , "OraDb").toList<TestResult>();
+        
         namespace Test1.Model
         {
             public class TestResult
@@ -139,12 +142,15 @@ FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config",new TestA
                 public DateTime? DELTIME { get; set; }
                 public string DELUSERID { get; set; }
                 public string DELUSERNAME { get; set; }
-                public List<BASE_AREA> area { get; set; }
-                public List<BASE_ROLE> role { get; set; }
+                
+                //Navigate
+                public virtual List<BASE_AREA> area { get; set; }
+                public virtual List<BASE_ROLE> role { get; set; }
             }
             
             public class BASE_ROLE
             {
+                [Navigate(Name = nameof(TestResult.ROLEID))]
                 public string ROLEID{ get; set; }
                 public string ROLENAME{ get; set; }
                 public string ROLEREMARK{ get; set; }
@@ -156,6 +162,7 @@ FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config",new TestA
             
             public class BASE_AREA
             {
+                [Navigate(Name = nameof(TestResult.AREAID))]
                 public string AREAID{ get; set; }
                 public string HOSPITALID{ get; set; }
                 public string AREANAME{ get; set; }
