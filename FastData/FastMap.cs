@@ -17,6 +17,7 @@ using System.Reflection;
 using FastData.Context;
 using System.Xml;
 using FastData.Aop;
+using FastData.Property;
 
 namespace FastData
 {
@@ -26,6 +27,29 @@ namespace FastData
     public static class FastMap
     {
         public static IFastAop fastAop;
+
+        #region 获取导航属性
+        /// <summary>
+        /// 获取导航属性
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private static NavigateModel GetNavigate(System.Type type)
+        {
+            var navigate = new NavigateModel();
+            type.GetProperties().ToList().ForEach(a =>
+            {
+                var attribute = a.GetCustomAttribute<NavigateAttribute>();
+                if (attribute != null)
+                {
+                    navigate.Appand = attribute.Appand;
+                    navigate.Name = a.Name;
+                    navigate.Key = attribute.Name;
+                }
+            });
+            return navigate;
+        }
+        #endregion
 
         #region 初始化model成员 1
         /// <summary>
@@ -51,13 +75,63 @@ namespace FastData
                     if (typeInfo.Namespace != null && typeInfo.Namespace == nameSpace)
                     {
                         var key = string.Format("{0}.{1}", typeInfo.Namespace, typeInfo.Name);
+                        var navigateKey = string.Format("{0}.navigate", key);
                         var cacheList = new List<PropertyModel>();
+                        var cacheNavigate = new List<NavigateModel>();
+
                         typeInfo.DeclaredProperties.ToList().ForEach(a => {
-                            var model = new PropertyModel();
-                            model.Name = a.Name;
-                            model.PropertyType = a.PropertyType;
-                            cacheList.Add(model);
+                            var navigateType = a.GetCustomAttribute<NavigateTypeAttribute>();
+                            if (navigateType != null && a.PropertyType == typeof(Dictionary<string, object>) && a.GetMethod.IsVirtual)
+                            {
+                                var navigate = GetNavigate(navigateType.Type);
+                                navigate.IsList = false;
+                                navigate.PropertyType = navigateType.Type;
+                                navigate.MemberName = a.Name;
+                                navigate.MemberType = a.PropertyType;
+                                if (!string.IsNullOrEmpty(navigate.Name))
+                                    cacheNavigate.Add(navigate);
+                            }
+                            else if (navigateType != null && a.PropertyType == typeof(List<Dictionary<string, object>>) && a.GetMethod.IsVirtual)
+                            {
+                                var navigate = GetNavigate(navigateType.Type);
+                                navigate.IsList = true;
+                                navigate.PropertyType = navigateType.Type;
+                                navigate.MemberName = a.Name;
+                                navigate.MemberType = a.PropertyType;
+                                if (!string.IsNullOrEmpty(navigate.Name))
+                                    cacheNavigate.Add(navigate);
+                            }
+                            else if (a.PropertyType.GetGenericArguments().Length > 0 && a.GetMethod.IsVirtual)
+                            {
+                                var navigate = GetNavigate(a.PropertyType.GenericTypeArguments[0]);
+                                navigate.IsList = true;
+                                navigate.PropertyType = a.PropertyType.GenericTypeArguments[0];
+                                navigate.MemberName = a.Name;
+                                navigate.MemberType = a.PropertyType;
+                                if (!string.IsNullOrEmpty(navigate.Name))
+                                    cacheNavigate.Add(navigate);
+                            }
+                            else if (a.GetMethod.IsVirtual)
+                            {
+                                var navigate = GetNavigate(a.PropertyType);
+                                navigate.IsList = false;
+                                navigate.PropertyType = a.PropertyType;
+                                navigate.MemberName = a.Name;
+                                navigate.MemberType = a.PropertyType;
+                                if (!string.IsNullOrEmpty(navigate.Name))
+                                    cacheNavigate.Add(navigate);
+                            }
+                            else
+                            {
+                                var model = new PropertyModel();
+                                model.Name = a.Name;
+                                model.PropertyType = a.PropertyType;
+                                cacheList.Add(model);
+                            }
                         });
+
+                        if (cacheNavigate.Count > 0)
+                            DbCache.Set<List<NavigateModel>>(config.CacheType, navigateKey, cacheNavigate);
 
                         DbCache.Set<List<PropertyModel>>(config.CacheType, key, cacheList);
                     }
@@ -906,7 +980,7 @@ namespace FastData
         #endregion
 
 
-
+        #region Aop Map Before
         /// <summary>
         /// Aop Map Before
         /// </summary>
@@ -931,7 +1005,9 @@ namespace FastData
                 fastAop.MapBefore(context);
             }
         }
+        #endregion
 
+        #region Aop Map After
         /// <summary>
         /// Aop Map After
         /// </summary>
@@ -957,6 +1033,7 @@ namespace FastData
                 fastAop.MapAfter(context);
             }
         }
+        #endregion
     }
 }
 
