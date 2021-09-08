@@ -1244,7 +1244,7 @@ namespace FastData.Repository
         #endregion
 
 
-
+        #region Aop Map Before
         /// <summary>
         /// Aop Map Before
         /// </summary>
@@ -1269,7 +1269,9 @@ namespace FastData.Repository
                 FastMap.fastAop.MapBefore(context);
             }
         }
+        #endregion
 
+        #region Aop Map After
         /// <summary>
         /// Aop Map After
         /// </summary>
@@ -1295,5 +1297,6 @@ namespace FastData.Repository
                 FastMap.fastAop.MapAfter(context);
             }
         }
+        #endregion
     }
 }
