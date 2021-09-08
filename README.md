@@ -150,6 +150,7 @@ FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config",new TestA
             
             public class BASE_ROLE
             {
+                //Navigate
                 [Navigate(Name = nameof(TestResult.ROLEID))]
                 public string ROLEID{ get; set; }
                 public string ROLENAME{ get; set; }
@@ -162,6 +163,7 @@ FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config",new TestA
             
             public class BASE_AREA
             {
+                //Navigate
                 [Navigate(Name = nameof(TestResult.AREAID))]
                 public string AREAID{ get; set; }
                 public string HOSPITALID{ get; set; }
