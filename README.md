@@ -145,7 +145,13 @@ FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config",new TestA
                 
                 //Navigate
                 public virtual List<BASE_AREA> area { get; set; }
-                public virtual List<BASE_ROLE> role { get; set; }
+                public virtual List<BASE_ROLE> role { get; set; }    
+                
+                [NavigateType(Type = typeof(BASE_ROLE))]
+                public virtual List<Dictionary<string, object>> roleList { get; set; }
+                                
+                [NavigateType(Type = typeof(BASE_ROLE))]
+                public virtual Dictionary<string, object> roleDic { get; set; }
             }
             
             public class BASE_ROLE
