@@ -73,7 +73,7 @@ namespace FastData.Context
                             var sql = new StringBuilder();
 
                             table.Add(a.PropertyType.Name);
-                            sql.AppendFormat("select * from {0} where {1}={2}{1}", a.PropertyType.Name, a.Name, config.Flag);
+                            sql.AppendFormat("select * from {0} where {1}={2}{1} ", a.PropertyType.Name, a.Name, config.Flag);
 
                             if (!string.IsNullOrEmpty(a.Appand) && a.Appand.ToLower().TrimStart().StartsWith("and"))
                                 sql.Append(a.Appand);
