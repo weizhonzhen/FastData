@@ -5,6 +5,7 @@ namespace FastData.Property
     /// <summary>
     /// 表属性
     /// </summary>
+    [AttributeUsage(AttributeTargets.Class)]
     public class TableAttribute : Attribute
     {
         /// <summary>

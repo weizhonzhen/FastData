@@ -5,6 +5,7 @@ namespace FastData.Property
     /// <summary>
     /// 字段属性
     /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
     public class ColumnAttribute : Attribute
     {
         /// <summary>
