@@ -37,7 +37,7 @@ namespace FastData.Repository
             this.Data.Predicate.Add(condtion);
             this.Data.Table.Add(string.Format("{2} {0}{3} {1}", typeof(T1).Name, predicate.Parameters[1].Name
             , joinType, isDblink && !string.IsNullOrEmpty(this.Data.Config.DbLinkName) ? string.Format("@", this.Data.Config.DbLinkName) : ""));
-
+            this.Data.TableName.Add(typeof(T1).Name);
             return this;
         }
         #endregion
