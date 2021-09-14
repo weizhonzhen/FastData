@@ -240,7 +240,7 @@ namespace FastData.Context
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
 
-                BaseAop.AopBefore(item.Table, sql.ToString(), param, config, true,AopType.Query_List_Lambda);
+                BaseAop.AopBefore(item.TableName, sql.ToString(), param, config, true,AopType.Query_List_Lambda);
 
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
@@ -258,7 +258,7 @@ namespace FastData.Context
                 dr.Close();
                 dr.Dispose();
 
-                BaseAop.AopAfter(item.Table, sql.ToString(), param, config, true, AopType.Query_List_Lambda, data);
+                BaseAop.AopAfter(item.TableName, sql.ToString(), param, config, true, AopType.Query_List_Lambda, data);
 
                 Navigate<T>(result, item.Config, false);
 
@@ -305,14 +305,14 @@ namespace FastData.Context
                     if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
-                    BaseAop.AopBefore(item.Table, sql.ToString(), param, config, true,AopType.Query_Page_Lambda_Model);
+                    BaseAop.AopBefore(item.TableName, sql.ToString(), param, config, true,AopType.Query_Page_Lambda_Model);
 
                     Dispose(cmd);
                     var dr = BaseExecute.ToPageDataReader(item, cmd, pModel, ref sql);
                     result.pageResult.list = BaseDataReader.ToList<T>(dr, item.Config, item.AsName);
                     result.sql = sql;
 
-                    BaseAop.AopAfter(item.Table, sql.ToString(), param, config, true, AopType.Query_Page_Lambda_Model, result.pageResult.list);
+                    BaseAop.AopAfter(item.TableName, sql.ToString(), param, config, true, AopType.Query_Page_Lambda_Model, result.pageResult.list);
 
                     dr.Close();
                     dr.Dispose();
@@ -366,7 +366,7 @@ namespace FastData.Context
                     if (pModel.PageId > pModel.TotalPage)
                         pModel.PageId = pModel.TotalPage;
 
-                    BaseAop.AopBefore(item.Table, sql.ToString(), param, config, true,AopType.Query_Page_Lambda_Dic);
+                    BaseAop.AopBefore(item.TableName, sql.ToString(), param, config, true,AopType.Query_Page_Lambda_Dic);
 
                     Dispose(cmd);
                     var dr = BaseExecute.ToPageDataReader(item, cmd, pModel, ref sql);
@@ -376,7 +376,7 @@ namespace FastData.Context
                     dr.Close();
                     dr.Dispose();
 
-                    BaseAop.AopAfter(item.Table, sql.ToString(), param, config, true, AopType.Query_Page_Lambda_Dic, result.PageResult.list);
+                    BaseAop.AopAfter(item.TableName, sql.ToString(), param, config, true, AopType.Query_Page_Lambda_Dic, result.PageResult.list);
                 }
                 else
                     result.PageResult.list = new List<Dictionary<string, object>>();
@@ -828,7 +828,7 @@ namespace FastData.Context
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
 
-                BaseAop.AopBefore(item.Table, sql.ToString(), param, config, true,AopType.Query_Dic_Lambda);
+                BaseAop.AopBefore(item.TableName, sql.ToString(), param, config, true,AopType.Query_Dic_Lambda);
 
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
@@ -846,7 +846,7 @@ namespace FastData.Context
                 dr.Close();
                 dr.Dispose();
 
-                BaseAop.AopAfter(item.Table, sql.ToString(), param, config, true, AopType.Query_Dic_Lambda, data);
+                BaseAop.AopAfter(item.TableName, sql.ToString(), param, config, true, AopType.Query_Dic_Lambda, data);
 
                 return result;
             }
@@ -920,7 +920,7 @@ namespace FastData.Context
                 if (param.Count != 0)
                     cmd.Parameters.AddRange(param.ToArray());
 
-                BaseAop.AopBefore(item.Table, sql.ToString(), param, config, true,AopType.Query_DataTable_Lambda);
+                BaseAop.AopBefore(item.TableName, sql.ToString(), param, config, true,AopType.Query_DataTable_Lambda);
 
                 var dr = BaseExecute.ToDataReader(cmd, sql.ToString());
 
@@ -929,7 +929,7 @@ namespace FastData.Context
                 dr.Close();
                 dr.Dispose();
 
-                BaseAop.AopAfter(item.Table, sql.ToString(), param, config, true, AopType.Query_DataTable_Lambda, result.Table);
+                BaseAop.AopAfter(item.TableName, sql.ToString(), param, config, true, AopType.Query_DataTable_Lambda, result.Table);
 
                 return result;
             }
