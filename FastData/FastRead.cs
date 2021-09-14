@@ -40,6 +40,7 @@ namespace FastData
             item.Predicate.Add(condtion);
             item.Table.Add(string.Format("{2} {0}{3} {1}", typeof(T1).Name, predicate.Parameters[1].Name
             , joinType, isDblink && !string.IsNullOrEmpty(item.Config.DbLinkName) ? string.Format("@", item.Config.DbLinkName) : ""));
+            item.TableName.Add(typeof(T1).Name);
 
             return item;
         }
