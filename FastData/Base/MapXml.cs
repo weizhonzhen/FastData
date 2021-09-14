@@ -937,14 +937,7 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                if (FastMap.fastAop != null)
-                {
-                    var context = new ExceptionContext();
-                    context.ex = ex;
-                    context.name = "Parsing xml";
-                    context.type = AopType.ParsingXml;
-                    FastMap.fastAop.Exception(context);
-                }
+                BaseAop.AopException(ex, "Parsing xml", config, AopType.ParsingXml);
 
                 if (config.SqlErrorType == SqlErrorType.Db)
                     DbLogTable.LogException(config, ex, "InstanceMap", "GetXmlList");
