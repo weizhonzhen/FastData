@@ -137,6 +137,19 @@ namespace FastData.Repository
         }
         #endregion
 
+        #region 是否过滤
+        /// <summary>
+        /// 是否过滤
+        /// </summary>
+        /// <param name="isFilter"></param>
+        /// <returns></returns>
+        public override IQuery Filter(bool isFilter = true)
+        {
+            this.Data.IsFilter = isFilter;
+            return this;
+        }
+        #endregion
+
 
         #region 返回list
         /// <summary>

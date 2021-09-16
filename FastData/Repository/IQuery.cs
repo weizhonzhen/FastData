@@ -22,6 +22,8 @@ namespace FastData.Repository
 
         public abstract IQuery Take(int i);
 
+        public abstract IQuery Filter(bool isFilter = true);
+
         public abstract string ToJson(DataContext db = null, bool isOutSql = false);
 
         public abstract Task<string> ToJsonAsy(DataContext db = null, bool isOutSql = false);
