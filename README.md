@@ -118,6 +118,13 @@ FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config",new TestA
         //Navigate
         var data = FastRead.Query<TestResult>(a => a.USERID != "" , null , "OraDb").toList<TestResult>();
         
+         //Filter
+        FastMap.AddFastFilter<TestResult>(a => a.USERID != "", FilterType.Query_Page_Lambda_Model);
+        FastMap.AddFastFilter<BASE_AREA>(a => a.HOSPITALID != "", FilterType.Query_Page_Lambda_Model);
+        
+        var data1 = IFast.Query<TestResult>(a => a.ORGID == "1",null,"OraDb").ToPage<TestResult>(page);
+        var data2 = IFast.Query<TestResult>(a => a.ORGID == "1",null,"OraDb").Filter(false).ToPage<TestResult>(page);
+        
         namespace Test1.Model
         {
             public class TestResult
