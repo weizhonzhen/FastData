@@ -18,6 +18,8 @@ using FastData.Context;
 using System.Xml;
 using FastData.Aop;
 using FastData.Property;
+using System.Linq.Expressions;
+using FastData.Filter;
 
 namespace FastData
 {
@@ -27,6 +29,7 @@ namespace FastData
     public static class FastMap
     {
         public static IFastAop fastAop;
+        private static string configKey = Guid.NewGuid().ToString();
 
         #region 获取导航属性
         /// <summary>
@@ -60,7 +63,9 @@ namespace FastData
         /// <param name="dll">dll名称</param>
         public static void InstanceProperties(string nameSpace, string dbFile = "db.config", IFastAop aop = null)
         {
-            fastAop = aop;
+            if (aop != null)
+                fastAop = aop;
+
             var projectName = Assembly.GetCallingAssembly().GetName().Name;
             FastRedis.RedisInfo.Init(dbFile, projectName);
             var config = DataConfig.GetConfig(null, projectName, dbFile);
@@ -149,7 +154,9 @@ namespace FastData
         /// <param name="dll">dll名称</param>
         public static void InstanceTable(string nameSpace, string dbKey = null, string dbFile = "db.config", IFastAop aop = null)
         {
-            fastAop = aop;
+            if (aop != null)
+                fastAop = aop;
+
             var projectName = Assembly.GetCallingAssembly().GetName().Name;
             FastRedis.RedisInfo.Init(dbFile, projectName);
             var query = new DataQuery();
@@ -176,10 +183,14 @@ namespace FastData
         #region 初始化map 3  by Resource
         public static void InstanceMapResource(string dbKey = null, string dbFile = "db.config", string mapFile = "SqlMap.config", IFastAop aop =null)
         {
-            fastAop = aop;
+            if (aop != null)
+                fastAop = aop;
+
             var projectName = Assembly.GetCallingAssembly().GetName().Name;
             FastRedis.RedisInfo.Init(dbFile, projectName);
             var config = DataConfig.GetConfig(dbKey, projectName, dbFile);
+            DbCache.Set<ConfigModel>(CacheType.Web, configKey, config);
+
             using (var db = new DataContext(dbKey))
             {
                 var assembly = Assembly.Load(projectName);
@@ -253,10 +264,14 @@ namespace FastData
         /// </summary>
         /// <returns></returns>
         public static void InstanceMap(string dbKey = null, string dbFile = "db.config", string mapFile = "SqlMap.config", IFastAop aop = null)
-        {        
-            fastAop = aop;
+        {
+            if (aop != null)
+                fastAop = aop;
+
             var list = MapConfig.GetConfig(mapFile);
             var config = DataConfig.GetConfig(dbKey, null, dbFile);
+            DbCache.Set<ConfigModel>(CacheType.Web, configKey, config);
+
             using (var db = new DataContext(dbKey))
             {
                 var query = new DataQuery { Config = config, Key = dbKey };
@@ -318,6 +333,23 @@ namespace FastData
         }
         #endregion
 
+        #region 增加过滤器
+        public static void AddFastFilter<T>(Expression<Func<T, bool>> predicate, FilterType type)
+        {
+            var config = DbCache.Get<ConfigModel>(CacheType.Web, configKey);
+            var model = VisitExpression.LambdaWhere<T>(predicate, config);
+
+            if (predicate.Parameters.Count > 0)
+            {
+                var flag = string.Format("{0}.", (predicate.Parameters[0] as ParameterExpression).Name);
+                model.Where = model.Where.Replace(flag, "");
+            }
+
+            var key = $"Filter.{typeof(T).Name}.{type.ToString()}";
+            DbCache.Set<VisitModel>(CacheType.Web, key, model);
+        }
+        #endregion
+
 
         #region maq 执行返回结果
         /// <summary>
@@ -335,7 +367,7 @@ namespace FastData
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
 
-                AopMapBefore(name, sql, param, config,AopType.Map_List_Model);
+                BaseAop.AopMapBefore(name, sql, param, config,AopType.Map_List_Model);
 
                 var result = FastRead.ExecuteSql<T>(sql, param, db, key, isOutSql);
                 if (MapXml.MapIsForEach(name, config))
@@ -354,14 +386,14 @@ namespace FastData
                         result = MapXml.MapForEach<T>(result, name, db, config);
                 }
 
-                AopMapAfter(name, sql, param, config, AopType.Map_List_Model, result);
+                BaseAop.AopMapAfter(name, sql, param, config, AopType.Map_List_Model, result);
                 return result;
             }
             else
             {
-                AopMapBefore(name, "", param, config, AopType.Map_List_Model);
+                BaseAop.AopMapBefore(name, "", param, config, AopType.Map_List_Model);
                 var data = new List<T>();
-                AopMapAfter(name, "", param, config, AopType.Map_List_Model, data);
+                BaseAop.AopMapAfter(name, "", param, config, AopType.Map_List_Model, data);
 
                 return data;
             }
@@ -421,15 +453,15 @@ namespace FastData
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
 
-                AopMapBefore(name, sql, param, config, AopType.Map_Write);
+                BaseAop.AopMapBefore(name, sql, param, config, AopType.Map_Write);
 
                 return FastWrite.ExecuteSql(sql, param, db, key, isOutSql);
             }
             else
             {
-                AopMapBefore(name, "", param, config, AopType.Map_Write);
+                BaseAop.AopMapBefore(name, "", param, config, AopType.Map_Write);
                 var data = new WriteReturn();
-                AopMapAfter(name, "", param, config,AopType.Map_Write,data.IsSuccess);
+                BaseAop.AopMapAfter(name, "", param, config,AopType.Map_Write,data.IsSuccess);
                 return data;
             }
         }
@@ -488,7 +520,7 @@ namespace FastData
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
 
-                AopMapBefore(name, sql, param, config,AopType.Map_List_Dic);
+                BaseAop.AopMapBefore(name, sql, param, config,AopType.Map_List_Dic);
 
                 var result = FastRead.ExecuteSql(sql, param, db, key, isOutSql);
 
@@ -508,14 +540,14 @@ namespace FastData
                         result = MapXml.MapForEach(result, name, db, key, config);
                 }
 
-                AopMapAfter(name, sql, param, config, AopType.Map_List_Dic, result);
+                BaseAop.AopMapAfter(name, sql, param, config, AopType.Map_List_Dic, result);
                 return result;
             }
             else
             {
-                AopMapBefore(name, "", param, config, AopType.Map_List_Dic);
+                BaseAop.AopMapBefore(name, "", param, config, AopType.Map_List_Dic);
                 var data = new List<Dictionary<string, object>>();
-                AopMapAfter(name, "", param, config, AopType.Map_List_Dic, data);
+                BaseAop.AopMapAfter(name, "", param, config, AopType.Map_List_Dic, data);
                 return data;
             }
         }
@@ -607,7 +639,7 @@ namespace FastData
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
 
-                AopMapBefore(name, sql, param, config,AopType.Map_Page_Dic);
+                BaseAop.AopMapBefore(name, sql, param, config,AopType.Map_Page_Dic);
 
                 var result = ExecuteSqlPage(pModel, sql, param, db, key, isOutSql);
 
@@ -627,14 +659,14 @@ namespace FastData
                         result.list = MapXml.MapForEach(result.list, name, db, key, config);
                 }
 
-                AopMapAfter(name, sql, param, config, AopType.Map_Page_Dic, result.list);
+                BaseAop.AopMapAfter(name, sql, param, config, AopType.Map_Page_Dic, result.list);
                 return result;
             }
             else
             {
-                AopMapBefore(name, "", param, config, AopType.Map_Page_Dic);
+                BaseAop.AopMapBefore(name, "", param, config, AopType.Map_Page_Dic);
                 var data = new PageResult();
-                AopMapAfter(name, "", param, config, AopType.Map_Page_Dic, data.list);
+                BaseAop.AopMapAfter(name, "", param, config, AopType.Map_Page_Dic, data.list);
                 return data;
             }
         }
@@ -726,7 +758,7 @@ namespace FastData
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
 
-                AopMapBefore(name, sql, param, config,AopType.Map_Page_Model);
+                BaseAop.AopMapBefore(name, sql, param, config,AopType.Map_Page_Model);
 
                 var result = ExecuteSqlPage<T>(pModel, sql, param, db, key, isOutSql);
 
@@ -745,14 +777,14 @@ namespace FastData
                     else
                         result.list = MapXml.MapForEach<T>(result.list, name, db, config);
                 }
-                AopMapAfter(name, sql, param, config, AopType.Map_Page_Model, result.list);
+                BaseAop.AopMapAfter(name, sql, param, config, AopType.Map_Page_Model, result.list);
                 return result;
             }
             else
             {
-                AopMapBefore(name, "", param, config, AopType.Map_Page_Model);
+                BaseAop.AopMapBefore(name, "", param, config, AopType.Map_Page_Model);
                 var data = new PageResult<T>();
-                AopMapAfter(name, "", param, config, AopType.Map_Page_Model, data.list);
+                BaseAop.AopMapAfter(name, "", param, config, AopType.Map_Page_Model, data.list);
                 return data;
             }
         }
@@ -976,62 +1008,6 @@ namespace FastData
         public static ConfigModel DbConfig(string name)
         {
             return DataConfig.GetConfig(name);
-        }
-        #endregion
-
-
-        #region Aop Map Before
-        /// <summary>
-        /// Aop Map Before
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="name"></param>
-        /// <param name="param"></param>
-        /// <param name="config"></param>
-        private static void AopMapBefore(string mapName, string sql, DbParameter[] param, ConfigModel config, AopType type)
-        {
-            if (fastAop != null)
-            {
-                var context = new MapBeforeContext();
-                context.mapName = mapName;
-                context.sql = sql;
-                context.type = type;
-
-                if (param != null)
-                    context.param = param.ToList();
-
-                context.dbType = config.DbType;
-
-                fastAop.MapBefore(context);
-            }
-        }
-        #endregion
-
-        #region Aop Map After
-        /// <summary>
-        /// Aop Map After
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="name"></param>
-        /// <param name="param"></param>
-        /// <param name="config"></param>
-        private static void AopMapAfter(string mapName, string sql, DbParameter[] param, ConfigModel config, AopType type, object data)
-        {
-            if (fastAop != null)
-            {
-                var context = new MapAfterContext();
-                context.mapName = mapName;
-                context.sql = sql;
-                context.type = type;
-
-                if (param != null)
-                    context.param = param.ToList();
-
-                context.dbType = config.DbType;
-                context.result = data;
-
-                fastAop.MapAfter(context);
-            }
         }
         #endregion
     }

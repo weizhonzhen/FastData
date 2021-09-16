@@ -69,6 +69,7 @@ namespace FastData
             var condtion = VisitExpression.LambdaWhere<T>(predicate, result.Config);
             result.Predicate.Add(condtion);
             result.Table.Add(string.Format("{0} {1}", typeof(T).Name, predicate.Parameters[0].Name));
+            result.TableName.Add(typeof(T).Name);
 
             return result;
         }
