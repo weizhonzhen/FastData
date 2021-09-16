@@ -58,6 +58,11 @@ namespace FastData.Model
         /// 表名
         /// </summary>
         internal List<string> TableName { set; get; } = new List<string>();
+
+        /// <summary>
+        /// 过滤
+        /// </summary>
+        internal bool IsFilter { get; set; } = true;
     }
     #endregion
 }
