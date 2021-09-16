@@ -14,6 +14,7 @@ using System.Data;
 using FastData.Property;
 using FastData.Aop;
 using FastData.CacheModel;
+using FastData.Filter;
 
 namespace FastData.Context
 {
@@ -227,6 +228,9 @@ namespace FastData.Context
                 if (item.Predicate[0].Param.Count != 0)
                     param.AddRange(item.Predicate[0].Param);
 
+                if (item.IsFilter)
+                    BaseFilter.Filter(param, FilterType.Query_List_Lambda, item.TableName, item.Config, sql);
+
                 if (item.GroupBy.Count > 0)
                     sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
 
@@ -293,7 +297,7 @@ namespace FastData.Context
                 pModel.StarId = (pModel.PageId - 1) * pModel.PageSize + 1;
                 pModel.EndId = pModel.PageId * pModel.PageSize;
                 Dispose(cmd);
-                pModel.TotalRecord = BaseExecute.ToPageCount(item, cmd, ref sql);
+                pModel.TotalRecord = BaseExecute.ToPageCount(item, cmd, ref sql,FilterType.Query_Page_Lambda_Model);
 
                 if (pModel.TotalRecord > 0)
                 {
@@ -308,7 +312,7 @@ namespace FastData.Context
                     BaseAop.AopBefore(item.TableName, sql.ToString(), param, config, true,AopType.Query_Page_Lambda_Model);
 
                     Dispose(cmd);
-                    var dr = BaseExecute.ToPageDataReader(item, cmd, pModel, ref sql);
+                    var dr = BaseExecute.ToPageDataReader(item, cmd, pModel, ref sql, FilterType.Query_Page_Lambda_Model);
                     result.pageResult.list = BaseDataReader.ToList<T>(dr, item.Config, item.AsName);
                     result.sql = sql;
 
@@ -354,7 +358,7 @@ namespace FastData.Context
                 pModel.StarId = (pModel.PageId - 1) * pModel.PageSize + 1;
                 pModel.EndId = pModel.PageId * pModel.PageSize;
                 Dispose(cmd);
-                pModel.TotalRecord = BaseExecute.ToPageCount(item, cmd, ref sql);
+                pModel.TotalRecord = BaseExecute.ToPageCount(item, cmd, ref sql,FilterType.Query_Page_Lambda_Dic);
 
                 if (pModel.TotalRecord > 0)
                 {
@@ -369,7 +373,7 @@ namespace FastData.Context
                     BaseAop.AopBefore(item.TableName, sql.ToString(), param, config, true,AopType.Query_Page_Lambda_Dic);
 
                     Dispose(cmd);
-                    var dr = BaseExecute.ToPageDataReader(item, cmd, pModel, ref sql);
+                    var dr = BaseExecute.ToPageDataReader(item, cmd, pModel, ref sql,FilterType.Query_Page_Lambda_Dic);
                     result.PageResult.list = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle);
                     result.Sql = sql;
 
@@ -413,7 +417,7 @@ namespace FastData.Context
                 pModel.StarId = (pModel.PageId - 1) * pModel.PageSize + 1;
                 pModel.EndId = pModel.PageId * pModel.PageSize;
                 Dispose(cmd);
-                pModel.TotalRecord = BaseExecute.ToPageCountSql(param, cmd, sql, config, ref countSql);
+                pModel.TotalRecord = BaseExecute.ToPageCountSql(param, cmd, sql, config, ref countSql,FilterType.Query_Page_Lambda_Dic,null);
 
                 if (pModel.TotalRecord > 0)
                 {
@@ -429,7 +433,7 @@ namespace FastData.Context
                         BaseAop.AopBefore(null, sql.ToString(), param?.ToList(), config, true,AopType.Query_Page_Lambda_Dic);
 
                     Dispose(cmd);
-                    var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql);
+                    var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql, FilterType.Query_Page_Lambda_Dic, null);
 
                     result.PageResult.list = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle);
                     result.Sql = string.Format("count:{0},page:{1}", countSql, pageSql);
@@ -475,7 +479,7 @@ namespace FastData.Context
                 pModel.StarId = (pModel.PageId - 1) * pModel.PageSize + 1;
                 pModel.EndId = pModel.PageId * pModel.PageSize;
                 Dispose(cmd);
-                pModel.TotalRecord = BaseExecute.ToPageCountSql(param, cmd, sql, config, ref countSql);
+                pModel.TotalRecord = BaseExecute.ToPageCountSql(param, cmd, sql, config, ref countSql,FilterType.Query_Page_Lambda_Model, typeof(T).Name);
 
                 if (pModel.TotalRecord > 0)
                 {
@@ -491,7 +495,7 @@ namespace FastData.Context
                         BaseAop.AopBefore(null, sql.ToString(), param?.ToList(), config, true,AopType.Query_Page_Lambda_Model);
 
                     Dispose(cmd);
-                    var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql);
+                    var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql, FilterType.Query_Page_Lambda_Model, typeof(T).Name);
 
                     result.pageResult.list = BaseDataReader.ToList<T>(dr, config, null);
                     result.sql = string.Format("count:{0},page:{1}", countSql, pageSql);
@@ -563,6 +567,9 @@ namespace FastData.Context
                 if (item.Predicate[0].Param.Count != 0)
                     param.AddRange(item.Predicate[0].Param);
 
+                if (item.IsFilter)
+                    BaseFilter.Filter(param, FilterType.Query_Json_Lambda, item.TableName, item.Config, sql);
+
                 if (item.GroupBy.Count > 0)
                     sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
 
@@ -633,6 +640,9 @@ namespace FastData.Context
                         param.AddRange(item.Predicate[0].Param);
                 }
 
+                if (item.IsFilter)
+                    BaseFilter.Filter(param, FilterType.Query_Count_Lambda, item.TableName, item.Config, sql);
+
                 if (item.GroupBy.Count > 0)
                     sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
 
@@ -680,8 +690,11 @@ namespace FastData.Context
         public DataReturn<T> ExecuteSql<T>(string sql, DbParameter[] param=null) where T : class,new()
         {
             var result = new DataReturn<T>();
+            var tableName = new List<string>();
             try
             {
+                tableName.Add(typeof(T).Name);
+
                 if (param != null)
                     result.sql = ParameterToSql.ObjectParamToSql(param.ToList(), sql, config);
                 else
@@ -692,7 +705,9 @@ namespace FastData.Context
                 if (param != null)
                     cmd.Parameters.AddRange(param.ToArray());
 
-                BaseAop.AopBefore(null, sql.ToString(), param?.ToList(), config, true,AopType.Execute_Sql_Model);
+                BaseAop.AopBefore(tableName, sql.ToString(), param?.ToList(), config, true,AopType.Execute_Sql_Model);
+
+                BaseFilter.Filter(param, FilterType.Execute_Sql_Model, tableName, config, ref sql);
 
                 var dr = BaseExecute.ToDataReader(cmd, sql);
 
@@ -701,7 +716,7 @@ namespace FastData.Context
                 dr.Close();
                 dr.Dispose();
 
-                BaseAop.AopAfter(null, sql.ToString(), param?.ToList(), config, true, AopType.Execute_Sql_Model, result.list);
+                BaseAop.AopAfter(tableName, sql.ToString(), param?.ToList(), config, true, AopType.Execute_Sql_Model, result.list);
             }
             catch (Exception ex)
             {
@@ -815,6 +830,9 @@ namespace FastData.Context
                 if (item.Predicate[0].Param.Count != 0)
                     param.AddRange(item.Predicate[0].Param);
 
+                if (item.IsFilter)
+                    BaseFilter.Filter(param, FilterType.Query_Dic_Lambda, item.TableName, item.Config, sql);
+
                 if (item.GroupBy.Count > 0)
                     sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
 
@@ -906,6 +924,9 @@ namespace FastData.Context
 
                 if (item.Predicate[0].Param.Count != 0)
                     param.AddRange(item.Predicate[0].Param);
+
+                if (item.IsFilter)
+                    BaseFilter.Filter(param, FilterType.Query_DataTable_Lambda, item.TableName, item.Config, sql);
 
                 if (item.GroupBy.Count > 0)
                     sql.AppendFormat(" group by {0}", string.Join(",", item.GroupBy));
