@@ -20,6 +20,7 @@ using FastData.Aop;
 using FastData.Property;
 using System.Linq.Expressions;
 using FastData.Filter;
+using FastData.Proxy;
 
 namespace FastData
 {
@@ -330,6 +331,83 @@ namespace FastData
                     }
                 });
             }
+        }
+        #endregion
+
+        #region 初始化 interface service
+        public static void InstanceService( string nameSpace)
+        {
+            var config = DataConfig.GetConfig();
+            Assembly.GetCallingAssembly().ExportedTypes.ToList().ForEach(a =>
+            {
+                if (a.Namespace == nameSpace)
+                {
+                    a.GetMethods().ToList().ForEach(m =>
+                    {
+                        var model = new ServiceModel();
+                        var read = m.GetCustomAttribute<FastReadAttribute>();
+                        var write = m.GetCustomAttribute<FastWriteAttribute>();
+
+                        if (read != null)
+                        {
+                            model.isWrite = false;
+                            model.sql = read.sql.ToLower();
+                            model.dbKey = read.dbKey;
+
+                            if (m.ReturnType == typeof(Dictionary<string, object>))
+                                model.isList = false;
+                            else if (m.ReturnType == typeof(List<Dictionary<string, object>>))
+                                model.isList = true;
+                            else
+                            {
+                                model.isList = m.ReturnType.GetGenericArguments().Length > 0;
+                                System.Type argType;
+
+                                if (model.isList)
+                                    argType = m.ReturnType.GetGenericArguments()[0];
+                                else
+                                    argType = m.ReturnType;
+
+                                if ((argType.IsPrimitive || argType.Equals(typeof(string)) || argType.Equals(typeof(decimal)) || argType.Equals(typeof(DateTime))))
+                                    throw new Exception($"FastReadAttribute[service:{a.Name}, method:{m.Name}, return type:{m.ReturnType} is not support]");
+                            }
+
+                            model.type = m.ReturnType;
+
+                            for (int i = 0; i < m.GetParameters().Length; i++)
+                            {
+                                model.param.Add(i.ToString(), m.GetParameters()[i].Name.ToLower());
+                            }
+
+                            if (m.ReturnType.IsPrimitive || m.ReturnType.Equals(typeof(string)) || m.ReturnType.Equals(typeof(decimal)) || m.ReturnType.Equals(typeof(DateTime)))
+                                throw new Exception($"FastReadAttribute[service:{a.Name}, method:{m.Name}, return type:{m.ReturnType} is not support]");
+
+                            var key = string.Format("{0}.{1}", a.Name, m.Name);
+                            DbCache.Set<ServiceModel>(config.CacheType, key, model);
+                        }
+
+                        if (write != null)
+                        {
+                            if (m.ReturnType != typeof(WriteReturn))
+                                throw new Exception($"FastWriteAttribute[return type only WriteReturn, service:{a.Name}, method:{m.Name}, return type:{m.ReturnType} is not support]");
+
+                            model.isWrite = true;
+                            model.sql = write.sql.ToLower();
+                            model.dbKey = write.dbKey;
+                            model.type = m.ReturnType;
+                            model.isList = false;
+
+                            for (int i = 0; i < m.GetParameters().Length; i++)
+                            {
+                                model.param.Add(i.ToString(), m.GetParameters()[i].Name.ToLower());
+                            }
+
+                            var key = string.Format("{0}.{1}", a.Name, m.Name);
+                            DbCache.Set<ServiceModel>(config.CacheType, key, model);
+                        }
+                    });
+                }
+            });
         }
         #endregion
 
@@ -826,6 +904,21 @@ namespace FastData
         }
         #endregion
 
+
+        #region 服务实例
+        /// <summary>
+        /// 服务实例
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T Resolve<T>()
+        {
+            var handler = new ProxyHandler();
+            return FastProxy.Invoke<T>(handler);
+        }
+        #endregion
+
+
         #region 验证xml
         /// <summary>
         /// 验证xml
@@ -1012,4 +1105,3 @@ namespace FastData
         #endregion
     }
 }
-

@@ -78,6 +78,7 @@
     <Compile Include="Base\MapXml.cs" />
     <Compile Include="Base\Provider.cs" />
     <Compile Include="CacheModel\NavigateModel.cs" />
+    <Compile Include="CacheModel\ServiceModel.cs" />
     <Compile Include="Check\CheckModel.cs" />
     <Compile Include="Base\Config.cs" />
     <Compile Include="Base\Parameter.cs" />
@@ -120,10 +121,15 @@
     <Compile Include="Property\ColumnAttribute.cs" />
     <Compile Include="Property\DynamicGet.cs" />
     <Compile Include="Property\DynamicSet.cs" />
+    <Compile Include="Property\FastReadAttribute.cs" />
+    <Compile Include="Property\FastWriteAttribute.cs" />
     <Compile Include="Property\NavigateAttribute.cs" />
     <Compile Include="Property\NavigateTypeAttribute.cs" />
     <Compile Include="Property\PropertyCache.cs" />
     <Compile Include="Property\TableAttribute.cs" />
+    <Compile Include="Proxy\FastProxy.cs" />
+    <Compile Include="Proxy\IProxyHandler.cs" />
+    <Compile Include="Proxy\ProxyHandler.cs" />
     <Compile Include="Repository\FastRepository.cs" />
     <Compile Include="Repository\IFastRepository.cs" />
     <Compile Include="Repository\IQuery.cs" />
