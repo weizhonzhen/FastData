@@ -43,6 +43,9 @@ FastMap.InstanceMap(dbkey,"SqlMap.config","db.config",new TestAop());
 //init map cache by Resource （xml file，SqlMap.config,db.config ,new TestAop()）
 FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config",new TestAop());
 
+//init  interface service
+FastMap.InstanceService("Test1.Service");
+
 //by Repository
  services.AddTransient<IFastRepository, FastRepository>();
  services.AddTransient<IRedisRepository, RedisRepository>();
@@ -223,7 +226,7 @@ interface  Service
         }
         
 ```
-//map.config
+map.config
 ```csharp
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
@@ -236,9 +239,6 @@ interface  Service
       <Add File="map/map.xml"/>
     </SqlMap>
   </MapConfig>
-</configuration>
-
- 
- 
+</configuration> 
 
 ```
