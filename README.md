@@ -70,7 +70,6 @@ interface  Service
         WriteReturn update(string userName, string userId);
     }
 
-//ioc  
  var testService = FastMap.Resolve<TestService>();
  var write = testService.update("管理员", "admin");
  var readDic = testService.readDic("admin", "101");
@@ -81,6 +80,7 @@ interface  Service
  ```   
 
 //web.config or db.config
+```csharp
 <configSections>
     <section name="DataConfig" type="FastData.Config.DataConfig,FastData" />
 </configSections>
