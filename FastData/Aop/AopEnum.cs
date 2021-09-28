@@ -39,6 +39,8 @@ namespace FastData.Aop
         ParsingXml =26,
         CodeFirst=27,
 
-        Navigate = 28
+        Navigate = 28,
+        FastRead = 29,
+        FaseWrite = 30
     }
 }
