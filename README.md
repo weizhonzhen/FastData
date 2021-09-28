@@ -75,8 +75,7 @@ interface  Service
  var readDic = testService.readDic("admin", "101");
  var readListDic = testService.readListDic("admin", "101");
  var readModel = testService.readModel("admin", "101");
- var readListModel = testService.readListModel("admin", "101");
-            
+ var readListModel = testService.readListModel("admin", "101");  
  ```   
 
 //web.config or db.config
@@ -99,8 +98,9 @@ interface  Service
       <Add ConnStr="connstr" IsOutSql="true" IsOutError="true" DesignModel="CodeFirst"  SqlErrorType="file" CacheType="redis"  Key="SqlDb" />
    </SqlServer>
  </DataConfig>
- 
- //map xml
+ ``` 
+ map xml
+ ```csharp
         <?xml version="1.0" encoding="utf-8" ?>
           <sqlMap>
             <select id="GetUser" log="true">
