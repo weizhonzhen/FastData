@@ -49,7 +49,7 @@ FastData.FastMap.InstanceMapResource(dbkey,"db.config","SqlMap.config",new TestA
  
  //redis by Resource db.config
  FastRedis.RedisInfo.Init("db.config")
-
+```
 interface  Service            
 ```csharp
     public interface TestService
