@@ -17,6 +17,7 @@ using System.IO;
 using System.Linq.Expressions;
 using FastData.Config;
 using FastData.Aop;
+using FastData.Proxy;
 
 namespace FastData.Repository
 {
@@ -1186,6 +1187,19 @@ namespace FastData.Repository
         }
         #endregion
 
+
+        #region 服务实例
+        /// <summary>
+        /// 服务实例
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T Resolve<T>()
+        {
+            var handler = new ProxyHandler();
+            return FastProxy.Invoke<T>(handler);
+        }
+        #endregion
 
         #region 表查询
         /// <summary>

@@ -51,6 +51,8 @@ namespace FastData.Repository
 
         Task<Lazy<PageResult<T>>> QueryPageLazyAsy<T>(PageModel pModel, string name, DbParameter[] param, DataContext db = null, string key = null, bool isOutSql = false) where T : class, new();
 
+        T Resolve<T>();
+
         string MapDb(string name, bool isMapDb = false);
 
         List<string> MapParam(string name);
