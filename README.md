@@ -1,11 +1,10 @@
 ```csharp
-# Data_Orm
-lambda,map orm,(code first ,db first)
 code firest ,db first ,map
 nuget url : https://www.nuget.org/packages/Fast.Data/
 in Application_Start method
-
-//aop by EventHandler
+```
+aop
+```csharp
     public class TestAop : IFastAop
     {
         public void After(AfterContext context)
@@ -33,7 +32,10 @@ in Application_Start method
             throw new NotImplementedException();
          }
     }
-    
+```
+start config
+```csharp
+
 //cache model
 FastMap.InstanceProperties(namespace, "db.config",new TestAop());
 
