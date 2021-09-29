@@ -493,5 +493,15 @@ namespace FastUntility.Base
             return HtmlString;
         }
         #endregion
+
+        #region 是不是基本类型
+        public static bool isSysType(this System.Type type)
+        {
+            if (type.IsPrimitive || type.Equals(typeof(string)) || type.Equals(typeof(decimal)) || type.Equals(typeof(DateTime)))
+                return true;
+            else
+                return false;
+        }
+        #endregion
     }
 }
