@@ -81,9 +81,9 @@ namespace FastData.Repository
 
         string MapDate(string name, string param);
 
-        string MapCheckMap(string name, string param);
+        string MapCheck(string name, string param);
 
-        string MapExistsMap(string name, string param);
+        string MapExists(string name, string param);
 
         ConfigModel DbConfig(string name);
 
