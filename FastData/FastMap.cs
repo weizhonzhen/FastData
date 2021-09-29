@@ -1112,7 +1112,7 @@ namespace FastData
         /// <param name="name"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static string MapCheckMap(string name, string param)
+        public static string MapCheck(string name, string param)
         {
             return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.{1}.checkmap", name.ToLower(), param.ToLower()));
         }
@@ -1125,7 +1125,7 @@ namespace FastData
         /// <param name="name"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static string MapExistsMap(string name, string param)
+        public static string MapExists(string name, string param)
         {
             return DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.{1}.existsmap", name.ToLower(), param.ToLower()));
         }
