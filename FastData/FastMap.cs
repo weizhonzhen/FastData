@@ -337,13 +337,13 @@ namespace FastData
         #region 初始化 interface service
         public static void InstanceService( string nameSpace)
         {
-            var config = DataConfig.GetConfig();
             Assembly.GetCallingAssembly().ExportedTypes.ToList().ForEach(a =>
             {
                 if (a.Namespace == nameSpace)
                 {
                     a.GetMethods().ToList().ForEach(m =>
                     {
+                        ConfigModel config = new ConfigModel();
                         var model = new ServiceModel();
                         var read = m.GetCustomAttribute<FastReadAttribute>();
                         var write = m.GetCustomAttribute<FastWriteAttribute>();
@@ -353,6 +353,7 @@ namespace FastData
                             model.isWrite = false;
                             model.sql = read.sql.ToLower();
                             model.dbKey = read.dbKey;
+                            config = DataConfig.GetConfig(model.dbKey);
 
                             if (m.ReturnType == typeof(Dictionary<string, object>))
                                 model.isList = false;
@@ -368,19 +369,15 @@ namespace FastData
                                 else
                                     argType = m.ReturnType;
 
-                                if ((argType.IsPrimitive || argType.Equals(typeof(string)) || argType.Equals(typeof(decimal)) || argType.Equals(typeof(DateTime))))
+                                if (argType.isSysType())
                                     throw new Exception($"FastReadAttribute[service:{a.Name}, method:{m.Name}, return type:{m.ReturnType} is not support]");
                             }
 
-                            model.type = m.ReturnType;
-
-                            for (int i = 0; i < m.GetParameters().Length; i++)
-                            {
-                                model.param.Add(i.ToString(), m.GetParameters()[i].Name.ToLower());
-                            }
-
-                            if (m.ReturnType.IsPrimitive || m.ReturnType.Equals(typeof(string)) || m.ReturnType.Equals(typeof(decimal)) || m.ReturnType.Equals(typeof(DateTime)))
+                            if (m.ReturnType.isSysType())
                                 throw new Exception($"FastReadAttribute[service:{a.Name}, method:{m.Name}, return type:{m.ReturnType} is not support]");
+
+                            model.type = m.ReturnType;
+                            ServiceParam(m, model, config);
 
                             var key = string.Format("{0}.{1}", a.Name, m.Name);
                             DbCache.Set<ServiceModel>(config.CacheType, key, model);
@@ -396,11 +393,8 @@ namespace FastData
                             model.dbKey = write.dbKey;
                             model.type = m.ReturnType;
                             model.isList = false;
-
-                            for (int i = 0; i < m.GetParameters().Length; i++)
-                            {
-                                model.param.Add(i.ToString(), m.GetParameters()[i].Name.ToLower());
-                            }
+                            config = DataConfig.GetConfig(model.dbKey);
+                            ServiceParam(m, model, config);
 
                             var key = string.Format("{0}.{1}", a.Name, m.Name);
                             DbCache.Set<ServiceModel>(config.CacheType, key, model);
@@ -408,6 +402,51 @@ namespace FastData
                     });
                 }
             });
+        }
+        #endregion
+
+        #region 服务参数
+        /// <summary>
+        /// 服务参数
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="model"></param>
+        private static void ServiceParam(MethodInfo info, ServiceModel model, ConfigModel config)
+        {
+            var dic = new Dictionary<int, string>();
+
+            if (info.GetParameters().Length == 1 && info.GetParameters()[0].ParameterType.IsGenericType)
+                throw new Exception($"FastReadAttribute[service:{info.DeclaringType.Name}, method:{info.Name}, parameter type:{info.GetParameters()[0].ParameterType} is not support]");
+            else if (info.GetParameters().Length == 1 && !info.GetParameters()[0].ParameterType.isSysType())
+            {
+                var pro = PropertyCache.GetPropertyInfo(Activator.CreateInstance(info.GetParameters()[0].ParameterType));
+                pro.ForEach(a => {
+                    var key = string.Format("{0}{1}", config.Flag, a.Name).ToLower();
+                    if (model.sql.IndexOf(key) > 0)
+                    {
+                        dic.Add(model.sql.IndexOf(key), a.Name);
+                    }
+                });
+            }
+            else
+            {
+                for (int i = 0; i < info.GetParameters().Length; i++)
+                {
+                    var key = string.Format("{0}{1}", config.Flag, info.GetParameters()[i].Name).ToLower();
+                    if (model.sql.IndexOf(key) > 0)
+                    {
+                        dic.Add(model.sql.IndexOf(key), info.GetParameters()[i].Name.ToLower());
+                    }
+                }
+                model.isSysType = true;
+            }
+
+            var list = dic.OrderBy(d => d.Key).ToList();
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                model.param.Add(i.ToString(), dic[list[i].Key]);
+            }
         }
         #endregion
 
