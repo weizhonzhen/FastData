@@ -59,23 +59,26 @@ interface  Service
 ```csharp
     public interface TestService
     {
-        [FastReadAttribute(dbKey = "Write", sql = "select * from TestResult where userId=?userId and userId=?userId")]
+        [FastReadAttribute(dbKey = "OraDb", sql = "select * from TestResult where userId=?userId and userId=?userId")]
         List<Dictionary<string, object>> readListDic(string userId, string kid);
         //List<Dictionary<string, object>> readListDic(TestResult model);
 
-        [FastReadAttribute(dbKey = "Write", sql = "select * from TestResult where userId=?userId and userId=?userId")]
+        [FastReadAttribute(dbKey = "OraDb", sql = "select * from TestResult where userId=?userId and userId=?userId")]
         Dictionary<string, object> readDic(string userId, string kid);
         //List<Dictionary<string, object>> readDic(TestResult model);
 
-        [FastReadAttribute(dbKey = "Write", sql = "select * from TestResult where userId=?userId and userId=:userId")]
+        [FastReadAttribute(dbKey = "OraDb", sql = "select * from TestResult where userId=?userId and userId=:userId")]
         List<TestResult> readModel(string userId, string kid);
         //List<TestResult> readModel(TestResult model);
 
-        [FastReadAttribute(dbKey = "Write", sql = "select * from TestResult where userId=?userId and userId=?userId")]
+        [FastReadAttribute(dbKey = "OraDb", sql = "select * from TestResult where userId=?userId and userId=?userId")]
         TestResult readListModel(string userId, string kid);
         //TestResult readListModel(TestResult model);
 
-        [FastWriteAttribute(dbKey = "Write", sql = "update TestResult set userName=?userName where userId=?userId")]
+        [FastReadAttribute(dbKey = "OraDb", sql = "select * from TestResult where userId=?userId and userId=?userId",isPage =true)]
+        PageResult<TestResult> readPage(PageModel page ,Dictionary<string, object> item);
+
+        [FastWriteAttribute(dbKey = "OraDb", sql = "update TestResult set userName=?userName where userId=?userId")]
         WriteReturn update(string userName, string userId);
         //WriteReturn update(TestResult model);
     }
@@ -90,6 +93,9 @@ interface  Service
  var readListDic = testService.readListDic("admin", "101");//or  testService.readListDic(model);
  var readModel = testService.readModel("admin", "101");//or  testService.readModel(model);
  var readListModel = testService.readListModel("admin", "101");  //or  testService.readListModel(model);
+ var page = new PageModel();
+ page.PageSize = 2;
+ var pageData = testService.readPage(page,model);
  ```   
 
 //web.config or db.config
