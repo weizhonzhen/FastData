@@ -78,6 +78,9 @@ interface  Service
         [FastReadAttribute(dbKey = "OraDb", sql = "select * from TestResult where userId=?userId and userId=?userId",isPage =true)]
         PageResult<TestResult> readPage(PageModel page ,Dictionary<string, object> item);
 
+       [FastReadAttribute(dbKey = "OraDb", sql = "select * from TestResult where userId=?userId and userId=?userId",isPage =true)]
+        PageResult readPage1(PageModel page ,Dictionary<string, object> item);
+
         [FastWriteAttribute(dbKey = "OraDb", sql = "update TestResult set userName=?userName where userId=?userId")]
         WriteReturn update(string userName, string userId);
         //WriteReturn update(TestResult model);
@@ -95,7 +98,8 @@ interface  Service
  var readListModel = testService.readListModel("admin", "101");  //or  testService.readListModel(model);
  var page = new PageModel();
  page.PageSize = 2;
- var pageData = testService.readPage(page,model);
+ var pageData = testService.readPage(page,model); 
+ var pageData1 = testService.readPage1(page,model);
  ```   
 
 //web.config or db.config
