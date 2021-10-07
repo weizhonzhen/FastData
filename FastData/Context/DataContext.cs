@@ -89,7 +89,7 @@ namespace FastData.Context
 
                                 var param = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
                                 param.ParameterName = a.Name[i];
-                                param.Value = dynGet.GetValue(d, a.Key[i], true);
+                                param.Value = dynGet.GetValue(d, a.Key[i]);
                                 cmd.Parameters.Add(param);
                                 paramList.Add(param);
                             }
@@ -150,32 +150,50 @@ namespace FastData.Context
         /// <param name="model"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        internal object FastReadAttribute(ServiceModel model, List<DbParameter> param)
+        internal object FastReadAttribute(ServiceModel model, List<DbParameter> param, PageModel pModel)
         {
-            object result;
-            cmd.Parameters.Clear();
-            var instance = Activator.CreateInstance(model.type);
-
-            BaseAop.AopBefore(null, model.sql, param, config, true, AopType.FastRead);
-            cmd.Parameters.AddRange(param.ToArray());
-            var dr = BaseExecute.ToDataReader(cmd, model.sql);
-
-            if (model.type == typeof(List<Dictionary<string, object>>) && model.isList)
-                result = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle);
-            else if (model.type == typeof(Dictionary<string, object>))
-                result = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle)?.FirstOrDefault() ?? new Dictionary<string, object>();
-            else if (model.isList)
+            var sql = "";
+            try
             {
-                instance = Activator.CreateInstance(model.type.GetGenericArguments()[0]);
-                result = BaseDataReader.ToList(model.type, instance, dr, config);
+                object result;
+                if (model.isPage && model.type == null)
+                    result = GetPageSql(pModel, model.sql, param.ToArray()).PageResult;
+                else if (model.isPage && model.type != null)
+                    result = GetPageSql(model, param, pModel);
+                else
+                {
+                    cmd.Parameters.Clear();
+                    var instance = Activator.CreateInstance(model.type);
+                    BaseAop.AopBefore(null, model.sql, param, config, true, AopType.FastRead);
+                    cmd.Parameters.AddRange(param.ToArray());
+                    var dr = BaseExecute.ToDataReader(cmd, model.sql);
+                    if (model.type == typeof(List<Dictionary<string, object>>) && model.isList)
+                        result = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle);
+                    else if (model.type == typeof(Dictionary<string, object>))
+                        result = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle)?.FirstOrDefault() ?? new Dictionary<string, object>();
+                    else if (model.isList)
+                    {
+                        instance = Activator.CreateInstance(model.type.GetGenericArguments()[0]);
+                        result = BaseDataReader.ToList(model.type, instance, dr, config);
+                    }
+                    else
+                        result = BaseDataReader.ToModel(instance, dr, config);
+
+                    dr.Close();
+                    BaseAop.AopAfter(null, cmd.CommandText, param, config, true, AopType.FastRead, result);
+                }
+
+                return result;
             }
-            else
-                result = BaseDataReader.ToModel(instance, dr, config);
-
-            dr.Close();
-            BaseAop.AopAfter(null, cmd.CommandText, param, config, true, AopType.FastRead, result);
-
-            return result;
+            catch (Exception ex)
+            {
+                BaseAop.AopException(ex, "FastReadAttribute", config, AopType.FastRead);
+                if (config.SqlErrorType == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "FastReadAttribute", sql);
+                else
+                    DbLog.LogException(config.IsOutError, config.DbType, ex, "FastReadAttribute", sql);
+                return null;
+            }
         }
         #endregion
 
@@ -352,7 +370,7 @@ namespace FastData.Context
                     result.pageResult.list = BaseDataReader.ToList<T>(dr, item.Config, item.AsName);
                     result.sql = sql;
 
-                    BaseAop.AopAfter(item.TableName, sql.ToString(), param, config, true, AopType.Query_Page_Lambda_Model, result.pageResult.list);
+                    BaseAop.AopAfter(item.TableName, cmd.CommandText, param, config, true, AopType.Query_Page_Lambda_Model, result.pageResult.list);
 
                     dr.Close();
                     dr.Dispose();
@@ -416,7 +434,7 @@ namespace FastData.Context
                     dr.Close();
                     dr.Dispose();
 
-                    BaseAop.AopAfter(item.TableName, sql.ToString(), param, config, true, AopType.Query_Page_Lambda_Dic, result.PageResult.list);
+                    BaseAop.AopAfter(item.TableName,cmd.CommandText, param, config, true, AopType.Query_Page_Lambda_Dic, result.PageResult.list);
                 }
                 else
                     result.PageResult.list = new List<Dictionary<string, object>>();
@@ -453,7 +471,7 @@ namespace FastData.Context
                 pModel.StarId = (pModel.PageId - 1) * pModel.PageSize + 1;
                 pModel.EndId = pModel.PageId * pModel.PageSize;
                 Dispose(cmd);
-                pModel.TotalRecord = BaseExecute.ToPageCountSql(param, cmd, sql, config, ref countSql,FilterType.Query_Page_Lambda_Dic,null);
+                pModel.TotalRecord = BaseExecute.ToPageCountSql(param, cmd, sql, config, ref countSql,FilterType.Query_Page_Sql_Dic, null);
 
                 if (pModel.TotalRecord > 0)
                 {
@@ -466,10 +484,10 @@ namespace FastData.Context
                         pModel.PageId = pModel.TotalPage;
 
                     if (isAop)
-                        BaseAop.AopBefore(null, sql.ToString(), param?.ToList(), config, true,AopType.Query_Page_Lambda_Dic);
+                        BaseAop.AopBefore(null, sql.ToString(), param?.ToList(), config, true,AopType.Query_Page_Sql_Dic);
 
                     Dispose(cmd);
-                    var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql, FilterType.Query_Page_Lambda_Dic, null);
+                    var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql, FilterType.Query_Page_Sql_Dic, null);
 
                     result.PageResult.list = BaseJson.DataReaderToDic(dr, config.DbType == DataDbType.Oracle);
                     result.Sql = string.Format("count:{0},page:{1}", countSql, pageSql);
@@ -478,7 +496,7 @@ namespace FastData.Context
                     dr.Dispose();
 
                     if(isAop)
-                        BaseAop.AopAfter(null, sql.ToString(), param?.ToList(), config, true, AopType.Query_Page_Lambda_Dic, result.PageResult.list);
+                        BaseAop.AopAfter(null, cmd.CommandText, param?.ToList(), config, true, AopType.Query_Page_Sql_Dic, result.PageResult.list);
                 }
                 else
                     result.PageResult.list = new List<Dictionary<string, object>>();
@@ -498,7 +516,66 @@ namespace FastData.Context
             return result;
         }
         #endregion
-        
+
+        #region fastread page
+        private object GetPageSql(ServiceModel model, List<DbParameter> param, PageModel pModel)
+        {
+            var result = Activator.CreateInstance(typeof(PageResult<>).MakeGenericType(model.type));
+            var countSql = "";
+            var pageSql = "";
+            try
+            {
+                pModel.StarId = (pModel.PageId - 1) * pModel.PageSize + 1;
+                pModel.EndId = pModel.PageId * pModel.PageSize;
+                Dispose(cmd);
+                pModel.TotalRecord = BaseExecute.ToPageCountSql(param.ToArray(), cmd, model.sql, config, ref countSql, FilterType.FastRead_Page, model.type.Name);
+                if (pModel.TotalRecord > 0)
+                {
+                    if ((pModel.TotalRecord % pModel.PageSize) == 0)
+                        pModel.TotalPage = pModel.TotalRecord / pModel.PageSize;
+                    else
+                        pModel.TotalPage = (pModel.TotalRecord / pModel.PageSize) + 1;
+
+                    if (pModel.PageId > pModel.TotalPage)
+                        pModel.PageId = pModel.TotalPage;
+
+                    BaseAop.AopBefore(null, model.sql, param?.ToList(), config, true, AopType.FastRead_Page);
+
+                    Dispose(cmd);
+                    var dr = BaseExecute.ToPageDataReaderSql(param.ToArray(), cmd, pModel, model.sql, config, ref pageSql, FilterType.FastRead_Page, model.type.Name);
+
+                    var instance = Activator.CreateInstance(model.type);
+                    var type = typeof(List<>).MakeGenericType(model.type);
+                    var list = BaseDataReader.ToList(type, instance, dr, config);
+
+                    result.GetType().GetFields().ToList().ForEach(a => {
+                        if (a.Name == "pModel")
+                            a.SetValue(result, pModel);
+                        if (a.Name == "list")
+                            a.SetValue(result, list);
+                    });
+
+                    dr.Close();
+                    dr.Dispose();
+                    dr = null;
+
+                    BaseAop.AopAfter(null, cmd.CommandText, param?.ToList(), config, true, AopType.FastRead_Page, list);
+                }
+            }
+            catch (Exception ex)
+            {
+                var sql = string.Format("count:{0},page:{1}", countSql, pageSql);
+                BaseAop.AopException(ex, "to Page tableName:" + model.type.Name, config, AopType.FastRead_Page);
+                if (config.SqlErrorType == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "GetPageSql", sql);
+                else
+                    DbLog.LogException(config.IsOutError, config.DbType, ex, "GetPageSql", sql);
+            }
+
+            return result;
+        }
+        #endregion
+
         #region 获取分页sql
         /// <summary>
         /// 获取分页
@@ -540,7 +617,7 @@ namespace FastData.Context
                     dr.Dispose();
 
                     if (isAop)
-                        BaseAop.AopAfter(null, sql.ToString(), param?.ToList(), config, true, AopType.Query_Page_Lambda_Model, result.pageResult.list);
+                        BaseAop.AopAfter(null, cmd.CommandText, param?.ToList(), config, true, AopType.Query_Page_Lambda_Model, result.pageResult.list);
                 }
 
                 result.pageResult.pModel = pModel;
@@ -1485,7 +1562,7 @@ namespace FastData.Context
 
                         list.ForEach(l =>
                         {
-                            var value = dyn.GetValue(l, a.Name, true);
+                            var value = dyn.GetValue(l, a.Name);
                             if (value == null)
                                 value = DBNull.Value;
                             pValue.Add(value);
