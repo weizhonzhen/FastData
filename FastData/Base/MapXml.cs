@@ -502,9 +502,9 @@ namespace FastData.Base
                                     continue;
 
                                 if (info.PropertyType.Name == "Nullable`1" && info.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                    dynSet.SetValue(model, info.Name, Convert.ChangeType(temp.GetValue(info.Name), Nullable.GetUnderlyingType(info.PropertyType)), config.IsPropertyCache);
+                                    dynSet.SetValue(model, info.Name, Convert.ChangeType(temp.GetValue(info.Name), Nullable.GetUnderlyingType(info.PropertyType)));
                                 else
-                                    dynSet.SetValue(model, info.Name, Convert.ChangeType(temp.GetValue(info.Name), info.PropertyType), config.IsPropertyCache);
+                                    dynSet.SetValue(model, info.Name, Convert.ChangeType(temp.GetValue(info.Name), info.PropertyType));
                             }
 
                             var method = list.GetType().GetMethod("Add", BindingFlags.Instance | BindingFlags.Public);

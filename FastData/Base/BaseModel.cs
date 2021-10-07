@@ -43,7 +43,7 @@ namespace FastData.Base
                     PropertyCache.GetPropertyInfo<T>(config.IsPropertyCache).ForEach(a =>
                     {
                         result.Sql = string.Format("{2} {0}={1}{0},", a.Name, config.Flag, result.Sql);
-                        var itemValue = dynGet.GetValue(model, a.Name, config.IsPropertyCache);
+                        var itemValue = dynGet.GetValue(model, a.Name);
                         var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
                         temp.ParameterName = a.Name;
                         temp.Value = itemValue == null ? DBNull.Value : itemValue;
@@ -57,7 +57,7 @@ namespace FastData.Base
                     (field.Body as NewExpression).Members.ToList().ForEach(a =>
                     {
                         result.Sql = string.Format("{2} {0}={1}{0},", a.Name, config.Flag, result.Sql);
-                        var itemValue = dynGet.GetValue(model, a.Name, config.IsPropertyCache);
+                        var itemValue = dynGet.GetValue(model, a.Name);
                         var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
                         temp.ParameterName = a.Name;
                         temp.Value = itemValue == null ? DBNull.Value : itemValue;
@@ -70,7 +70,7 @@ namespace FastData.Base
                 {
                     if (result.Param.Exists(a => a.ParameterName == item))
                     {
-                        var itemValue = dynGet.GetValue(model, item, config.IsPropertyCache);
+                        var itemValue = dynGet.GetValue(model, item);
                         if (itemValue == null)
                         {
                             result.IsSuccess = false;
@@ -128,7 +128,7 @@ namespace FastData.Base
 
                         sbValue.AppendFormat("{1}{0},", p.Name, config.Flag);
 
-                        var itemValue = dynGet.GetValue(model, p.Name, config.IsPropertyCache);
+                        var itemValue = dynGet.GetValue(model, p.Name);
                         var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
                         temp.ParameterName = p.Name;
                         temp.Value = itemValue == null ? DBNull.Value : itemValue;
@@ -188,7 +188,7 @@ namespace FastData.Base
                     PropertyCache.GetPropertyInfo<T>(config.IsPropertyCache).ForEach(a =>
                     {
                         result.Sql = string.Format("{2} {0}={1}{0},", a.Name, config.Flag, result.Sql);
-                        var itemValue = dynGet.GetValue(model, a.Name, config.IsPropertyCache);
+                        var itemValue = dynGet.GetValue(model, a.Name);
                         var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
                         temp.ParameterName = a.Name;
                         temp.Value = itemValue == null ? DBNull.Value : itemValue;
@@ -202,7 +202,7 @@ namespace FastData.Base
                     (field.Body as NewExpression).Members.ToList().ForEach(a =>
                     {
                         result.Sql = string.Format("{2} {0}={1}{0},", a.Name, config.Flag, result.Sql);
-                        var itemValue = dynGet.GetValue(model, a.Name, config.IsPropertyCache);
+                        var itemValue = dynGet.GetValue(model, a.Name);
                         var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
                         temp.ParameterName = a.Name;
                         temp.Value = itemValue == null ? DBNull.Value : itemValue;
@@ -216,7 +216,7 @@ namespace FastData.Base
                 var count = 1;
                 foreach (var item in where)
                 {
-                    var itemValue = dynGet.GetValue(model, item, config.IsPropertyCache);
+                    var itemValue = dynGet.GetValue(model, item);
 
                     if (itemValue == null)
                     {
@@ -340,11 +340,11 @@ namespace FastData.Base
                 list.ForEach(p =>
                 {
                     var row = result.table.NewRow();
-                    where.ForEach(a => { row[a] = dynGet.GetValue(p, a, true); });
+                    where.ForEach(a => { row[a] = dynGet.GetValue(p, a); });
                     if (field == null)
-                        PropertyCache.GetPropertyInfo<T>().ForEach(a => { row[a.Name] = dynGet.GetValue(p, a.Name, true); });
+                        PropertyCache.GetPropertyInfo<T>().ForEach(a => { row[a.Name] = dynGet.GetValue(p, a.Name); });
                     else
-                        (field.Body as NewExpression).Members.ToList().ForEach(a => { row[a.Name] = dynGet.GetValue(p, a.Name, true); });
+                        (field.Body as NewExpression).Members.ToList().ForEach(a => { row[a.Name] = dynGet.GetValue(p, a.Name); });
                     result.table.Rows.Add(row);
                 });
 
@@ -393,7 +393,7 @@ namespace FastData.Base
                 var count = 1;
                 foreach (var item in where)
                 {
-                    var itemValue = dynGet.GetValue(model, item, config.IsPropertyCache);
+                    var itemValue = dynGet.GetValue(model, item);
 
                     if (itemValue == null)
                     {
