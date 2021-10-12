@@ -183,7 +183,11 @@ namespace FastData.Base
         {
             try
             {
-                var id = dr.GetOrdinal(config.DbType == DataDbType.Oracle ? info.Name.ToUpper() : info.Name);
+                var colName = config.DbType == DataDbType.Oracle ? info.Name.ToUpper() : info.Name;
+                if (!dr.GetSchemaTable().Columns.Contains(colName))
+                    return item;
+
+                var id = dr.GetOrdinal(colName);
                 if (DataDbType.Oracle == config.DbType)
                 {
                     object value = null;
@@ -284,7 +288,12 @@ namespace FastData.Base
         {
             try
             {
-                var id = dr.GetOrdinal(config.DbType == DataDbType.Oracle ? info.Name.ToUpper() : info.Name);
+                var colName = config.DbType == DataDbType.Oracle ? info.Name.ToUpper() : info.Name;
+
+                if (!dr.GetSchemaTable().Columns.Contains(colName))
+                    return item;
+
+                var id = dr.GetOrdinal(colName);
                 if (DataDbType.Oracle == config.DbType)
                 {
                     object value = null;
