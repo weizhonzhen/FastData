@@ -121,6 +121,7 @@
     <Compile Include="Property\ColumnAttribute.cs" />
     <Compile Include="Property\DynamicGet.cs" />
     <Compile Include="Property\DynamicSet.cs" />
+    <Compile Include="Property\FastMapAttribute.cs" />
     <Compile Include="Property\FastReadAttribute.cs" />
     <Compile Include="Property\FastWriteAttribute.cs" />
     <Compile Include="Property\NavigateAttribute.cs" />
