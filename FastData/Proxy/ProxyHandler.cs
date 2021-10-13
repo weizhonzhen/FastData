@@ -84,7 +84,7 @@ namespace FastData.Proxy
                 }
 
                 if (model.isXml)
-                    model.sql = MapXml.GetFastMapSql(method, config, args, ref param);
+                    model.sql = MapXml.GetFastMapSql(method, config, ref param);
 
                 using (var db = new DataContext(config.Key))
                 {
