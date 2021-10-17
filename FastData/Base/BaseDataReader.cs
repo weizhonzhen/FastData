@@ -26,12 +26,16 @@ namespace FastData.Base
         public static List<T> ToList<T>(DbDataReader dr, ConfigModel config, List<string> field = null) where T : class, new()
         {
             var list = new List<T>();
+            var colList = new List<string>();
             var dynSet = new Property.DynamicSet<T>();
 
             if (dr == null)
                 return list;
 
             var propertyList = PropertyCache.GetPropertyInfo<T>(config.IsPropertyCache);
+
+            if (dr.HasRows)
+                colList = GetCol(dr);
 
             while (dr.Read())
             {
@@ -41,6 +45,8 @@ namespace FastData.Base
                 {
                     foreach (var info in propertyList)
                     {
+                        if (!colList.Exists(a => a.ToLower() == info.Name.ToLower()))
+                            continue;
                         if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
                             continue;
 
@@ -77,12 +83,16 @@ namespace FastData.Base
         public static IList ToList(System.Type type, Object model, DbDataReader dr, ConfigModel config, List<string> field = null)
         {
             var list = Activator.CreateInstance(type);
+            var colList = new List<string>();
             var dynSet = new DynamicSet(model);
 
             if (dr == null)
                 return null;
 
             var propertyList = PropertyCache.GetPropertyInfo(model, config.IsPropertyCache);
+
+            if (dr.HasRows)
+                colList = GetCol(dr);
 
             while (dr.Read())
             {
@@ -92,6 +102,8 @@ namespace FastData.Base
                 {
                     foreach (var info in propertyList)
                     {
+                        if (!colList.Exists(a => a.ToLower() == info.Name.ToLower()))
+                            continue;
                         if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
                             continue;
 
@@ -133,10 +145,14 @@ namespace FastData.Base
         public static Object ToModel(Object model, DbDataReader dr, ConfigModel config, List<string> field = null)
         {
             var result = Activator.CreateInstance(model.GetType());
+            var colList = new List<string>();
             var dynSet = new DynamicSet(model);
 
             if (dr == null)
                 return null;
+
+            if (dr.HasRows)
+                colList = GetCol(dr);
 
             var propertyList = PropertyCache.GetPropertyInfo(model, config.IsPropertyCache);
 
@@ -146,6 +162,8 @@ namespace FastData.Base
                 {
                     foreach (var info in propertyList)
                     {
+                        if (!colList.Exists(a => a.ToLower() == info.Name.ToLower()))
+                            continue;
                         if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
                             continue;
 
@@ -184,9 +202,6 @@ namespace FastData.Base
             try
             {
                 var colName = config.DbType == DataDbType.Oracle ? info.Name.ToUpper() : info.Name;
-                if (!dr.GetSchemaTable().Columns.Contains(colName))
-                    return item;
-
                 var id = dr.GetOrdinal(colName);
                 if (DataDbType.Oracle == config.DbType)
                 {
@@ -289,10 +304,6 @@ namespace FastData.Base
             try
             {
                 var colName = config.DbType == DataDbType.Oracle ? info.Name.ToUpper() : info.Name;
-
-                if (!dr.GetSchemaTable().Columns.Contains(colName))
-                    return item;
-
                 var id = dr.GetOrdinal(colName);
                 if (DataDbType.Oracle == config.DbType)
                 {
@@ -381,6 +392,19 @@ namespace FastData.Base
                 return item;
             }
         }
+        #endregion
+
+        #region get datareader col
+        private static List<string> GetCol(DbDataReader dr)
+        {
+            var list = new List<string>();
+            for(var i=0;i<dr.FieldCount;i++)
+            {
+                list.Add(dr.GetName(i));
+            }
+            return list;
+        }
+
         #endregion
     }
 }
