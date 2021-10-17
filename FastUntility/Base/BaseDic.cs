@@ -147,9 +147,6 @@ namespace FastUntility.Base
             var cases = new List<SwitchCase>();
             foreach (var propertyInfo in BaseDic.PropertyInfo<T>())
             {
-                if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
-                    continue;
-
                 var property = Expression.Property(Expression.Convert(instance, typeof(T)), propertyInfo.Name);
                 var setValue = Expression.Assign(property, Expression.Convert(newValue, propertyInfo.PropertyType));
                 var propertyHash = Expression.Constant(propertyInfo.Name.GetHashCode(), typeof(int));
@@ -211,9 +208,6 @@ namespace FastUntility.Base
 
             foreach (var propertyInfo in BaseDic.PropertyInfo<T>())
             {
-                if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
-                    continue;
-
                 var property = Expression.Property(Expression.Convert(instance, typeof(T)), propertyInfo.Name);
                 var propertyHash = Expression.Constant(propertyInfo.Name.GetHashCode(), typeof(int));
                 cases.Add(Expression.SwitchCase(Expression.Convert(property, typeof(object)), propertyHash));
