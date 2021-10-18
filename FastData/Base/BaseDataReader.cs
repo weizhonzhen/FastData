@@ -47,6 +47,7 @@ namespace FastData.Base
                     {
                         if (!colList.Exists(a => a.ToLower() == info.Name.ToLower()))
                             continue;
+
                         if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
                             continue;
 
@@ -57,6 +58,9 @@ namespace FastData.Base
                 {
                     for (var i = 0; i < field.Count; i++)
                     {
+                        if (!colList.Exists(a => a.ToLower() == field[i].ToLower()))
+                            continue;
+
                         if (propertyList.Exists(a => a.Name.ToLower() == field[i].ToLower()))
                         {
                             var info = propertyList.Find(a => a.Name.ToLower() == field[i].ToLower());
@@ -104,6 +108,7 @@ namespace FastData.Base
                     {
                         if (!colList.Exists(a => a.ToLower() == info.Name.ToLower()))
                             continue;
+
                         if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
                             continue;
 
@@ -114,6 +119,9 @@ namespace FastData.Base
                 {
                     for (var i = 0; i < field.Count; i++)
                     {
+                        if (!colList.Exists(a => a.ToLower() == field[i].ToLower()))
+                            continue;
+
                         if (propertyList.Exists(a => a.Name.ToLower() == field[i].ToLower()))
                         {
                             var info = propertyList.Find(a => a.Name.ToLower() == field[i].ToLower());
@@ -164,6 +172,7 @@ namespace FastData.Base
                     {
                         if (!colList.Exists(a => a.ToLower() == info.Name.ToLower()))
                             continue;
+
                         if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
                             continue;
 
@@ -174,6 +183,9 @@ namespace FastData.Base
                 {
                     for (var i = 0; i < field.Count; i++)
                     {
+                        if (!colList.Exists(a => a.ToLower() == field[i].ToLower()))
+                            continue;
+
                         if (propertyList.Exists(a => a.Name.ToLower() == field[i].ToLower()))
                         {
                             var info = propertyList.Find(a => a.Name.ToLower() == field[i].ToLower());
