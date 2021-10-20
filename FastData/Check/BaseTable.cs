@@ -543,7 +543,7 @@ namespace FastData.Check
                     sql = "select constraint_name PK from INFORMATION_SCHEMA.KEY_COLUMN_USAGE where upper(TABLE_NAME)=?tableName and constraint_name='PRIMARY' and upper(column_name)=?colName";
                 }
 
-                return db.ExecuteSqlList(sql, param.ToArray(), item.Config.IsOutSql,false).DicList.First() ?? new Dictionary<string, object>();
+                return db.ExecuteSqlList(sql, param.ToArray(), item.Config.IsOutSql,false).DicList.FirstOrDefault() ?? new Dictionary<string, object>();
             }
         }
         #endregion
