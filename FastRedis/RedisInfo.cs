@@ -19,11 +19,9 @@ namespace FastRedis
         /// <param name="dbFile"></param>
         public static void Init(string dbFile = "db.config", string projectName = null)
         {
-            if (projectName == null)
-                projectName = Assembly.GetCallingAssembly().GetName().Name;
             RedisConfig.GetConfig(projectName, dbFile);
         }
-
+        
         #region 获取上下文
         /// <summary>
         /// 获取上下文
