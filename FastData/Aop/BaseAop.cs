@@ -71,7 +71,7 @@ namespace FastData.Aop
         /// <param name="name"></param>
         /// <param name="param"></param>
         /// <param name="config"></param>
-        public static void AopBefore(List<string> tableName, string sql, List<DbParameter> param, ConfigModel config, bool isRead, AopType type)
+        public static void AopBefore(List<string> tableName, string sql, List<DbParameter> param, ConfigModel config, bool isRead, AopType type,object model = null)
         {
             if (FastMap.fastAop != null)
             {
@@ -88,6 +88,7 @@ namespace FastData.Aop
                 context.dbType = config.DbType;
                 context.isRead = isRead;
                 context.isWrite = !isRead;
+                context.model = model;
 
                 FastMap.fastAop.Before(context);
             }
@@ -102,7 +103,7 @@ namespace FastData.Aop
         /// <param name="name"></param>
         /// <param name="param"></param>
         /// <param name="config"></param>
-        public static void AopAfter(List<string> tableName, string sql, List<DbParameter> param, ConfigModel config, bool isRead, AopType type, object result)
+        public static void AopAfter(List<string> tableName, string sql, List<DbParameter> param, ConfigModel config, bool isRead, AopType type, object result, object model = null)
         {
             if (FastMap.fastAop != null)
             {
@@ -120,6 +121,7 @@ namespace FastData.Aop
                 context.isRead = isRead;
                 context.isWrite = !isRead;
                 context.result = result;
+                context.model = model;
 
                 FastMap.fastAop.After(context);
             }
@@ -132,7 +134,7 @@ namespace FastData.Aop
         /// </summary>
         /// <param name="ex"></param>
         /// <param name="name"></param>
-        public static void AopException(Exception ex, string name, ConfigModel config, AopType type)
+        public static void AopException(Exception ex, string name, ConfigModel config, AopType type,object model=null)
         {
             if (FastMap.fastAop != null)
             {
@@ -141,6 +143,7 @@ namespace FastData.Aop
                 context.ex = ex;
                 context.name = name;
                 context.type = type;
+                context.model = model;
                 FastMap.fastAop.Exception(context);
             }
         }
