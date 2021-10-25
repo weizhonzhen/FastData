@@ -615,7 +615,7 @@ namespace FastData
             {
                 BaseAop.AopMapBefore(name, "", param, config, AopType.Map_Write);
                 var data = new WriteReturn();
-                BaseAop.AopMapAfter(name, "", param, config,AopType.Map_Write,data.IsSuccess);
+                BaseAop.AopMapAfter(name, "", param, config,AopType.Map_Write,data);
                 return data;
             }
         }
