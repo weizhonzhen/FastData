@@ -198,6 +198,9 @@ interface  Service
         var data1 = IFast.Query<TestResult>(a => a.ORGID == "1",null,"OraDb").ToPage<TestResult>(page);
         var data2 = IFast.Query<TestResult>(a => a.ORGID == "1",null,"OraDb").Filter(false).ToPage<TestResult>(page);
         
+        //more da all change
+        FastMap.AddFastKey(a => { a.dbKey = "db"});
+        
         namespace Test1.Model
         {
             public class TestResult
