@@ -46,6 +46,19 @@ namespace FastData
         }
         #endregion
 
+        #region 是否过滤
+        /// <summary>
+        /// 是否过滤
+        /// </summary>
+        /// <param name="isFilter"></param>
+        /// <returns></returns>
+        public static DataQuery Filter(this DataQuery item, bool isFilter = true)
+        {
+            item.IsFilter = isFilter;
+            return item;
+        }
+        #endregion
+
         #region 表查询
         /// <summary>
         /// 表查询
@@ -59,8 +72,17 @@ namespace FastData
         {
             var projectName = Assembly.GetCallingAssembly().GetName().Name;
             var result = new DataQuery();
+
+            var cacheKey = $"FastData.Key.{typeof(ConfigKey).Name}";
+
+            if (DbCache.Exists(CacheType.Web, cacheKey) && key == null)
+                key = DbCache.Get<ConfigKey>(CacheType.Web, cacheKey).dbKey;
+            else if (DataConfig.DataType(key, projectName, dbFile) && key == null)
+                throw new Exception("数据库查询key不能为空,数据库类型有多个");
+
             result.Config = DataConfig.GetConfig(key, projectName, dbFile);
             result.Key = key;
+
 
             var queryField = BaseField.QueryField<T>(predicate, field, result.Config);
             result.Field.Add(queryField.Field);

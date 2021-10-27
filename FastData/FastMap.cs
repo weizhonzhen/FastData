@@ -504,6 +504,17 @@ namespace FastData
         }
         #endregion
 
+        #region 增加全局多数据切换
+        public static void AddFastKey<T>(Action<ConfigKey> action)
+        {
+            var model = new ConfigKey();
+            action(model);
+
+            var key = $"FastData.Key.{typeof(ConfigKey).Name}";
+            DbCache.Set<ConfigKey>(CacheType.Web, key, model);
+        }
+        #endregion
+
 
         #region maq 执行返回结果
         /// <summary>
@@ -1179,5 +1190,10 @@ namespace FastData
             return DataConfig.GetConfig(name);
         }
         #endregion
+    }
+
+    public class ConfigKey
+    {
+        public string dbKey { get; set; }
     }
 }
