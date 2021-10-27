@@ -505,7 +505,7 @@ namespace FastData
         #endregion
 
         #region 增加全局多数据切换
-        public static void AddFastKey<T>(Action<ConfigKey> action)
+        public static void AddFastKey(Action<ConfigKey> action)
         {
             var model = new ConfigKey();
             action(model);
