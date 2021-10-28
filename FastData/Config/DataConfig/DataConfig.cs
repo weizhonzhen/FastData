@@ -191,7 +191,7 @@ namespace FastData.Config
                     {
                         var item = new ConfigModel();
                         item.DbType = DataDbType.MySql;
-                        item.Flag = "?";
+                        item.Flag = "@";
                         item.ProviderName = Provider.MySql;
                         item.ConnStr = (temp as ElementConfig).ConnStr;
                         item.IsOutError = (temp as ElementConfig).IsOutError;
@@ -269,7 +269,7 @@ namespace FastData.Config
                     {
                         var item = new ConfigModel();
                         item.DbType = DataDbType.PostgreSql;
-                        item.Flag = ":";
+                        item.Flag = "@";
                         item.ProviderName = Provider.PostgreSql;
                         item.ConnStr = (temp as ElementConfig).ConnStr;
                         item.IsOutError = (temp as ElementConfig).IsOutError;
@@ -325,7 +325,7 @@ namespace FastData.Config
                                         if (leaf.Name.ToLower() == DataDbType.MySql.ToLower())
                                         {
                                             item.DbType = DataDbType.MySql;
-                                            item.Flag = "?";
+                                            item.Flag = "@";
                                             item.ProviderName = Provider.MySql;
                                         }
 
@@ -346,7 +346,7 @@ namespace FastData.Config
                                         if (leaf.Name.ToLower() == DataDbType.PostgreSql.ToLower())
                                         {
                                             item.DbType = DataDbType.PostgreSql;
-                                            item.Flag = ":";
+                                            item.Flag = "@";
                                             item.ProviderName = Provider.PostgreSql;
                                         }
 
