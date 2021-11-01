@@ -129,13 +129,13 @@ namespace FastData.Check
                 });
 
                 sql.Append(")");
-                db.ExecuteSql(sql.ToString(), null, false, item.Config.IsOutSql,false,false);
+                db.ExecuteDDL(sql.ToString(), null, item.Config.IsOutSql);
 
                 //主键
                 key.ForEach(a => {
                     sql = new StringBuilder();
                     sql.AppendFormat("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, a);
-                    db.ExecuteSql(sql.ToString(), null, false, item.Config.IsOutSql,false,false);
+                    db.ExecuteDDL(sql.ToString(), null, item.Config.IsOutSql);
                 });
             }
 
@@ -160,7 +160,7 @@ namespace FastData.Check
                 //add colunm
                 info.AddName.ForEach(a => {
                     var tempSql = string.Format("alter table {0} add {1} {2}", tableName, a.Name, GetFieldType(a));
-                    db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                    db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                 });
 
                 //修改列不为空
@@ -172,26 +172,26 @@ namespace FastData.Check
                     if (key.Count > 0)
                     {
                         tempSql = string.Format("alter table {0} drop constraint {1}", tableName, key.GetValue("pk"));
-                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                        db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                     }
 
                     if (item.Config.DbType == DataDbType.SqlServer)
                     {
                         tempSql = string.Format("alter table {0} alter column {1} {2} not null", tableName, a.Name, GetFieldType(a));
-                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                        db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                     }
 
                     if (item.Config.DbType == DataDbType.MySql || item.Config.DbType == DataDbType.Oracle)
                     {
                         tempSql = string.Format("alter table {0} modify {1} {2} not null", tableName, a.Name, GetFieldType(a));
-                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                        db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                     }
 
                     //增加主键
                     if (key.Count > 0)
                     {
                         tempSql = string.Format("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, a.Name);
-                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                        db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                     }
                 });
 
@@ -205,19 +205,19 @@ namespace FastData.Check
                     if (key.Count > 0)
                     {
                         tempSql = string.Format("alter table {0} drop constraint {1}", tableName, key.GetValue("pk"));
-                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                        db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                     }
 
                     if (item.Config.DbType == DataDbType.SqlServer)
                     {
                         tempSql = string.Format("alter table {0} alter column {1} {2} null", tableName, temp.Name, GetFieldType(temp));
-                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                        db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                     }
 
                     if (item.Config.DbType == DataDbType.MySql || item.Config.DbType == DataDbType.Oracle)
                     {
                         tempSql = string.Format("alter table {0} modify {1} {2} null", tableName, temp.Name, GetFieldType(temp));
-                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                        db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                     }
 
 
@@ -225,7 +225,7 @@ namespace FastData.Check
                     if (key.Count > 0)
                     {
                         tempSql = string.Format("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, temp.Name);
-                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                        db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                     }
                 }
 
@@ -237,26 +237,26 @@ namespace FastData.Check
                     if (key.Count > 0)
                     {
                         tempSql = string.Format("alter table {0} drop constraint {1}", tableName, key.GetValue("pk"));
-                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                        db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                     }
 
                     if (item.Config.DbType == DataDbType.SqlServer)
                     {
                         tempSql = string.Format("alter table {0} alter column {1} {2} null", tableName, a.Name, GetFieldType(a));
-                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                        db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                     }
 
                     if (item.Config.DbType == DataDbType.MySql || item.Config.DbType == DataDbType.Oracle)
                     {
                         tempSql = string.Format("alter table {0} modify {1} {2} null", tableName, a.Name, GetFieldType(a));
-                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                        db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                     }
 
                     //增加主键
                     if (key.Count > 0)
                     {
                         tempSql = string.Format("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, a.Name);
-                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                        db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                     }
                 });
 
@@ -264,7 +264,7 @@ namespace FastData.Check
                 info.RemoveKey.ForEach(a => {
                     var key = CheckKey(item, a, tableName);
                     var tempSql = string.Format("alter table {0} drop constraint {1}", tableName, key.GetValue("pk"));
-                    db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                    db.ExecuteDDL(tempSql, null, false, item.Config.IsOutSql);
                 });
 
                 //增加主键
@@ -273,17 +273,17 @@ namespace FastData.Check
                     if (item.Config.DbType == DataDbType.SqlServer)
                     {
                         tempSql = string.Format("alter table {0} alter column {1} {2} not null", tableName, a.Name, GetFieldType(a));
-                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                        db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                     }
 
                     if (item.Config.DbType == DataDbType.MySql || item.Config.DbType == DataDbType.Oracle)
                     {
                         tempSql = string.Format("alter table {0} modify {1} {2} not null", tableName, a.Name, GetFieldType(a));
-                        db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                        db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                     }
 
                     tempSql = string.Format("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, a.Name);
-                    db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                    db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                 });
 
                 //修改列
@@ -296,26 +296,26 @@ namespace FastData.Check
                         if (key.Count>0)
                         {
                             tempSql = string.Format("alter table {0} drop constraint {1}", tableName, key.GetValue("pk"));
-                            db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                            db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                         }
 
                         if (item.Config.DbType == DataDbType.SqlServer)
                         {
                             tempSql = string.Format("alter table {0} alter column {1} {2}", tableName, t.Name, GetFieldType(t));
-                            db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                            db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                         }
 
                         if (item.Config.DbType == DataDbType.MySql || item.Config.DbType == DataDbType.Oracle)
                         {
                             tempSql = string.Format("alter table {0} modify {1} {2}", tableName, t.Name, GetFieldType(t));
-                            db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                            db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                         }
 
                         //增加主键
                         if (key.Count > 0)
                         {
                             tempSql = string.Format("alter table {0} add constraint pk_{0}_{1} primary key ({1})", tableName, t.Name);
-                            db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql,false,false);
+                            db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                         }
                     }
                 });
@@ -323,7 +323,7 @@ namespace FastData.Check
                 //删除列
                 info.RemoveName.ForEach(a => {
                     var tempSql = string.Format("alter table {0} drop column {1}", tableName, a);
-                    db.ExecuteSql(tempSql, null, false, item.Config.IsOutSql, false, false); ;
+                    db.ExecuteDDL(tempSql, null, item.Config.IsOutSql);
                 });
             }
 
@@ -363,7 +363,7 @@ namespace FastData.Check
                         sql = string.Format("execute sp_addextendedproperty N'MS_Description', '{0}', N'user', N'dbo', N'table', N'{1}', NULL, NULL", value, tableName);
                 }
 
-                db.ExecuteSql(sql, null, false, item.Config.IsOutSql,false,false);
+                db.ExecuteDDL(sql, null, item.Config.IsOutSql);
             }
         }
         #endregion
@@ -401,7 +401,7 @@ namespace FastData.Check
                     else
                         sql = string.Format("execute sp_addextendedproperty N'MS_Description', '{0}', N'user', N'dbo', N'table', N'{1}', N'column', {2}", value, tableName, name);
 
-                    db.ExecuteSql(sql, null, false, item.Config.IsOutSql,false,false);
+                    db.ExecuteDDL(sql, null, item.Config.IsOutSql);
                 }
             }
         }
