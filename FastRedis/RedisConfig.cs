@@ -25,7 +25,7 @@ namespace FastRedis.Config
                 return BaseCache.Get<RedisConfig>(cacheKey);
             else if (projectName == null)
             {
-                if (dbFile.ToLower() == "web.config")
+                if (dbFile.ToLower() == "web.config" || dbFile.ToLower() == "app.config")
                     section = (RedisConfig)ConfigurationManager.GetSection("RedisConfig");
                 else
                 {
