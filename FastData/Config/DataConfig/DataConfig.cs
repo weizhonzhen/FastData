@@ -123,7 +123,7 @@ namespace FastData.Config
                 list = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
             else if (projectName == null)
             {
-                if (dbFile.ToLower() == "web.config")
+                if (dbFile.ToLower() == "web.config" || dbFile.ToLower() == "app.config")
                     config = (DataConfig)ConfigurationManager.GetSection("DataConfig");
                 else
                 {
