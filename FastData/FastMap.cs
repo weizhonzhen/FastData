@@ -62,89 +62,113 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceProperties(string nameSpace, string dbFile = "db.config", IFastAop aop = null)
+        public static void InstanceProperties(string nameSpace, string dbFile = "db.config", bool isResource = false, IFastAop aop = null)
         {
+            InitAssembly();
+            var config = new ConfigModel();
             if (aop != null)
                 fastAop = aop;
 
-            var projectName = Assembly.GetCallingAssembly().GetName().Name;
-            FastRedis.RedisInfo.Init(dbFile, projectName);
-            var config = DataConfig.GetConfig(null, projectName, dbFile);
-            var assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == projectName);
-            if (assembly == null)
-                assembly = Assembly.Load(projectName);
+            if (isResource)
+                config = DataConfig.GetConfig(null, Assembly.GetCallingAssembly().GetName().Name, dbFile);
+            else
+                config = DataConfig.GetConfig(null, null, dbFile);
 
-            if (assembly != null)
+            if (config.CacheType == CacheType.Redis && isResource)
+                FastRedis.RedisInfo.Init(dbFile, Assembly.GetCallingAssembly().GetName().Name);
+
+            if (config.CacheType == CacheType.Redis)
+                FastRedis.RedisInfo.Init(dbFile);
+            
+            AppDomain.CurrentDomain.GetAssemblies().ToList().ForEach(assembly =>
             {
-                assembly.ExportedTypes.ToList().ForEach(t => {
-                    var typeInfo = (t as TypeInfo);
-                    if (typeInfo.Namespace != null && typeInfo.Namespace == nameSpace)
+                try
+                {
+                    assembly.ExportedTypes.ToList().ForEach(t =>
                     {
-                        var key = string.Format("{0}.{1}", typeInfo.Namespace, typeInfo.Name);
-                        var navigateKey = string.Format("{0}.navigate", key);
-                        var cacheList = new List<PropertyModel>();
-                        var cacheNavigate = new List<NavigateModel>();
+                        var typeInfo = (t as TypeInfo);
+                        if (typeInfo.Namespace != null && typeInfo.Namespace == nameSpace)
+                        {
+                            var key = string.Format("{0}.{1}", typeInfo.Namespace, typeInfo.Name);
+                            var navigateKey = string.Format("{0}.navigate", key);
+                            var cacheList = new List<PropertyModel>();
+                            var cacheNavigate = new List<NavigateModel>();
 
-                        typeInfo.DeclaredProperties.ToList().ForEach(a => {
-                            var navigateType = a.GetCustomAttribute<NavigateTypeAttribute>();
-                            if (navigateType != null && a.PropertyType == typeof(Dictionary<string, object>) && a.GetMethod.IsVirtual)
+                            typeInfo.DeclaredProperties.ToList().ForEach(a =>
                             {
-                                var navigate = GetNavigate(navigateType.Type);
-                                navigate.IsList = false;
-                                navigate.PropertyType = navigateType.Type;
-                                navigate.MemberName = a.Name;
-                                navigate.MemberType = a.PropertyType;
-                                if (navigate.Name.Count != 0)
-                                    cacheNavigate.Add(navigate);
-                            }
-                            else if (navigateType != null && a.PropertyType == typeof(List<Dictionary<string, object>>) && a.GetMethod.IsVirtual)
-                            {
-                                var navigate = GetNavigate(navigateType.Type);
-                                navigate.IsList = true;
-                                navigate.PropertyType = navigateType.Type;
-                                navigate.MemberName = a.Name;
-                                navigate.MemberType = a.PropertyType;
-                                if (navigate.Name.Count != 0)
-                                    cacheNavigate.Add(navigate);
-                            }
-                            else if (a.PropertyType.GetGenericArguments().Length > 0 && a.GetMethod.IsVirtual)
-                            {
-                                var navigate = GetNavigate(a.PropertyType.GenericTypeArguments[0]);
-                                navigate.IsList = true;
-                                navigate.PropertyType = a.PropertyType.GenericTypeArguments[0];
-                                navigate.MemberName = a.Name;
-                                navigate.MemberType = a.PropertyType;
-                                if (navigate.Name.Count != 0)
-                                    cacheNavigate.Add(navigate);
-                            }
-                            else if (a.GetMethod.IsVirtual)
-                            {
-                                var navigate = GetNavigate(a.PropertyType);
-                                navigate.IsList = false;
-                                navigate.PropertyType = a.PropertyType;
-                                navigate.MemberName = a.Name;
-                                navigate.MemberType = a.PropertyType;
-                                if (navigate.Name.Count != 0)
-                                    cacheNavigate.Add(navigate);
-                            }
-                            else
-                            {
-                                var model = new PropertyModel();
-                                model.Name = a.Name;
-                                model.PropertyType = a.PropertyType;
-                                cacheList.Add(model);
-                            }
-                        });
+                                var navigateType = a.GetCustomAttribute<NavigateTypeAttribute>();
+                                if (navigateType != null && a.PropertyType == typeof(Dictionary<string, object>) && a.GetMethod.IsVirtual)
+                                {
+                                    var navigate = GetNavigate(navigateType.Type);
+                                    navigate.IsList = false;
+                                    navigate.PropertyType = navigateType.Type;
+                                    navigate.MemberName = a.Name;
+                                    navigate.MemberType = a.PropertyType;
+                                    if (navigate.Name.Count != 0)
+                                        cacheNavigate.Add(navigate);
+                                }
+                                else if (navigateType != null && a.PropertyType == typeof(List<Dictionary<string, object>>) && a.GetMethod.IsVirtual)
+                                {
+                                    var navigate = GetNavigate(navigateType.Type);
+                                    navigate.IsList = true;
+                                    navigate.PropertyType = navigateType.Type;
+                                    navigate.MemberName = a.Name;
+                                    navigate.MemberType = a.PropertyType;
+                                    if (navigate.Name.Count != 0)
+                                        cacheNavigate.Add(navigate);
+                                }
+                                else if (a.PropertyType.GetGenericArguments().Length > 0 && a.GetMethod.IsVirtual)
+                                {
+                                    var navigate = GetNavigate(a.PropertyType.GenericTypeArguments[0]);
+                                    navigate.IsList = true;
+                                    navigate.PropertyType = a.PropertyType.GenericTypeArguments[0];
+                                    navigate.MemberName = a.Name;
+                                    navigate.MemberType = a.PropertyType;
+                                    if (navigate.Name.Count != 0)
+                                        cacheNavigate.Add(navigate);
+                                }
+                                else if (a.GetMethod.IsVirtual)
+                                {
+                                    var navigate = GetNavigate(a.PropertyType);
+                                    navigate.IsList = false;
+                                    navigate.PropertyType = a.PropertyType;
+                                    navigate.MemberName = a.Name;
+                                    navigate.MemberType = a.PropertyType;
+                                    if (navigate.Name.Count != 0)
+                                        cacheNavigate.Add(navigate);
+                                }
+                                else
+                                {
+                                    var model = new PropertyModel();
+                                    model.Name = a.Name;
+                                    model.PropertyType = a.PropertyType;
+                                    cacheList.Add(model);
+                                }
+                            });
 
-                        if (cacheNavigate.Count > 0)
-                            DbCache.Set<List<NavigateModel>>(config.CacheType, navigateKey, cacheNavigate);
+                            if (cacheNavigate.Count > 0)
+                                DbCache.Set<List<NavigateModel>>(config.CacheType, navigateKey, cacheNavigate);
 
-                        DbCache.Set<List<PropertyModel>>(config.CacheType, key, cacheList);
-                    }
-                });
-            }
+                            DbCache.Set<List<PropertyModel>>(config.CacheType, key, cacheList);
+                        }
+                    });
+                }
+                catch (Exception ex) { }
+            });
         }
         #endregion
+
+        private static void InitAssembly()
+        {
+            Assembly.GetCallingAssembly().GetReferencedAssemblies().ToList().ForEach(a => {
+                try
+                {
+                    if (!AppDomain.CurrentDomain.GetAssemblies().ToList().Exists(b => b.GetName().Name == a.Name))
+                        Assembly.Load(a.Name);
+                }
+                catch (Exception ex) { }
+            });
+        }
 
         #region 初始化code first 2
         /// <summary>
@@ -153,31 +177,41 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceTable(string nameSpace, string dbKey = null, string dbFile = "db.config", IFastAop aop = null)
+        public static void InstanceTable(string nameSpace, string dbKey = null, string dbFile = "db.config", bool isResource = false, IFastAop aop = null)
         {
+            InitAssembly();
             if (aop != null)
                 fastAop = aop;
 
-            var projectName = Assembly.GetCallingAssembly().GetName().Name;
-            FastRedis.RedisInfo.Init(dbFile, projectName);
             var query = new DataQuery();
-            query.Config = DataConfig.GetConfig(dbKey, projectName, dbFile);
+
+            if (isResource)
+                query.Config = DataConfig.GetConfig(dbKey, Assembly.GetCallingAssembly().GetName().Name, dbFile);
+            else
+                query.Config = DataConfig.GetConfig(dbKey, null, dbFile);
+
             query.Key = dbKey;
+
+            if (query.Config.CacheType == CacheType.Redis && isResource)
+                FastRedis.RedisInfo.Init(dbFile, Assembly.GetCallingAssembly().GetName().Name);
+
+            if (query.Config.CacheType == CacheType.Redis && isResource)
+                FastRedis.RedisInfo.Init(dbFile);
 
             MapXml.CreateLogTable(query);
 
-            var assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == projectName);
-            if (assembly == null)
-                assembly = Assembly.Load(projectName);
-
-            if (assembly != null)
+            AppDomain.CurrentDomain.GetAssemblies().ToList().ForEach(assembly =>
             {
-                assembly.ExportedTypes.ToList().ForEach(a => {
-                    var typeInfo = (a as TypeInfo);
-                    if (typeInfo.Namespace != null && typeInfo.Namespace == nameSpace)
-                        BaseTable.Check(query, a.Name, typeInfo.DeclaredProperties.ToList(), typeInfo.GetCustomAttributes().ToList());
-                });
-            }
+                try {
+                    assembly.ExportedTypes.ToList().ForEach(a =>
+                    {
+                        var typeInfo = (a as TypeInfo);
+                        if (typeInfo.Namespace != null && typeInfo.Namespace == nameSpace)
+                            BaseTable.Check(query, a.Name, typeInfo.DeclaredProperties.ToList(), typeInfo.GetCustomAttributes().ToList());
+                    });
+                }
+                catch (Exception ex) { }
+            });
         }
         #endregion
 
@@ -188,13 +222,16 @@ namespace FastData
                 fastAop = aop;
 
             var projectName = Assembly.GetCallingAssembly().GetName().Name;
-            FastRedis.RedisInfo.Init(dbFile, projectName);
             var config = DataConfig.GetConfig(dbKey, projectName, dbFile);
+
+            if (config.CacheType == CacheType.Redis)
+                FastRedis.RedisInfo.Init(dbFile, projectName);
             DbCache.Set<ConfigModel>(CacheType.Web, configKey, config);
+                
+            var assembly = Assembly.Load(projectName);
 
             using (var db = new DataContext(dbKey))
             {
-                var assembly = Assembly.Load(projectName);
                 var map = new MapConfigModel();
                 using (var resource = assembly.GetManifestResourceStream(string.Format("{0}.{1}", projectName, mapFile)))
                 {
@@ -335,65 +372,72 @@ namespace FastData
         #endregion
 
         #region 初始化 interface service
-        public static void InstanceService( string nameSpace)
+        public static void InstanceService(string nameSpace)
         {
-            Assembly.GetCallingAssembly().ExportedTypes.ToList().ForEach(a =>
+            InitAssembly();
+            AppDomain.CurrentDomain.GetAssemblies().ToList().ForEach(assembly =>
             {
-                if (a.Namespace == nameSpace)
+                try {
+                    assembly.ExportedTypes.ToList().ForEach(a =>
                 {
-                    var isRegister = false;
-                    a.GetMethods().ToList().ForEach(m =>
+                    if (a.Namespace == nameSpace)
                     {
-                        ConfigModel config = new ConfigModel();
-                        var model = new ServiceModel();
-                        var read = m.GetCustomAttribute<FastReadAttribute>();
-                        var write = m.GetCustomAttribute<FastWriteAttribute>();
-                        var map = m.GetCustomAttribute<FastMapAttribute>();
-
-                        if (read != null)
+                        var isRegister = false;
+                        a.GetMethods().ToList().ForEach(m =>
                         {
-                            isRegister = true;
-                            model.isWrite = false;
-                            model.sql = read.sql.ToLower();
-                            model.dbKey = read.dbKey;
-                            config = DataConfig.GetConfig(model.dbKey);
-                            model.isPage = read.isPage;
-                            model.type = m.ReturnType;
-                            ServiceParam(m, model, config);
-                        }
+                            ConfigModel config = new ConfigModel();
+                            var model = new ServiceModel();
+                            var read = m.GetCustomAttribute<FastReadAttribute>();
+                            var write = m.GetCustomAttribute<FastWriteAttribute>();
+                            var map = m.GetCustomAttribute<FastMapAttribute>();
 
-                        if (write != null)
-                        {
-                            isRegister = true;
-                            model.isWrite = true;
-                            model.sql = write.sql.ToLower();
-                            model.dbKey = write.dbKey;
-                            model.type = m.ReturnType;
-                            config = DataConfig.GetConfig(model.dbKey);
-                            ServiceParam(m, model, config);
-                            model.isList = false;
-                        }
+                            if (read != null)
+                            {
+                                isRegister = true;
+                                model.isWrite = false;
+                                model.sql = read.sql.ToLower();
+                                model.dbKey = read.dbKey;
+                                config = DataConfig.GetConfig(model.dbKey);
+                                model.isPage = read.isPage;
+                                model.type = m.ReturnType;
+                                ServiceParam(m, model, config);
+                            }
 
-                        if (map != null)
-                        {
-                            isRegister = true;
-                            model.isWrite = false;
-                            model.isXml = true;
-                            model.dbKey = map.dbKey;
-                            model.isPage = map.isPage;
-                            model.type = m.ReturnType;
-                            config = DataConfig.GetConfig(model.dbKey);
-                            MapXml.ReadFastMap(map.xml, m, config);
-                            ServiceParam(m, model, config);
-                        }
+                            if (write != null)
+                            {
+                                isRegister = true;
+                                model.isWrite = true;
+                                model.sql = write.sql.ToLower();
+                                model.dbKey = write.dbKey;
+                                model.type = m.ReturnType;
+                                config = DataConfig.GetConfig(model.dbKey);
+                                ServiceParam(m, model, config);
+                                model.isList = false;
+                            }
 
-                        if (isRegister)
-                        {
-                            var key = string.Format("{0}.{1}", a.FullName, m.Name);
-                            DbCache.Set<ServiceModel>(config.CacheType, key, model);
-                        }
-                    });
+                            if (map != null)
+                            {
+                                isRegister = true;
+                                model.isWrite = false;
+                                model.isXml = true;
+                                model.dbKey = map.dbKey;
+                                model.isPage = map.isPage;
+                                model.type = m.ReturnType;
+                                config = DataConfig.GetConfig(model.dbKey);
+                                MapXml.ReadFastMap(map.xml, m, config);
+                                ServiceParam(m, model, config);
+                            }
+
+                            if (isRegister)
+                            {
+                                var key = string.Format("{0}.{1}", a.FullName, m.Name);
+                                DbCache.Set<ServiceModel>(config.CacheType, key, model);
+                            }
+                        });
+                    }
+                });
                 }
+                catch (Exception ex) { }
             });
         }
         #endregion
