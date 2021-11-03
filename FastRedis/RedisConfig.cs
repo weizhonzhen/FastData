@@ -17,7 +17,7 @@ namespace FastRedis.Config
         /// 配置信息
         /// </summary>
         /// <returns></returns>
-        public static RedisConfig GetConfig(string projectName = null, string dbFile = "db.config")
+        public static RedisConfig GetConfig(string projectName = null, string dbFile = "web.config")
         {
             var section = new RedisConfig();
             var cacheKey = "FastRedis.db.config";
