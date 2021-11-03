@@ -62,7 +62,7 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceProperties(string nameSpace, string dbFile = "db.config", bool isResource = false, IFastAop aop = null)
+        public static void InstanceProperties(string nameSpace, string dbFile = "web.config", bool isResource = false, IFastAop aop = null)
         {
             InitAssembly();
             var config = new ConfigModel();
@@ -177,7 +177,7 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceTable(string nameSpace, string dbKey = null, string dbFile = "db.config", bool isResource = false, IFastAop aop = null)
+        public static void InstanceTable(string nameSpace, string dbKey = null, string dbFile = "web.config", bool isResource = false, IFastAop aop = null)
         {
             InitAssembly();
             if (aop != null)
@@ -216,7 +216,7 @@ namespace FastData
         #endregion
 
         #region 初始化map 3  by Resource
-        public static void InstanceMapResource(string dbKey = null, string dbFile = "db.config", string mapFile = "SqlMap.config", IFastAop aop =null)
+        public static void InstanceMapResource(string dbKey = null, string dbFile = "web.config", string mapFile = "SqlMap.config", IFastAop aop =null)
         {
             if (aop != null)
                 fastAop = aop;
@@ -301,7 +301,7 @@ namespace FastData
         /// 初始化map 3
         /// </summary>
         /// <returns></returns>
-        public static void InstanceMap(string dbKey = null, string dbFile = "db.config", string mapFile = "SqlMap.config", IFastAop aop = null)
+        public static void InstanceMap(string dbKey = null, string dbFile = "web.config", string mapFile = "SqlMap.config", IFastAop aop = null)
         {
             if (aop != null)
                 fastAop = aop;
