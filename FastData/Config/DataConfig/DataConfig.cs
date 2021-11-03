@@ -112,7 +112,7 @@ namespace FastData.Config
         /// 获取配置节点
         /// </summary>
         /// <returns></returns>
-        public static ConfigModel GetConfig(string key = null, string projectName = null, string dbFile = "db.config")
+        public static ConfigModel GetConfig(string key = null, string projectName = null, string dbFile = "web.config")
         {
             var cacheKey = "FastData.db.config";
             var result = new ConfigModel();
@@ -389,7 +389,7 @@ namespace FastData.Config
         }
         #endregion
 
-        public static bool DataType(string key = null, string projectName = null, string dbFile = "db.config")
+        public static bool DataType(string key = null, string projectName = null, string dbFile = "web.config")
         {
             var result = new List<bool>();
             var cacheKey = "FastData.db.config";
