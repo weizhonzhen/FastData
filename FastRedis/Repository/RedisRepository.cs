@@ -62,6 +62,7 @@ namespace FastRedis.Repository
         }
         #endregion
 
+
         #region 设置值 item
         /// <summary>
         /// 设置值 item
@@ -89,6 +90,34 @@ namespace FastRedis.Repository
         }
         #endregion
 
+        #region 设置值 item
+        /// <summary>
+        /// 设置值 item
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="key">键</param>
+        /// <param name="model">值</param>
+        /// <param name="hours">存期限</param>
+        /// <returns></returns>
+        public bool Set<T>(string key, T model, TimeSpan timeSpan, int db = 0)
+        {
+            try
+            {
+                Context.Db = db;
+                if (string.IsNullOrEmpty(key))
+                    return false;
+                else
+                    return Context.Set<T>(key, model, timeSpan);
+            }
+            catch (RedisException ex)
+            {
+                SaveLog<T>(ex, "Set<T>");
+                return false;
+            }
+        }
+        #endregion
+
+
         #region 设置值 item asy
         /// <summary>
         /// 设置值 item asy
@@ -106,6 +135,25 @@ namespace FastRedis.Repository
            });
         }
         #endregion
+
+        #region 设置值 item asy
+        /// <summary>
+        /// 设置值 item asy
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="key">键</param>
+        /// <param name="model">值</param>
+        /// <param name="hours">存期限</param>
+        /// <returns></returns>
+        public Task<bool> SetAsy<T>(string key, T model, TimeSpan timeSpan, int db = 0)
+        {
+            return Task.Run(() =>
+            {
+                return Set<T>(key, model, timeSpan, db);
+            });
+        }
+        #endregion
+
 
         #region 设置值 item
         /// <summary>
@@ -135,6 +183,36 @@ namespace FastRedis.Repository
         }
         #endregion
 
+
+        #region 设置值 item
+        /// <summary>
+        /// 设置值 item
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="key">键</param>
+        /// <param name="model">值</param>
+        /// <param name="hours">存期限</param>
+        /// <returns></returns>
+        public bool Set(string key, string model, TimeSpan timeSpan, int db = 0)
+        {
+            try
+            {
+                Context.Db = db;
+                if (string.IsNullOrEmpty(key))
+                    return false;
+                else
+                    return Context.Set<string>(key, model, timeSpan);
+
+            }
+            catch (RedisException ex)
+            {
+                SaveLog(ex, "Set", key);
+                return false;
+            }
+        }
+        #endregion
+
+
         #region 设置值 item asy
         /// <summary>
         /// 设置值 item asy
@@ -153,33 +231,6 @@ namespace FastRedis.Repository
         }
         #endregion
 
-        #region 设置值 item
-        /// <summary>
-        /// 设置值 item
-        /// </summary>
-        /// <typeparam name="T">泛型</typeparam>
-        /// <param name="key">键</param>
-        /// <param name="model">值</param>
-        /// <param name="Minutes">存期限</param>
-        /// <returns></returns>
-        public bool Set(string key, string model, double Minutes, int db = 0)
-        {
-            try
-            {
-                Context.Db = db;
-                if (string.IsNullOrEmpty(key))
-                    return false;
-                else
-                    return Context.Set<string>(key, model, DateTime.Now.AddMinutes(Minutes));
-            }
-            catch (RedisException ex)
-            {
-                SaveLog(ex, "Set", key);
-                return false;
-            }
-        }
-        #endregion
-
         #region 设置值 item asy
         /// <summary>
         /// 设置值 item asy
@@ -187,16 +238,17 @@ namespace FastRedis.Repository
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="key">键</param>
         /// <param name="model">值</param>
-        /// <param name="Minutes">存期限</param>
+        /// <param name="hours">存期限</param>
         /// <returns></returns>
-        public Task<bool> SetAsy(string key, string model, double Minutes, int db = 0)
+        public Task<bool> SetAsy(string key, string model, TimeSpan timeSpan, int db = 0)
         {
             return Task.Run(() =>
-           {
-               return Set(key, model, Minutes, db);
-           });
+            {
+                return Set(key, model, timeSpan, db);
+            });
         }
         #endregion
+
 
         #region 获取值 item
         /// <summary>
@@ -239,6 +291,7 @@ namespace FastRedis.Repository
         }
         #endregion
 
+
         #region 获取值 item
         /// <summary>
         /// 获取值 item
@@ -280,6 +333,7 @@ namespace FastRedis.Repository
         }
         #endregion
 
+
         #region 删除值 item
         /// <summary>
         /// 删除值 item
@@ -318,6 +372,7 @@ namespace FastRedis.Repository
            });
         }
         #endregion
+
 
         #region 设置值 Dic
         /// <summary>
@@ -358,6 +413,7 @@ namespace FastRedis.Repository
         }
         #endregion
 
+
         #region 获取值 dic
         /// <summary>
         /// 获取值 dic
@@ -395,6 +451,7 @@ namespace FastRedis.Repository
            });
         }
         #endregion
+
 
         #region 删除值 dic
         /// <summary>
