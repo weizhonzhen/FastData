@@ -81,6 +81,7 @@ namespace FastRedis
         }
         #endregion
 
+
         #region 设置值 item
         /// <summary>
         /// 设置值 item
@@ -110,6 +111,36 @@ namespace FastRedis
         }
         #endregion
 
+        #region 设置值 item
+        /// <summary>
+        /// 设置值 item
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="key">键</param>
+        /// <param name="model">值</param>
+        /// <param name="hours">存期限</param>
+        /// <returns></returns>
+        public static bool Set<T>(string key, T model, TimeSpan timeSpan, int db = 0)
+        {
+            try
+            {
+                using (IRedisClient redis = Context(db).GetClient())
+                {
+                    if (string.IsNullOrEmpty(key))
+                        return false;
+                    else
+                        return redis.Set<T>(key, model, timeSpan);
+                }
+            }
+            catch (RedisException ex)
+            {
+                SaveLog<T>(ex, "Set<T>");
+                return false;
+            }
+        }
+        #endregion
+
+
         #region 设置值 item asy
         /// <summary>
         /// 设置值 item asy
@@ -127,6 +158,25 @@ namespace FastRedis
            });
         }
         #endregion
+
+        #region 设置值 item asy
+        /// <summary>
+        /// 设置值 item asy
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="key">键</param>
+        /// <param name="model">值</param>
+        /// <param name="hours">存期限</param>
+        /// <returns></returns>
+        public static Task<bool> SetAsy<T>(string key, T model, TimeSpan timeSpan, int db = 0)
+        {
+            return Task.Run(() =>
+            {
+                return Set<T>(key, model, timeSpan, db);
+            });
+        }
+        #endregion
+
 
         #region 设置值 item
         /// <summary>
@@ -157,6 +207,36 @@ namespace FastRedis
         }
         #endregion
 
+        #region 设置值 item
+        /// <summary>
+        /// 设置值 item
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="key">键</param>
+        /// <param name="model">值</param>
+        /// <param name="hours">存期限</param>
+        /// <returns></returns>
+        public static bool Set(string key, string model, TimeSpan timeSpan, int db = 0)
+        {
+            try
+            {
+                using (IRedisClient redis = Context(db).GetClient())
+                {
+                    if (string.IsNullOrEmpty(key))
+                        return false;
+                    else
+                        return redis.Set<string>(key, model, timeSpan);
+                }
+            }
+            catch (RedisException ex)
+            {
+                SaveLog(ex, "Set", key);
+                return false;
+            }
+        }
+        #endregion
+
+
         #region 设置值 item asy
         /// <summary>
         /// 设置值 item asy
@@ -175,34 +255,6 @@ namespace FastRedis
         }
         #endregion
 
-        #region 设置值 item
-        /// <summary>
-        /// 设置值 item
-        /// </summary>
-        /// <typeparam name="T">泛型</typeparam>
-        /// <param name="key">键</param>
-        /// <param name="model">值</param>
-        /// <param name="Minutes">存期限</param>
-        /// <returns></returns>
-        public static bool Set(string key, string model, double Minutes, int db = 0)
-        {
-            try
-            {
-                using (IRedisClient redis = Context(db).GetClient())
-                {
-                    if (string.IsNullOrEmpty(key))
-                        return false;
-                    else
-                        return redis.Set<string>(key, model, DateTime.Now.AddMinutes(Minutes));
-                }
-            }
-            catch (RedisException ex)
-            {
-                SaveLog(ex, "Set", key);
-                return false;
-            }
-        }
-        #endregion
 
         #region 设置值 item asy
         /// <summary>
@@ -211,16 +263,17 @@ namespace FastRedis
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="key">键</param>
         /// <param name="model">值</param>
-        /// <param name="Minutes">存期限</param>
+        /// <param name="hours">存期限</param>
         /// <returns></returns>
-        public static Task<bool> SetAsy(string key, string model, double Minutes, int db = 0)
+        public static Task<bool> SetAsy(string key, string model, TimeSpan timeSpan, int db = 0)
         {
             return Task.Run(() =>
-           {
-               return Set(key, model, Minutes, db);
-           });
+            {
+                return Set(key, model, timeSpan, db);
+            });
         }
         #endregion
+
 
         #region 获取值 item
         /// <summary>
