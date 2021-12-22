@@ -592,7 +592,7 @@ namespace FastData.Context
                 pModel.StarId = (pModel.PageId - 1) * pModel.PageSize + 1;
                 pModel.EndId = pModel.PageId * pModel.PageSize;
                 Dispose(cmd);
-                pModel.TotalRecord = BaseExecute.ToPageCountSql(param, cmd, sql, config, ref countSql,FilterType.Query_Page_Lambda_Model, typeof(T).Name);
+                pModel.TotalRecord = BaseExecute.ToPageCountSql(param, cmd, sql, config, ref countSql,FilterType.Query_Page_Sql_Model, typeof(T).Name);
 
                 if (pModel.TotalRecord > 0)
                 {
@@ -605,10 +605,10 @@ namespace FastData.Context
                         pModel.PageId = pModel.TotalPage;
 
                     if (isAop)
-                        BaseAop.AopBefore(null, sql.ToString(), param?.ToList(), config, true,AopType.Query_Page_Lambda_Model);
+                        BaseAop.AopBefore(null, sql.ToString(), param?.ToList(), config, true,AopType.Query_Page_Sql_Model);
 
                     Dispose(cmd);
-                    var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql, FilterType.Query_Page_Lambda_Model, typeof(T).Name);
+                    var dr = BaseExecute.ToPageDataReaderSql(param, cmd, pModel, sql, config, ref pageSql, FilterType.Query_Page_Sql_Model, typeof(T).Name);
 
                     result.pageResult.list = BaseDataReader.ToList<T>(dr, config, null);
                     result.sql = string.Format("count:{0},page:{1}", countSql, pageSql);
@@ -617,14 +617,16 @@ namespace FastData.Context
                     dr.Dispose();
 
                     if (isAop)
-                        BaseAop.AopAfter(null, cmd.CommandText, param?.ToList(), config, true, AopType.Query_Page_Lambda_Model, result.pageResult.list);
+                        BaseAop.AopAfter(null, cmd.CommandText, param?.ToList(), config, true, AopType.Query_Page_Sql_Model, result.pageResult.list);
+
+                    Navigate<T>(result, config, true);
                 }
 
                 result.pageResult.pModel = pModel;
             }
             catch (Exception ex)
             {
-                BaseAop.AopException(ex, "to Page tableName:" + typeof(T).Name,config, AopType.Query_Page_Lambda_Model);
+                BaseAop.AopException(ex, "to Page tableName:" + typeof(T).Name,config, AopType.Query_Page_Sql_Model);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException(config, ex, "GetPageSql", result.sql);
@@ -830,6 +832,9 @@ namespace FastData.Context
                 dr.Dispose();
 
                 BaseAop.AopAfter(tableName, sql.ToString(), param?.ToList(), config, true, AopType.Execute_Sql_Model, result.list);
+
+
+                Navigate<T>(result, config, false);
             }
             catch (Exception ex)
             {
