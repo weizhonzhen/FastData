@@ -287,7 +287,7 @@ namespace FastData.Base
                 if (tableName != null)
                     BaseFilter.Filter(param, type, table, config, ref sql);
 
-                tempSql = ParameterToSql.ObjectParamToSql(param.ToList(), sql, config);
+                tempSql = ParameterToSql.ObjectParamToSql(param?.ToList(), sql, config);
 
                 var dt = BaseExecute.ToDataTable(cmd, sql.ToString());
 
@@ -351,7 +351,7 @@ namespace FastData.Base
                 if (tableName != null)
                     BaseFilter.Filter(param, type, table, config, ref sql);
 
-                tempSql = ParameterToSql.ObjectParamToSql(param.ToList(), sql, config);
+                tempSql = ParameterToSql.ObjectParamToSql(param?.ToList(), sql, config);
 
                 cmd.CommandText = sql;
 
