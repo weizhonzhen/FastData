@@ -227,7 +227,10 @@ interface  Service
                 public string DELUSERNAME { get; set; }
                 
                 //Navigate
+                [NavigateType(IsAdd = true,IsUpdate =true,IsDel =true)] //add,update by PrimaryKey,delete by PrimaryKey
                 public virtual List<BASE_AREA> area { get; set; }
+                
+                [NavigateType(IsAdd = true,IsUpdate =true,IsDel =true)] //add,update by PrimaryKey,delete by PrimaryKey
                 public virtual List<BASE_ROLE> role { get; set; }    
                 
                 [NavigateType(Type = typeof(BASE_ROLE))]
