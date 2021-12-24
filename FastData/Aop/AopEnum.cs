@@ -44,6 +44,11 @@ namespace FastData.Aop
         FaseWrite = 30,
         FastRead_Page = 31,
 
-        Execute_Sql_DDL = 32
+        Execute_Sql_DDL = 32,
+
+        Navigate_Add = 33,
+        Navigate_Delete = 34,
+        Navigate_Update = 35,
+        Navigate_AddList = 36
     }
 }
