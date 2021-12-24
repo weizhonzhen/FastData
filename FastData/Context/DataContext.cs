@@ -26,6 +26,137 @@ namespace FastData.Context
         private DbCommand cmd;
         private DbTransaction trans;
 
+        #region Navigate Add
+        /// <summary>
+        /// Navigate Add
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private List<WriteReturn> NavigateAdd(List<Dictionary<string, object>> list)
+        {
+            var result = new List<WriteReturn>();
+
+            list.ForEach(a =>
+            {
+                var navigate = a.GetValue("navigate") as NavigateModel;
+                var model = a.GetValue("model");
+
+                if (!navigate.IsList && model != null)
+                    result.Add(Add(model, navigate).writeReturn);
+
+                if (navigate.IsList && model != null && navigate.MemberType.GenericTypeArguments.Length > 0)
+                    result.Add(AddList(model, navigate).writeReturn);
+            });
+
+            return result;
+        }
+        #endregion
+
+        #region Navigate Update
+        /// <summary>
+        /// Navigate Update
+        /// </summary>
+        /// <returns></returns>
+        private List<WriteReturn> NavigateUpdate(List<Dictionary<string, object>> list)
+        {
+            var result = new List<WriteReturn>();
+
+            list.ForEach(a =>
+            {
+                var navigate = a.GetValue("navigate") as NavigateModel;
+                var model = a.GetValue("model");
+
+                if (!navigate.IsList && model != null)
+                    result.Add(Update(model, navigate).writeReturn);
+
+                if (navigate.IsList && model != null && navigate.MemberType.GenericTypeArguments.Length > 0)
+                {
+                    BaseJson.JsonToList(BaseJson.ModelToJson(model), navigate.PropertyType).ForEach(d =>
+                    {
+                        result.Add(Update(d, navigate).writeReturn);
+                    });
+                }
+            });
+
+            return result;
+        }
+        #endregion
+
+        #region Navigate Delete
+        /// <summary>
+        /// Navigate Delete
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        private List<WriteReturn> NavigateDelete(List<Dictionary<string, object>> list)
+        {
+            var result = new List<WriteReturn>();
+
+            list.ForEach(a =>
+            {
+                var navigate = a.GetValue("navigate") as NavigateModel;
+                var model = a.GetValue("model");
+
+                if (!navigate.IsList && model != null)
+                    result.Add(Delete(model, navigate).writeReturn);
+
+                BaseJson.JsonToList(BaseJson.ModelToJson(model), navigate.PropertyType).ForEach(d =>
+                {
+                    result.Add(Delete(d, navigate).writeReturn);
+                });
+            });
+
+            return result;
+        }
+        #endregion
+
+        #region Check Navigate
+        /// <summary>
+        /// Check Navigate
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private List<Dictionary<string, object>> CheckNavigate<T>(T model, AopType type)
+        {
+            var result = new List<Dictionary<string, object>>();
+            var key = string.Format("{0}.{1}.navigate", typeof(T).Namespace, typeof(T).Name);
+            if (DbCache.Exists(config.CacheType, key))
+            {
+                var list = DbCache.Get<List<NavigateModel>>(config.CacheType, key);
+                list.ForEach(a =>
+                {
+                    var check = false;
+                    if (type == AopType.Navigate_Add) check = a.IsAdd;
+                    if (type == AopType.Navigate_Delete) check = a.IsDel;
+                    if (type == AopType.Navigate_Update) check = a.IsUpdate;
+
+                    if (check && a.MemberType != typeof(Dictionary<string, object>) && a.MemberType != typeof(List<Dictionary<string, object>>))
+                    {
+                        var item = typeof(T).GetProperty(a.MemberName).GetValue(model);
+                        if (!a.IsList && item != null)
+                        {
+                            var dic = new Dictionary<string, object>();
+                            dic.Add("model", item);
+                            dic.Add("navigate", a);
+                            result.Add(dic);
+                        }
+
+                        if (a.IsList && item != null && a.MemberType.GenericTypeArguments.Length > 0)
+                        {
+                            var dic = new Dictionary<string, object>();
+                            dic.Add("model", item);
+                            dic.Add("navigate", a);
+                            result.Add(dic);
+                        }
+                    }
+                });
+            }
+            return result;
+        }
+        #endregion
+
         #region Dispose param
         private void Dispose(DbCommand cmd)
         {
@@ -134,7 +265,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                BaseAop.AopException(ex, "to List tableName:" + typeof(T).Name, config, AopType.Navigate);
+                BaseAop.AopException(ex, $"to List tableName:{typeof(T).Name}", config, AopType.Navigate);
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "Navigate<T>", "");
                 else
@@ -227,7 +358,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                BaseAop.AopException(ex, "DataContext :" + key,config,AopType.DataContext);
+                BaseAop.AopException(ex, $"DataContext :{key}",config,AopType.DataContext);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException(config, ex, "DataContext", "");
@@ -324,7 +455,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                BaseAop.AopException(ex, "to List tableName:" + typeof(T).Name,config, AopType.Query_List_Lambda);
+                BaseAop.AopException(ex, $"to List tableName:{typeof(T).Name}",config, AopType.Query_List_Lambda);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "GetList<T>", "");
@@ -384,7 +515,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                BaseAop.AopException(ex, "to Page tableName:" + typeof(T).Name,config, AopType.Query_Page_Lambda_Model);
+                BaseAop.AopException(ex, $"to Page tableName:{typeof(T).Name}",config, AopType.Query_Page_Lambda_Model);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "GetPage<T>", "");
@@ -565,7 +696,7 @@ namespace FastData.Context
             catch (Exception ex)
             {
                 var sql = string.Format("count:{0},page:{1}", countSql, pageSql);
-                BaseAop.AopException(ex, "to Page tableName:" + model.type.Name, config, AopType.FastRead_Page);
+                BaseAop.AopException(ex, $"to Page tableName:{model.type.Name}", config, AopType.FastRead_Page);
                 if (config.SqlErrorType == SqlErrorType.Db)
                     DbLogTable.LogException(config, ex, "GetPageSql", sql);
                 else
@@ -626,7 +757,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                BaseAop.AopException(ex, "to Page tableName:" + typeof(T).Name,config, AopType.Query_Page_Sql_Model);
+                BaseAop.AopException(ex, $"to Page tableName:{typeof(T).Name}",config, AopType.Query_Page_Sql_Model);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException(config, ex, "GetPageSql", result.sql);
@@ -838,7 +969,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                BaseAop.AopException(ex, "ExecuteSql tableName:" + typeof(T).Name,config, AopType.Execute_Sql_Model);
+                BaseAop.AopException(ex, $"ExecuteSql tableName:{typeof(T).Name}",config, AopType.Execute_Sql_Model);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "ExecuteSql<T>", "");
@@ -1128,12 +1259,10 @@ namespace FastData.Context
                     SubmitTrans();
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
-
-                BaseAop.AopAfter(tableName, sql.ToString(), visitModel.Param, config, false, AopType.Delete_Lambda, result.writeReturn);
             }
             catch (Exception ex)
             {
-                BaseAop.AopException(ex, "Delete by Lambda tableName"+typeof(T).Name,config, AopType.Delete_Lambda);
+                BaseAop.AopException(ex, $"Delete by Lambda tableName：{typeof(T).Name}", config, AopType.Delete_Lambda);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "Delete<T>", "");
@@ -1147,6 +1276,7 @@ namespace FastData.Context
                 result.writeReturn.Message = ex.Message;
             }
 
+            BaseAop.AopAfter(tableName, sql.ToString(), visitModel.Param, config, false, AopType.Delete_Lambda, result.writeReturn);
             return result;
         }
         #endregion
@@ -1165,39 +1295,58 @@ namespace FastData.Context
 
             try
             {
-                if (isTrans)
-                    BeginTrans();
-
                 optionModel = BaseModel.DeleteToSql<T>(cmd, model, config);
 
-                result.sql = ParameterToSql.ObjectParamToSql(optionModel.Param, optionModel.Sql, config);
-
-                Dispose(cmd);
-
-                if (optionModel.Param.Count != 0)
-                    cmd.Parameters.AddRange(optionModel.Param.ToArray());
-
                 tableName.Add(typeof(T).Name);
-                BaseAop.AopBefore(tableName, optionModel.Sql, optionModel.Param, config, false,AopType.Delete_PrimaryKey, model);
+                BaseAop.AopBefore(tableName, optionModel.Sql, optionModel.Param, config, false, AopType.Delete_PrimaryKey, model);
 
                 if (optionModel.IsSuccess)
+                {
+                    var dic = CheckNavigate<T>(model, AopType.Navigate_Delete);
+                    if (dic.Count > 0)
+                    {
+                        isTrans = true;
+                        BeginTrans();
+
+                        var tempResult = NavigateDelete(dic);
+                        if (tempResult.Exists(a => a.IsSuccess == false))
+                        {
+                            if (isTrans)
+                                RollbackTrans();
+
+                            result.writeReturn.IsSuccess = false;
+                            result.writeReturn.Message = tempResult.Find(a => a.IsSuccess == false).Message;
+                            BaseAop.AopAfter(tableName, optionModel.Sql, optionModel.Param, config, false, AopType.Delete_PrimaryKey, result.writeReturn, model);
+                            return result;
+                        }
+                    }
+                    else if (isTrans)
+                        BeginTrans();
+
+                    Dispose(cmd);
+
+                    if (optionModel.Param.Count != 0)
+                        cmd.Parameters.AddRange(optionModel.Param.ToArray());
+
+                    result.sql = ParameterToSql.ObjectParamToSql(optionModel.Param, optionModel.Sql, config);
+
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, optionModel.Sql);
+                }
                 else
                 {
                     result.writeReturn.IsSuccess = false;
                     result.writeReturn.Message = optionModel.Message;
                 }
+                
 
                 if (isTrans && result.writeReturn.IsSuccess)
                     SubmitTrans();
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
-
-                BaseAop.AopAfter(tableName, optionModel.Sql, optionModel.Param, config, false, AopType.Delete_PrimaryKey, result.writeReturn, model);
             }
             catch (Exception ex)
             {
-                BaseAop.AopException(ex, "Delete by Primary Key tableName" + typeof(T).Name,config, AopType.Delete_PrimaryKey, model);
+                BaseAop.AopException(ex, $"Delete by Primary Key tableName：{typeof(T).Name}",config, AopType.Delete_PrimaryKey, model);
 
                 if (isTrans)
                     RollbackTrans();
@@ -1211,6 +1360,60 @@ namespace FastData.Context
                 result.writeReturn.Message = ex.Message;
             }
 
+            BaseAop.AopAfter(tableName, optionModel.Sql, optionModel.Param, config, false, AopType.Delete_PrimaryKey, result.writeReturn, model);
+            return result;
+        }
+        #endregion
+
+        #region 删除
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private DataReturn Delete(object model, NavigateModel navigate)
+        {
+            var result = new DataReturn();
+            var optionModel = new OptionModel();
+            var tableName = new List<string>();
+
+            try
+            {
+                optionModel = BaseModel.DeleteToSql(cmd, model, config);
+                tableName.Add(model.GetType().Name);
+                BaseAop.AopBefore(tableName, optionModel.Sql, optionModel.Param, config, false, AopType.Navigate_Delete, model);
+
+                if (optionModel.IsSuccess)
+                {
+                    Dispose(cmd);
+
+                    if (optionModel.Param.Count != 0)
+                        cmd.Parameters.AddRange(optionModel.Param.ToArray());
+
+                    result.Sql = ParameterToSql.ObjectParamToSql(optionModel.Param, optionModel.Sql, config);
+
+                    result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, optionModel.Sql);
+                }
+                else
+                {
+                    result.writeReturn.IsSuccess = false;
+                    result.writeReturn.Message = optionModel.Message;
+                }
+            }
+            catch (Exception ex)
+            {
+                BaseAop.AopException(ex, $"tableName: {model.GetType().Name}, NavigateDelete:{ex.Message}, MemberName:{navigate.MemberName}", config, AopType.Navigate_Delete, model);
+
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "Delete", "");
+                else
+                    DbLog.LogException(config.IsOutError, config.DbType, ex, "Delete", result.Sql);
+
+                result.writeReturn.IsSuccess = false;
+                result.writeReturn.Message = $"tableName: {model.GetType().Name}, NavigateDelete:{ex.Message}, MemberName:{navigate.MemberName}";
+            }
+
+            BaseAop.AopAfter(tableName, optionModel.Sql, optionModel.Param, config, false, AopType.Navigate_Delete, result.writeReturn, model);
             return result;
         }
         #endregion
@@ -1237,11 +1440,13 @@ namespace FastData.Context
                     BeginTrans();
 
                 update = BaseModel.UpdateToSql<T>(model, config, field, cmd);
+                visitModel = VisitExpression.LambdaWhere<T>(predicate, config);
+
+                tableName.Add(typeof(T).Name);
+                BaseAop.AopBefore(tableName, sql, Parameter.ParamMerge(update.Param, visitModel.Param), config, false, AopType.Update_Lambda, model);
 
                 if (update.IsSuccess)
                 {
-                    visitModel = VisitExpression.LambdaWhere<T>(predicate, config);
-
                     sql = string.Format("{0} {1}", update.Sql, string.IsNullOrEmpty(visitModel.Where) ? "" : string.Format("where {0}", visitModel.Where.Replace(string.Format("{0}.", predicate.Parameters[0].Name), "")));
 
                     Dispose(cmd);
@@ -1253,9 +1458,6 @@ namespace FastData.Context
                         cmd.Parameters.AddRange(visitModel.Param.ToArray());
 
                     result.sql = ParameterToSql.ObjectParamToSql(Parameter.ParamMerge(update.Param, visitModel.Param), sql, config);
-
-                    tableName.Add(typeof(T).Name);
-                    BaseAop.AopBefore(tableName, sql, Parameter.ParamMerge(update.Param, visitModel.Param), config, false,AopType.Update_Lambda, model);
 
                     if (visitModel.IsSuccess)
                         result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, sql);
@@ -1272,12 +1474,10 @@ namespace FastData.Context
                     SubmitTrans();
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
-
-                BaseAop.AopAfter(tableName, sql, Parameter.ParamMerge(update.Param, visitModel.Param), config, false, AopType.Update_Lambda, result.writeReturn, model);
             }
             catch (Exception ex)
             {
-                BaseAop.AopException(ex, "Update by Lambda tableName:" + typeof(T).Name,config, AopType.Update_Lambda, model);
+                BaseAop.AopException(ex, $"Update by Lambda tableName:{typeof(T).Name}",config, AopType.Update_Lambda, model);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "Update<T>", "");
@@ -1290,6 +1490,7 @@ namespace FastData.Context
                     RollbackTrans();
             }
 
+            BaseAop.AopAfter(tableName, sql, Parameter.ParamMerge(update.Param, visitModel.Param), config, false, AopType.Update_Lambda, result.writeReturn, model);
             return result;
         }
         #endregion
@@ -1310,21 +1511,39 @@ namespace FastData.Context
             var tableName = new List<string>();
             try
             {
-
                 update = BaseModel.UpdateToSql<T>(cmd, model, config, field);
-                if (isTrans)
-                    BeginTrans();
+                tableName.Add(typeof(T).Name);
+                BaseAop.AopBefore(tableName, update.Sql, update.Param, config, false, AopType.Update_PrimaryKey, model);
+
                 if (update.IsSuccess)
                 {
+                    var dic = CheckNavigate<T>(model, AopType.Navigate_Update);
+                    if (dic.Count > 0)
+                    {
+                        isTrans = true;
+                        BeginTrans();
+
+                        var tempResult = NavigateUpdate(dic);
+                        if (tempResult.Exists(a => a.IsSuccess == false))
+                        {
+                            if (isTrans)
+                                RollbackTrans();
+
+                            result.writeReturn.IsSuccess = false;
+                            result.writeReturn.Message = tempResult.Find(a => a.IsSuccess == false).Message;
+                            BaseAop.AopAfter(tableName, update.Sql, update.Param, config, false, AopType.Update_PrimaryKey, result.writeReturn, model);
+                            return result;
+                        }
+                    }
+                    else if (isTrans)
+                        BeginTrans();
+
                     Dispose(cmd);
 
                     if (update.Param.Count != 0)
                         cmd.Parameters.AddRange(update.Param.ToArray());
 
                     result.sql = ParameterToSql.ObjectParamToSql(update.Param, update.Sql, config);
-
-                    tableName.Add(typeof(T).Name);
-                    BaseAop.AopBefore(tableName, update.Sql, update.Param, config, false,AopType.Update_PrimaryKey, model);
 
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, update.Sql);
                 }
@@ -1338,12 +1557,10 @@ namespace FastData.Context
                     SubmitTrans();
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
-
-                BaseAop.AopAfter(tableName, update.Sql, update.Param, config, false, AopType.Update_PrimaryKey, result.writeReturn, model);
             }
             catch (Exception ex)
             {
-                BaseAop.AopException(ex, "Update by Primary Key tableName:" + typeof(T).Name,config, AopType.Update_PrimaryKey, model);
+                BaseAop.AopException(ex, $"Update by Primary Key tableName:{typeof(T).Name}",config, AopType.Update_PrimaryKey, model);
 
                 if (isTrans)
                     RollbackTrans();
@@ -1356,10 +1573,63 @@ namespace FastData.Context
                 result.writeReturn.Message = ex.Message;
             }
 
+            BaseAop.AopAfter(tableName, update.Sql, update.Param, config, false, AopType.Update_PrimaryKey, result.writeReturn, model);
             return result;
         }
         #endregion
 
+        #region 修改
+        /// <summary>
+        /// 修改
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private DataReturn Update(object model, NavigateModel navigate)
+        {
+            var result = new DataReturn();
+            var update = new OptionModel();
+            var tableName = new List<string>();
+            try
+            {
+                update = BaseModel.UpdateToSql(cmd, model, config);
+
+                tableName.Add(model.GetType().Name);
+                BaseAop.AopBefore(tableName, update.Sql, update.Param, config, false, AopType.Navigate_Update, model);
+
+                if (update.IsSuccess)
+                {
+                    Dispose(cmd);
+
+                    if (update.Param.Count != 0)
+                        cmd.Parameters.AddRange(update.Param.ToArray());
+
+                    result.Sql = ParameterToSql.ObjectParamToSql(update.Param, update.Sql, config);
+
+                    result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, update.Sql);
+                }
+                else
+                {
+                    result.writeReturn.Message = update.Message;
+                    result.writeReturn.IsSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                BaseAop.AopException(ex, $"tableName: {model.GetType().Name}, NavigateUpdate:{ex.Message}, MemberName:{navigate.MemberName}", config, AopType.Navigate_Update, model);
+
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "Update", "");
+                else
+                    DbLog.LogException(config.IsOutError, config.DbType, ex, "Update", result.Sql);
+
+                result.writeReturn.IsSuccess = false;
+                result.writeReturn.Message = $"tableName: {model.GetType().Name}, NavigateUpdate:{ex.Message}, MemberName:{navigate.MemberName}";
+            }
+
+            BaseAop.AopAfter(tableName, update.Sql, update.Param, config, false, AopType.Navigate_Update, result.writeReturn, model);
+            return result;
+        }
+        #endregion
 
         #region 修改list
         /// <summary>
@@ -1386,6 +1656,9 @@ namespace FastData.Context
 
                 update = BaseModel.UpdateListToSql<T>(cmd, list, config, field);
 
+                tableName.Add(typeof(T).Name);
+                BaseAop.AopBefore(tableName, update.Sql, update.Param, config, false, AopType.UpdateList, list);
+
                 if (update.IsSuccess)
                 {
                     using (var adapter = DbProviderFactories.GetFactory(config.ProviderName).CreateDataAdapter())
@@ -1402,16 +1675,11 @@ namespace FastData.Context
 
                         result.sql = ParameterToSql.ObjectParamToSql(update.Param, update.Sql, config);
                         
-                        tableName.Add(typeof(T).Name);
-                        BaseAop.AopBefore(tableName, update.Sql, update.Param, config, false,AopType.UpdateList,list);
-
                         result.writeReturn.IsSuccess = adapter.Update(update.table) > 0;
                         if (result.writeReturn.IsSuccess)
                             SubmitTrans();
                         else
                             RollbackTrans();
-
-                        BaseAop.AopAfter(tableName, update.Sql, update.Param, config, false, AopType.UpdateList, result.writeReturn,list);
                     }
                 }
                 else
@@ -1422,7 +1690,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                BaseAop.AopException(ex, "Update List tableName:" + typeof(T).Name,config, AopType.UpdateList, list);
+                BaseAop.AopException(ex, $"Update List tableName:{typeof(T).Name}",config, AopType.UpdateList, list);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "UpdateList<T>", "");
@@ -1432,6 +1700,7 @@ namespace FastData.Context
                 result.writeReturn.Message = ex.Message;
             }
 
+            BaseAop.AopAfter(tableName, update.Sql, update.Param, config, false, AopType.UpdateList, result.writeReturn, list);
             return result;
         }
         #endregion
@@ -1451,13 +1720,34 @@ namespace FastData.Context
 
             try
             {
-                if (isTrans)
-                    BeginTrans();
-
                 insert = BaseModel.InsertToSql<T>(model, config);
+
+                tableName.Add(typeof(T).Name);
+                BaseAop.AopBefore(tableName, insert.Sql, insert.Param, config, false, AopType.Add, model);
 
                 if (insert.IsSuccess)
                 {
+                    var dic = CheckNavigate<T>(model,AopType.Navigate_Add);
+                    if (dic.Count > 0)
+                    {
+                        isTrans = true;
+                        BeginTrans();
+
+                        var tempResult = NavigateAdd(dic);
+                        if (tempResult.Exists(a => a.IsSuccess == false))
+                        {
+                            if (isTrans)
+                                RollbackTrans();
+
+                            result.writeReturn.IsSuccess = false;
+                            result.writeReturn.Message = tempResult.Find(a => a.IsSuccess == false).Message;
+                            BaseAop.AopAfter(tableName, insert.Sql, insert.Param, config, false, AopType.Add, result.writeReturn, model);
+                            return result;
+                        }
+                    }
+                    else if (isTrans)
+                        BeginTrans();
+
                     result.sql = ParameterToSql.ObjectParamToSql(insert.Param, insert.Sql, config);
 
                     Dispose(cmd);
@@ -1465,24 +1755,17 @@ namespace FastData.Context
                     if (insert.Param.Count != 0)
                         cmd.Parameters.AddRange(insert.Param.ToArray());
 
-                    tableName.Add(typeof(T).Name);
-                    BaseAop.AopBefore(tableName, insert.Sql, insert.Param, config, false,AopType.Add, model);
-
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, insert.Sql);
 
                     if (isTrans)
                         SubmitTrans();
-
-                    BaseAop.AopAfter(tableName, insert.Sql, insert.Param, config, false, AopType.Add, result.writeReturn, model);
-
-                    return result;
                 }
-                else
-                    return result;
+
+                return result;
             }
             catch (Exception ex)
             {
-                BaseAop.AopException(ex, "Add tableName: " + typeof(T).Name,config, AopType.Add,model);
+                BaseAop.AopException(ex, $"Add tableName: typeof(T).Name",config, AopType.Add,model);
 
                 if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
                     DbLogTable.LogException<T>(config, ex, "Add<T>", "");
@@ -1495,6 +1778,54 @@ namespace FastData.Context
                     RollbackTrans();
 
                 result.writeReturn.Message = ex.Message;
+                result.writeReturn.IsSuccess = false;
+                return result;
+            }
+        }
+        #endregion
+
+        #region 增加
+        /// <summary>
+        /// 增加
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private DataReturn Add(object model, NavigateModel navigate)
+        {
+            var result = new DataReturn();
+            var insert = new OptionModel();
+            var tableName = new List<string>();
+            try
+            {
+                insert = BaseModel.InsertToSql(model, config);
+                tableName.Add(model.GetType().Name);
+                BaseAop.AopBefore(tableName, insert.Sql, insert.Param, config, false, AopType.Navigate_Add, model);
+
+                if (insert.IsSuccess)
+                {
+                    result.Sql = ParameterToSql.ObjectParamToSql(insert.Param, insert.Sql, config);
+
+                    Dispose(cmd);
+
+                    if (insert.Param.Count != 0)
+                        cmd.Parameters.AddRange(insert.Param.ToArray());
+
+                    result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, insert.Sql);
+                }
+
+                BaseAop.AopAfter(tableName, insert.Sql, insert.Param, config, false, AopType.Navigate_Add, result.writeReturn, model);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                BaseAop.AopException(ex, $"tableName: {model.GetType().Name}, NavigateAdd:{ex.Message}, MemberName:{navigate.MemberName}", config, AopType.Navigate_Add, model);
+
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "Add", "");
+                else
+                    DbLog.LogException(config.IsOutError, config.DbType, ex, "Add", result.Sql);
+
+                result.writeReturn.Message = $"tableName: {model.GetType().Name}, NavigateAdd:{ex.Message}, MemberName:{navigate.MemberName}";
                 result.writeReturn.IsSuccess = false;
                 return result;
             }
@@ -1668,7 +1999,7 @@ namespace FastData.Context
             }
             catch (Exception ex)
             {
-                BaseAop.AopException(ex, "Add List tableName:" + typeof(T).Name,config,AopType.AddList,list);
+                BaseAop.AopException(ex, $"Add List tableName:{typeof(T).Name}",config,AopType.AddList,list);
 
                 if (IsTrans)
                     RollbackTrans();
@@ -1679,6 +2010,170 @@ namespace FastData.Context
                     DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "AddList<T>", result.sql);
             }
 
+            cmd = conn.CreateCommand();
+            return result;
+        }
+        #endregion
+
+        #region 批量增加 
+        /// <summary>
+        /// 批量增加
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="IsTrans"></param>
+        /// <param name="IsAsync"></param>
+        /// <returns></returns>
+        private DataReturn AddList(object model, NavigateModel navigate)
+        {
+            var sql = new StringBuilder();
+            var result = new DataReturn();
+            var tableName = new List<string>();
+            try
+            {
+                var list = BaseJson.JsonToList(BaseJson.ModelToJson(model), navigate.PropertyType);
+
+                if (list.Count == 0)
+                    return result;
+
+                var dyn = new DynamicGet(list[0]);
+
+                if (config.DbType == DataDbType.Oracle)
+                {
+                    #region oracle
+                    Dispose(cmd);
+                    cmd.GetType().GetMethods().ToList().ForEach(a =>
+                    {
+                        if (a.Name == "set_ArrayBindCount")
+                        {
+                            var param = new object[1];
+                            param[0] = list.Count;
+                            a.Invoke(cmd, param);
+                        }
+
+                        if (a.Name == "set_BindByName")
+                        {
+                            var param = new object[1];
+                            param[0] = true;
+                            a.Invoke(cmd, param);
+                        }
+                    });
+
+                    sql.AppendFormat("insert into {0} values(", navigate.PropertyType.Name);
+                    PropertyCache.GetPropertyInfo(list[0]).ForEach(a =>
+                    {
+                        var pValue = new List<object>();
+                        var param = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        if (a.PropertyType.Name.ToLower() == "nullable`1")
+                            param.DbType = CommandParam.GetOracleDbType(a.PropertyType.GetGenericArguments()[0].Name);
+                        else
+                            param.DbType = CommandParam.GetOracleDbType(a.PropertyType.Name);
+
+                        param.Direction = ParameterDirection.Input;
+                        param.ParameterName = a.Name;
+
+                        sql.AppendFormat("{0}{1},", config.Flag, a.Name);
+
+                        list.ForEach(l =>
+                        {
+                            var value = dyn.GetValue(l, a.Name);
+                            if (value == null)
+                                value = DBNull.Value;
+                            pValue.Add(value);
+                        });
+
+                        param.Value = pValue.ToArray();
+                        cmd.Parameters.Add(param);
+                    });
+
+                    sql.Append(")");
+                    cmd.CommandText = sql.ToString().Replace(",)", ")");
+
+                    tableName.Add(navigate.PropertyType.Name);
+                    BaseAop.AopBefore(tableName, cmd.CommandText, null, config, false, AopType.Navigate_AddList, list);
+                    result.writeReturn.IsSuccess = cmd.ExecuteNonQuery() > 0;
+                    BaseAop.AopAfter(tableName, cmd.CommandText, null, config, false, AopType.Navigate_AddList, result.writeReturn, list);
+                    #endregion
+                }
+
+                if (config.DbType == DataDbType.SqlServer)
+                {
+                    #region sqlserver
+                    Dispose(cmd);
+                    CommandParam.InitTvps(cmd, navigate.PropertyType);
+                    foreach (var method in cmd.Parameters.GetType().GetMethods())
+                    {
+                        if (method.Name == "AddWithValue")
+                        {
+                            var param = new object[2];
+                            param[0] = string.Format("@{0}", navigate.PropertyType.Name);
+                            param[1] = CommandParam.GetTable(cmd, list);
+                            var sqlParam = method.Invoke(cmd.Parameters, param);
+
+                            sqlParam.GetType().GetMethods().ToList().ForEach(a =>
+                            {
+                                if (a.Name == "set_SqlDbType")
+                                {
+                                    param = new object[1];
+                                    param[0] = SqlDbType.Structured;
+                                    a.Invoke(sqlParam, param);
+                                }
+                                if (a.Name == "set_TypeName")
+                                {
+                                    param = new object[1];
+                                    param[0] = navigate.PropertyType.Name;
+                                    a.Invoke(sqlParam, param);
+                                }
+                            });
+                            break;
+                        }
+                    }
+
+                    cmd.CommandText = CommandParam.GetTvps(list[0]);
+
+                    tableName.Add(navigate.PropertyType.Name);
+                    BaseAop.AopBefore(tableName, cmd.CommandText, null, config, false, AopType.Navigate_AddList, list);
+                    result.writeReturn.IsSuccess = cmd.ExecuteNonQuery() > 0;
+                    BaseAop.AopAfter(tableName, cmd.CommandText, null, config, false, AopType.Navigate_AddList, result.writeReturn, list);
+                    #endregion
+                }
+
+                if (config.DbType == DataDbType.MySql)
+                {
+                    #region mysql
+                    Dispose(cmd);
+                    cmd.CommandText = CommandParam.GetMySql(list);
+
+                    tableName.Add(navigate.PropertyType.Name);
+                    BaseAop.AopBefore(tableName, cmd.CommandText, null, config, false, AopType.AddList, list);
+                    result.writeReturn.IsSuccess = cmd.ExecuteNonQuery() > 0;
+                    BaseAop.AopAfter(tableName, cmd.CommandText, null, config, false, AopType.Navigate_AddList, result.writeReturn, list);
+                    #endregion
+                }
+
+                if (config.DbType == DataDbType.SQLite)
+                {
+                    #region sqlite
+
+
+
+                    #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                BaseAop.AopException(ex, $"Add List tableName:{navigate.PropertyType.Name}", config, AopType.Navigate_AddList, model);
+
+                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                    DbLogTable.LogException(config, ex, "AddList", "");
+                else
+                    DbLog.LogException(config.IsOutError, config.DbType, ex, "AddList", result.Sql);
+
+                result.writeReturn.Message = $"NavigateAddList:{ex.Message}, MemberName:{navigate.MemberName}";
+                result.writeReturn.IsSuccess = false;
+            }
+
+            cmd = conn.CreateCommand();
             return result;
         }
         #endregion
