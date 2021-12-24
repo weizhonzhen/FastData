@@ -104,6 +104,9 @@ namespace FastData
                                     navigate.PropertyType = navigateType.Type;
                                     navigate.MemberName = a.Name;
                                     navigate.MemberType = a.PropertyType;
+                                    navigate.IsUpdate = navigateType.IsUpdate;
+                                    navigate.IsDel = navigateType.IsDel;
+                                    navigate.IsAdd = navigateType.IsAdd;
                                     if (navigate.Name.Count != 0)
                                         cacheNavigate.Add(navigate);
                                 }
@@ -114,6 +117,9 @@ namespace FastData
                                     navigate.PropertyType = navigateType.Type;
                                     navigate.MemberName = a.Name;
                                     navigate.MemberType = a.PropertyType;
+                                    navigate.IsUpdate = navigateType.IsUpdate;
+                                    navigate.IsDel = navigateType.IsDel;
+                                    navigate.IsAdd = navigateType.IsAdd;
                                     if (navigate.Name.Count != 0)
                                         cacheNavigate.Add(navigate);
                                 }
@@ -124,6 +130,12 @@ namespace FastData
                                     navigate.PropertyType = a.PropertyType.GenericTypeArguments[0];
                                     navigate.MemberName = a.Name;
                                     navigate.MemberType = a.PropertyType;
+                                    if (navigateType != null)
+                                    {
+                                        navigate.IsUpdate = navigateType.IsUpdate;
+                                        navigate.IsDel = navigateType.IsDel;
+                                        navigate.IsAdd = navigateType.IsAdd;
+                                    }
                                     if (navigate.Name.Count != 0)
                                         cacheNavigate.Add(navigate);
                                 }
@@ -134,6 +146,12 @@ namespace FastData
                                     navigate.PropertyType = a.PropertyType;
                                     navigate.MemberName = a.Name;
                                     navigate.MemberType = a.PropertyType;
+                                    if (navigateType != null)
+                                    {
+                                        navigate.IsUpdate = navigateType.IsUpdate;
+                                        navigate.IsDel = navigateType.IsDel;
+                                        navigate.IsAdd = navigateType.IsAdd;
+                                    }
                                     if (navigate.Name.Count != 0)
                                         cacheNavigate.Add(navigate);
                                 }
