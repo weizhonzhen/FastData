@@ -22,10 +22,9 @@ namespace FastUntility.Base
         public static T DicToModel<T>(Dictionary<string, object> dic) where T : class, new()
         {
             var result = new T();
-            var info = new DynamicSet<T>();
             PropertyInfo<T>().ForEach(a => {
                 if (dic.ContainsKey(a.Name.ToLower()) && !string.IsNullOrEmpty(dic[a.Name.ToLower()].ToStr()))
-                    info.SetValue(result, a.Name, Convert.ChangeType(dic[a.Name.ToLower()], a.PropertyType));
+                    BaseEmit.Set<T>(result, a.Name,dic[a.Name.ToLower()]);
             });
 
             return result;
