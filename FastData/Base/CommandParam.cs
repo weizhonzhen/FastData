@@ -107,14 +107,13 @@ namespace FastData.Base
         /// <returns></returns>
         public static DataTable GetTable<T>(DbCommand cmd, List<T> list)
         {
-            var dyn = new Property.DynamicGet<T>();
             var dt = new DataTable();
             cmd.CommandText = string.Format("select top 1 * from {0}", typeof(T).Name);
             dt.Load(cmd.ExecuteReader());
             dt.Clear();
             list.ForEach(p => {
                 var row = dt.NewRow();
-                PropertyCache.GetPropertyInfo<T>().ForEach(a => { row[a.Name] = dyn.GetValue(p, a.Name); });
+                PropertyCache.GetPropertyInfo<T>().ForEach(a => { row[a.Name] = BaseEmit.Get<T>(p, a.Name); });
                 dt.Rows.Add(row);
             });
             return dt;
@@ -130,7 +129,6 @@ namespace FastData.Base
         /// <returns></returns>
         public static DataTable GetTable(DbCommand cmd, List<object> list, System.Type type)
         {
-            var dyn = new Property.DynamicGet(list[0]);
             var dt = new DataTable();
             cmd.CommandText = string.Format("select top 1 * from {0}", type.Name);
             dt.Load(cmd.ExecuteReader());
@@ -141,7 +139,7 @@ namespace FastData.Base
                 var row = dt.NewRow();
                 PropertyCache.GetPropertyInfo(list[0]).ForEach(p =>
                 {
-                    row[p.Name] = dyn.GetValue(a, p.Name);
+                    row[p.Name] = BaseEmit.Get(a, p.Name);
                 });
                 dt.Rows.Add(row);
             });
@@ -222,13 +220,12 @@ namespace FastData.Base
         {
             var sql = new StringBuilder();
             sql.AppendFormat("insert into {0}(", typeof(T).Name);
-            var dyn = new Property.DynamicGet<T>();
             PropertyCache.GetPropertyInfo<T>().ForEach(a => { sql.AppendFormat("{0},", a.Name); });
             sql.Append(")").Replace(",)", ")");
             list.ForEach(a => {
                 sql.Append("(");
                 PropertyCache.GetPropertyInfo<T>().ForEach(p => {
-                    sql.AppendFormat("'{0}',", dyn.GetValue(a, p.Name));
+                    sql.AppendFormat("'{0}',", BaseEmit.Get<T>(a, p.Name));
                 });
                 sql.Append("),").Replace(",)", ")");
             });
@@ -247,7 +244,6 @@ namespace FastData.Base
         {
             var sql = new StringBuilder();
             sql.AppendFormat("insert into {0}(", list[0].GetType().Name);
-            var dyn = new Property.DynamicGet(list[0]);
 
             PropertyCache.GetPropertyInfo(list[0]).ForEach(a => { sql.AppendFormat("{0},", a.Name); });
 
@@ -256,7 +252,7 @@ namespace FastData.Base
             list.ForEach(a =>
             {
                 sql.Append("(");
-                PropertyCache.GetPropertyInfo(list[0]).ForEach(b => { sql.AppendFormat("'{0}',", dyn.GetValue(a, b.Name)); });
+                PropertyCache.GetPropertyInfo(list[0]).ForEach(b => { sql.AppendFormat("'{0}',", BaseEmit.Get(a, b.Name)); });
                 sql.Append("),").Replace(",)", ")");
             });
 
