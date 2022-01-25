@@ -39,10 +39,8 @@ namespace FastUntility.Base
         public static Dictionary<string, object> ModelToDic<T>(T model) where T : class, new()
         {
             var dic = new Dictionary<string,object>();
-            var info = new DynamicGet<T>();
-
             PropertyInfo<T>().ForEach(a => {
-                dic.Add(a.Name, info.GetValue(model, a.Name));
+                dic.Add(a.Name, BaseEmit.Get<T>(model, a.Name));
             });
 
             return dic;

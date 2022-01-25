@@ -87,5 +87,64 @@ namespace FastUntility.Base
             }
             catch (Exception ex) { }
         }
+
+
+        public static object Get<T>(T model, string name)
+        {
+            var type = typeof(T);
+            var dynamicMethod = new DynamicMethod("GetEmit", typeof(object), new[] { typeof(object) }, type, true);
+            var method = type.GetMethod($"get_{name}");
+
+            if (method == null)
+                return null;
+
+            var property = type.GetProperty(name);
+
+            var iL = dynamicMethod.GetILGenerator();
+            iL.Emit(OpCodes.Ldarg_0);
+
+            if (type.IsValueType)
+                iL.Emit(OpCodes.Unbox, type);
+            else
+                iL.Emit(OpCodes.Castclass, type);
+
+            iL.EmitCall(OpCodes.Callvirt, method, null);
+
+            if (property.PropertyType.IsValueType)
+                iL.Emit(OpCodes.Box, property.PropertyType);
+
+            iL.Emit(OpCodes.Ret);
+            var dyn = (Func<T, object>)dynamicMethod.CreateDelegate(typeof(Func<T, object>));
+            return dyn(model);
+        }
+
+        public static object Get(object model, string name)
+        {
+            var type = model.GetType();
+            var dynamicMethod = new DynamicMethod("GetEmit", typeof(object), new[] { typeof(object) }, type, true);
+            var method = type.GetMethod($"get_{name}");
+
+            if (method == null)
+                return null;
+
+            var property = type.GetProperty(name);
+
+            var iL = dynamicMethod.GetILGenerator();
+            iL.Emit(OpCodes.Ldarg_0);
+
+            if (type.IsValueType)
+                iL.Emit(OpCodes.Unbox, type);
+            else
+                iL.Emit(OpCodes.Castclass, type);
+
+            iL.EmitCall(OpCodes.Callvirt, method, null);
+
+            if (property.PropertyType.IsValueType)
+                iL.Emit(OpCodes.Box, property.PropertyType);
+
+            iL.Emit(OpCodes.Ret);
+            var dyn = (Func<object, object>)dynamicMethod.CreateDelegate(typeof(Func<object, object>));
+            return dyn(model);
+        }
     }
 }
