@@ -72,12 +72,11 @@ namespace FastData.Proxy
                 {
                     var data = args.ToList().Find(a => a.GetType() != typeof(PageModel));
                     var type = method.GetParameters().ToList().Find(a => a.ParameterType != typeof(PageModel)).ParameterType;
-                    var dyn = new DynamicGet(Activator.CreateInstance(type));
                     for (int i = 0; i < model.param.Count; i++)
                     {
                         var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
                         temp.ParameterName = model.param.GetValue(i.ToString()).ToStr();
-                        temp.Value = dyn.GetValue(data, temp.ParameterName);
+                        temp.Value = BaseEmit.Get(data, temp.ParameterName);
                         temp.ParameterName = temp.ParameterName.ToLower();
                         param.Add(temp);
                     }
