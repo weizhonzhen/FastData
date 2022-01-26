@@ -300,7 +300,7 @@ namespace FastUntility.Base
                                     var temp = m.Invoke(reader, param);
                                     temp.GetType().GetMethods().ToList().ForEach(v => {
                                         if (v.Name == "get_Value" && !reader.IsDBNull(id))
-                                            dic.Add(a.ToLower(), v.Invoke(temp, null));
+                                            dic.Add(a.ToLower(), BaseEmit.Get(temp, "Value"));
                                     });
                                     temp.GetType().GetMethods().ToList().ForEach(v =>
                                     {
@@ -325,7 +325,7 @@ namespace FastUntility.Base
                                     var temp = m.Invoke(reader, param);
                                     temp.GetType().GetMethods().ToList().ForEach(v => {
                                         if (v.Name == "get_Value" && !reader.IsDBNull(id))
-                                            dic.Add(a.ToLower(), v.Invoke(temp, null));
+                                            dic.Add(a.ToLower(), BaseEmit.Get(temp, "Value"));
                                     });
                                     temp.GetType().GetMethods().ToList().ForEach(v =>
                                     {
@@ -393,7 +393,7 @@ namespace FastUntility.Base
                                     var temp = m.Invoke(reader, param);
                                     temp.GetType().GetMethods().ToList().ForEach(v => {
                                         if (v.Name == "get_Value")
-                                            dic.Add(a.ToLower(), v.Invoke(temp, null));
+                                            dic.Add(a.ToLower(), BaseEmit.Get(temp, "Value"));
                                     });
                                     temp.GetType().GetMethods().ToList().ForEach(v =>
                                     {
@@ -418,7 +418,7 @@ namespace FastUntility.Base
                                     var temp = m.Invoke(reader, param);
                                     temp.GetType().GetMethods().ToList().ForEach(v => {
                                         if (v.Name == "get_Value")
-                                            dic.Add(a.ToLower(), v.Invoke(temp, null));
+                                            dic.Add(a.ToLower(), BaseEmit.Get(temp, "Value"));
                                     });
                                     temp.GetType().GetMethods().ToList().ForEach(v =>
                                     {
