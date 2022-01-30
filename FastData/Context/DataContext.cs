@@ -167,7 +167,7 @@ namespace FastData.Context
                     param.GetType().GetMethods().ToList().ForEach(m =>
                     {
                         if (m.Name == "Dispose")
-                            m.Invoke(param, null);
+                            BaseEmit.Invoke(param, m, null);
                     });
                 }
             cmd.Parameters.Clear();
@@ -1863,19 +1863,11 @@ namespace FastData.Context
 
                     cmd.GetType().GetMethods().ToList().ForEach(a =>
                     {
-                        if (a.Name == "set_ArrayBindCount")
-                        {
-                            var param = new object[1];
-                            param[0] = list.Count;
-                            a.Invoke(cmd, param);
-                        }
+                        if (a.Name == "set_ArrayBindCount") 
+                            BaseEmit.Invoke(cmd, a, new object[] { list.Count });
 
-                        if (a.Name == "set_BindByName")
-                        {
-                            var param = new object[1];
-                            param[0] = true;
-                            a.Invoke(cmd, param);
-                        }
+                        if (a.Name == "set_BindByName") 
+                            BaseEmit.Invoke(cmd, a, new object[] { true });
                     });
 
                     sql.AppendFormat("insert into {0} values(", typeof(T).Name);
@@ -1934,22 +1926,15 @@ namespace FastData.Context
                             var param = new object[2];
                             param[0] = string.Format("@{0}", typeof(T).Name);
                             param[1] = CommandParam.GetTable<T>(cmd, list);
-                            var sqlParam = method.Invoke(cmd.Parameters, param);
+                            var sqlParam = BaseEmit.Invoke(cmd.Parameters, method, param);
 
                             sqlParam.GetType().GetMethods().ToList().ForEach(a =>
                             {
                                 if (a.Name == "set_SqlDbType")
-                                {
-                                    param = new object[1];
-                                    param[0] = SqlDbType.Structured;
-                                    a.Invoke(sqlParam, param);
-                                }
+                                    BaseEmit.Invoke(sqlParam, a, new object[] { SqlDbType.Structured });
+                              
                                 if (a.Name == "set_TypeName")
-                                {
-                                    param = new object[1];
-                                    param[0] = typeof(T).Name;
-                                    a.Invoke(sqlParam, param);
-                                }
+                                    BaseEmit.Invoke(sqlParam, a, new object[] { typeof(T).Name });                                
                             });
 
                             break;
@@ -2041,18 +2026,10 @@ namespace FastData.Context
                     cmd.GetType().GetMethods().ToList().ForEach(a =>
                     {
                         if (a.Name == "set_ArrayBindCount")
-                        {
-                            var param = new object[1];
-                            param[0] = list.Count;
-                            a.Invoke(cmd, param);
-                        }
+                            BaseEmit.Invoke(cmd, a, new object[] { list.Count });
 
                         if (a.Name == "set_BindByName")
-                        {
-                            var param = new object[1];
-                            param[0] = true;
-                            a.Invoke(cmd, param);
-                        }
+                            BaseEmit.Invoke(cmd, a, new object[] { true });
                     });
 
                     sql.AppendFormat("insert into {0} values(", navigate.PropertyType.Name);
@@ -2104,22 +2081,14 @@ namespace FastData.Context
                             var param = new object[2];
                             param[0] = string.Format("@{0}", navigate.PropertyType.Name);
                             param[1] = CommandParam.GetTable(cmd, list);
-                            var sqlParam = method.Invoke(cmd.Parameters, param);
+                            var sqlParam = BaseEmit.Invoke(cmd.Parameters, method, param);
 
                             sqlParam.GetType().GetMethods().ToList().ForEach(a =>
                             {
                                 if (a.Name == "set_SqlDbType")
-                                {
-                                    param = new object[1];
-                                    param[0] = SqlDbType.Structured;
-                                    a.Invoke(sqlParam, param);
-                                }
+                                    BaseEmit.Invoke(sqlParam, a, new object[] { SqlDbType.Structured });
                                 if (a.Name == "set_TypeName")
-                                {
-                                    param = new object[1];
-                                    param[0] = navigate.PropertyType.Name;
-                                    a.Invoke(sqlParam, param);
-                                }
+                                    BaseEmit.Invoke(sqlParam, a, new object[] { navigate.PropertyType.Name });
                             });
                             break;
                         }
