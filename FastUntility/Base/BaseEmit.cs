@@ -167,7 +167,7 @@ namespace FastUntility.Base
                 for (int i = 0; i < type.Length; i++)
                 {
                     iL.Emit(OpCodes.Ldarg_1);
-                    EmitInt(iL, i);
+                    iL.Emit(OpCodes.Ldc_I4, i);
                     iL.Emit(OpCodes.Ldelem_Ref);
                     if (type[i].IsValueType)
                         iL.Emit(OpCodes.Unbox_Any, type[i]);
@@ -203,7 +203,7 @@ namespace FastUntility.Base
                     if (info[i].ParameterType.IsByRef)
                     {
                         iL.Emit(OpCodes.Ldarg_1);
-                        EmitInt(iL, i);
+                        iL.Emit(OpCodes.Ldc_I4, i);
                         iL.Emit(OpCodes.Ldloc, local[i]);
                         if (local[i].LocalType.IsValueType)
                             iL.Emit(OpCodes.Box, local[i].LocalType);
@@ -219,48 +219,6 @@ namespace FastUntility.Base
             {
                 return methodInfo.Invoke(model, param);
             }
-        }
-
-        private static void EmitInt(ILGenerator iL, int value)
-        {
-            switch (value)
-            {
-                case -1:
-                    iL.Emit(OpCodes.Ldc_I4_M1);
-                    return;
-                case 0:
-                    iL.Emit(OpCodes.Ldc_I4_0);
-                    return;
-                case 1:
-                    iL.Emit(OpCodes.Ldc_I4_1);
-                    return;
-                case 2:
-                    iL.Emit(OpCodes.Ldc_I4_2);
-                    return;
-                case 3:
-                    iL.Emit(OpCodes.Ldc_I4_3);
-                    return;
-                case 4:
-                    iL.Emit(OpCodes.Ldc_I4_4);
-                    return;
-                case 5:
-                    iL.Emit(OpCodes.Ldc_I4_5);
-                    return;
-                case 6:
-                    iL.Emit(OpCodes.Ldc_I4_6);
-                    return;
-                case 7:
-                    iL.Emit(OpCodes.Ldc_I4_7);
-                    return;
-                case 8:
-                    iL.Emit(OpCodes.Ldc_I4_8);
-                    return;
-            }
-
-            if (value > -129 && value < 128)
-                iL.Emit(OpCodes.Ldc_I4_S, (SByte)value);
-            else
-                iL.Emit(OpCodes.Ldc_I4, value);
         }
     }
 }
