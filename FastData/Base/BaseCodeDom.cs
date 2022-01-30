@@ -14,6 +14,7 @@ namespace FastData.Base
     /// </summary>
     internal static class BaseCodeDom
     {
+        [Obsolete]
         public static bool GetResult(string code,string references=null)
         {
             //动态编译
@@ -50,11 +51,10 @@ namespace FastData.Base
             }
             else
             {
-                //反射
                 assembly = result.CompiledAssembly;
                 var instance = assembly.CreateInstance("DynamicCode.Condition");
                 var method = instance.GetType().GetMethod("OutPut");
-                return (bool)method.Invoke(instance, null);
+                return (bool)BaseEmit.Invoke(instance, method, null);
             }
         }
 
