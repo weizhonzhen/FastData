@@ -58,12 +58,12 @@ namespace FastData.Base
                             var ower = "";
                             var propertyName = GetPropertyMethod(a, out methodName, false, out ower);
 
-                            if (methodName.ToLower() == "distinct")
+                            if (string.Compare( methodName, "distinct",false)==0)
                             {
                                 queryFields.Add(string.Format("{2}{0} {3}.{1} ", methodName, propertyName, ower, predicate.Parameters[0].Name));
                                 result.AsName.Add((a as MemberExpression).Member.Name);
                             }
-                            else if (methodName.ToLower() == "sum")
+                            else if (string.Compare( methodName,"sum",false)==0)
                             {
                                 if (config.DbType == DataDbType.SqlServer)
                                     propertyName = string.Format("isnull({1}.{0},0)", propertyName, predicate.Parameters[0].Name);
@@ -102,7 +102,7 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                if (string.Compare( config.SqlErrorType,SqlErrorType.Db,false)==0)
                     DbLogTable.LogException<T>(config, ex, "QueryField<T>", "");
                 else
                     DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "QueryField<T>", "");
@@ -157,12 +157,12 @@ namespace FastData.Base
                         var ower = "";
                         var propertyName = GetPropertyMethod(a, out methodName, true, out ower);
 
-                        if (methodName.ToLower() == "distinct")
+                        if (string.Compare( methodName, "distinct",false)==0)
                         {
                             queryFields.Add(string.Format("{2}{0} {2}.{1}", methodName, propertyName, ower, predicate.Parameters[0].Name));
                             result.AsName.Add((a as MemberExpression).Member.Name);
                         }
-                        else if (methodName.ToLower() == "sum")
+                        else if (string.Compare( methodName, "sum",false)==0)
                         {
                             if (config.DbType == DataDbType.SqlServer)
                                 propertyName = string.Format("isnull({1}.{0},0)", propertyName, predicate.Parameters[0].Name);
@@ -201,7 +201,7 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                if (string.Compare( config.SqlErrorType, SqlErrorType.Db,false)==0)
                     DbLogTable.LogException(config, ex, "QueryField<T1,T2,T>", "");
                 else
                     DbLog.LogException(config.IsOutError, config.DbType, ex, "QueryField<T1,T2,T>", "");
@@ -233,7 +233,7 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                if (string.Compare( config.SqlErrorType, SqlErrorType.Db,false)==0)
                     DbLogTable.LogException(config, ex, "GroupBy<T>", "");
                 else
                     DbLog.LogException(config.IsOutError, config.DbType, ex, "GroupBy<T>", "");
@@ -267,7 +267,7 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                if (config.SqlErrorType.ToLower() == SqlErrorType.Db)
+                if (string.Compare( config.SqlErrorType, SqlErrorType.Db,false)==0)
                     DbLogTable.LogException(config, ex, "OrderBy<T>", "");
                 else
                     DbLog.LogException(config.IsOutError, config.DbType, ex, "OrderBy<T>", "");

@@ -45,7 +45,7 @@ namespace FastData.Base
                 {
                     foreach (var info in propertyList)
                     {
-                        if (!colList.Exists(a => a.ToLower() == info.Name.ToLower()))
+                        if (!colList.Exists(a => string.Compare( a, info.Name,false)==0))
                             continue;
 
                         if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
@@ -58,12 +58,12 @@ namespace FastData.Base
                 {
                     for (var i = 0; i < field.Count; i++)
                     {
-                        if (!colList.Exists(a => a.ToLower() == field[i].ToLower()))
+                        if (!colList.Exists(a => string.Compare( a,field[i],false)==0))
                             continue;
 
-                        if (propertyList.Exists(a => a.Name.ToLower() == field[i].ToLower()))
+                        if (propertyList.Exists(a => string.Compare( a.Name,field[i],false)==0))
                         {
-                            var info = propertyList.Find(a => a.Name.ToLower() == field[i].ToLower());
+                            var info = propertyList.Find(a => string.Compare( a.Name, field[i],false)==0);
                             item = SetValue<T>(item, dr, info, config);
                         }
                     }
@@ -105,7 +105,7 @@ namespace FastData.Base
                 {
                     foreach (var info in propertyList)
                     {
-                        if (!colList.Exists(a => a.ToLower() == info.Name.ToLower()))
+                        if (!colList.Exists(a =>string.Compare( a, info.Name,false)==0))
                             continue;
 
                         if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
@@ -118,12 +118,12 @@ namespace FastData.Base
                 {
                     for (var i = 0; i < field.Count; i++)
                     {
-                        if (!colList.Exists(a => a.ToLower() == field[i].ToLower()))
+                        if (!colList.Exists(a =>string.Compare( a, field[i],false)==0))
                             continue;
 
-                        if (propertyList.Exists(a => a.Name.ToLower() == field[i].ToLower()))
+                        if (propertyList.Exists(a =>string.Compare( a.Name, field[i],false)==0))
                         {
-                            var info = propertyList.Find(a => a.Name.ToLower() == field[i].ToLower());
+                            var info = propertyList.Find(a =>string.Compare( a.Name, field[i],false)==0);
                             item = SetValue(item, dr, info, config);
                         }
                     }
@@ -168,7 +168,7 @@ namespace FastData.Base
                 {
                     foreach (var info in propertyList)
                     {
-                        if (!colList.Exists(a => a.ToLower() == info.Name.ToLower()))
+                        if (!colList.Exists(a =>string.Compare( a, info.Name,false)==0))
                             continue;
 
                         if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
@@ -181,12 +181,12 @@ namespace FastData.Base
                 {
                     for (var i = 0; i < field.Count; i++)
                     {
-                        if (!colList.Exists(a => a.ToLower() == field[i].ToLower()))
+                        if (!colList.Exists(a =>string.Compare( a, field[i],false)==0))
                             continue;
 
-                        if (propertyList.Exists(a => a.Name.ToLower() == field[i].ToLower()))
+                        if (propertyList.Exists(a =>string.Compare( a.Name,field[i],false)==0))
                         {
-                            var info = propertyList.Find(a => a.Name.ToLower() == field[i].ToLower());
+                            var info = propertyList.Find(a =>string.Compare( a.Name, field[i],false)==0);
                             result = SetValue(result, dr, info, config);
                         }
                     }
