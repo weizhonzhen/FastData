@@ -209,7 +209,7 @@ namespace FastUntility.Base
                         int j = 0;
                         foreach (var temp in item)
                         {
-                            if (string.Compare( temp.Key, exclude,false)==0)
+                            if (string.Compare( temp.Key, exclude, true) ==0)
                                 continue;
 
                             model.cell = model.row.CreateCell(j++);
