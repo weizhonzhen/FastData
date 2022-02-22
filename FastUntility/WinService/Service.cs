@@ -182,7 +182,7 @@ namespace FastUntility.WinService
             var services = ServiceController.GetServices();
             foreach (ServiceController s in services)
             {
-                if (string.Compare( s.ServiceName,serviceName,false)==0)
+                if (string.Compare( s.ServiceName,serviceName, true) ==0)
                 {
                     return true;
                 }
