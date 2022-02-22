@@ -128,7 +128,7 @@ namespace FastData.Property
                     if (c.AttributeType.Name == typeof(ColumnAttribute).Name)
                     {
                         c.NamedArguments.ToList().ForEach(n => {
-                            if (paramList.Exists(b =>string.Compare(  b.Name, n.MemberName,false)==0))
+                            if (paramList.Exists(b =>string.Compare(  b.Name, n.MemberName, true) ==0))
                                 BaseEmit.Set(temp, n.MemberName, n.TypedValue.Value);
                         });
                     }
