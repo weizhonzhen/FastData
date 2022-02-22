@@ -41,7 +41,7 @@ namespace FastData.Check
                         if (model.Count >= table.Column.Count)
                         {
                             model.ForEach(p => {
-                                var info = table.Column.Find(a =>string.Compare( a.Name, p.Name,false)==0) ?? new ColumnModel();
+                                var info = table.Column.Find(a =>string.Compare( a.Name, p.Name, true) ==0) ?? new ColumnModel();
                                 var result = CheckModel.CompareTo(info, p);
                                 if (result.IsUpdate)
                                     UpdateTable(item, result, tableName);
@@ -53,7 +53,7 @@ namespace FastData.Check
                             tempColumn = table.Column;
                            
                             tempColumn.ForEach(p => {
-                                var info = table.Column.Find(a =>string.Compare( a.Name, p.Name,false)==0) ?? new ColumnModel();
+                                var info = table.Column.Find(a =>string.Compare( a.Name, p.Name, true) ==0) ?? new ColumnModel();
                                 var result = CheckModel.CompareTo(p, info);
                                 if (result.IsUpdate)
                                     UpdateTable(item, result, tableName);
@@ -93,7 +93,7 @@ namespace FastData.Check
                     FastMap.fastAop.Exception(context);
                 }
 
-                if (string.Compare( item.Config.SqlErrorType, SqlErrorType.Db,false)==0)
+                if (string.Compare( item.Config.SqlErrorType, SqlErrorType.Db, true) ==0)
                     DbLogTable.LogException(item.Config, ex, string.Format("Check_{0}", tableName), "");
                 else
                     DbLog.LogException(item.Config.IsOutError, item.Config.DbType, ex, string.Format("Check_{0}", tableName), "");
@@ -727,11 +727,11 @@ namespace FastData.Check
 
             result.Column.ForEach(a =>
             {
-                if (string.Compare( a.DataType, "nchar",false)==0 
-                || string.Compare(a.DataType, "nvarchar", false) == 0
-                || string.Compare(a.DataType, "nvarchar2", false) == 0 
-                || string.Compare(a.DataType, "ntext", false) == 0
-                || string.Compare(a.DataType, "nclob", false) == 0)
+                if (string.Compare( a.DataType, "nchar", true) ==0 
+                || string.Compare(a.DataType, "nvarchar", true) == 0
+                || string.Compare(a.DataType, "nvarchar2", true) == 0 
+                || string.Compare(a.DataType, "ntext", true) == 0
+                || string.Compare(a.DataType, "nclob", true) == 0)
                     a.Length = a.Length / 2;
             });
 
