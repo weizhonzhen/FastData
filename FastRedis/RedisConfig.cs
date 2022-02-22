@@ -25,7 +25,7 @@ namespace FastRedis.Config
                 return BaseCache.Get<RedisConfig>(cacheKey);
             else if (projectName == null)
             {
-                if (string.Compare( dbFile,"web.config",false)==0 || string.Compare( dbFile,"app.config",false)==0)
+                if (string.Compare( dbFile,"web.config", true) ==0 || string.Compare( dbFile,"app.config", true) ==0)
                     section = (RedisConfig)ConfigurationManager.GetSection("RedisConfig");
                 else
                 {
@@ -49,7 +49,7 @@ namespace FastRedis.Config
                             var nodelList = xmlDoc.SelectNodes("configuration/RedisConfig");
                             foreach (XmlNode node in nodelList)
                             {
-                                section.AutoStart = string.Compare( node.Attributes["AutoStart"]?.Value.ToStr(), "true",false)==0 || node.Attributes["IsOutError"]?.Value.ToStr() == null;
+                                section.AutoStart = string.Compare( node.Attributes["AutoStart"]?.Value.ToStr(), "true", true) ==0 || node.Attributes["IsOutError"]?.Value.ToStr() == null;
                                 section.MaxReadPoolSize = node.Attributes["MaxReadPoolSize"].Value.ToStr().ToInt(60);
                                 section.MaxWritePoolSize = node.Attributes["MaxWritePoolSize"].Value.ToStr().ToInt(60);
                                 section.ReadServerList = node.Attributes["ReadServerList"]?.Value;
