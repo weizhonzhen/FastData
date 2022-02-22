@@ -75,9 +75,9 @@ namespace FastData.Base
                         var tempSql = new StringBuilder();
                         foreach (var item in DbCache.Get<List<string>>(cacheType, string.Format("{0}.param", name.ToLower())))
                         {
-                            if (!param.ToList().Exists(a =>string.Compare( a.ParameterName, item,false)==0))
+                            if (!param.ToList().Exists(a =>string.Compare( a.ParameterName, item, true) ==0))
                                 continue;
-                            var temp = param.ToList().Find(a =>string.Compare( a.ParameterName,item,false)==0);
+                            var temp = param.ToList().Find(a =>string.Compare( a.ParameterName,item, true) ==0);
                             if (!tempParam.ToList().Exists(a => a.ParameterName == temp.ParameterName))
                                 tempParam.Add(temp);
 
@@ -486,7 +486,7 @@ namespace FastData.Base
                         {
                             foreach (var split in field.Split(','))
                             {
-                                var infoField = BaseDic.PropertyInfo<T>().Find(a => string.Compare( a.Name,split,false)==0);
+                                var infoField = BaseDic.PropertyInfo<T>().Find(a => string.Compare( a.Name,split, true) ==0);
                                 var tempParam = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
                                 tempParam.ParameterName = split;
                                 tempParam.Value = infoField.GetValue(item, null);
@@ -495,7 +495,7 @@ namespace FastData.Base
                         }
                         else
                         {
-                            var infoField = BaseDic.PropertyInfo<T>().Find(a =>string.Compare( a.Name, field,false)==0);
+                            var infoField = BaseDic.PropertyInfo<T>().Find(a =>string.Compare( a.Name, field, true) ==0);
                             var tempParam = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
                             tempParam.ParameterName = field;
                             tempParam.Value = infoField.GetValue(item, null);
@@ -787,7 +787,7 @@ namespace FastData.Base
                                     }
 
                                     //foreach
-                                    if (string.Compare( node.Name, "foreach",false)==0)
+                                    if (string.Compare( node.Name, "foreach", true) ==0)
                                     {
                                         //type
                                         if (node.Attributes["type"] != null)
@@ -851,13 +851,13 @@ namespace FastData.Base
                                         if (dyn.Attributes["name"] != null)
                                             result.parameName.Add(string.Format("{0}.{1}.remark", tempKey, dyn.Attributes["property"].Value.ToLower()), dyn.Attributes["name"].Value);
 
-                                        if (string.Compare( dyn.Name, "ispropertyavailable",false)==0)
+                                        if (string.Compare( dyn.Name, "ispropertyavailable", true) ==0)
                                         {
                                             //属性和值
                                             result.key.Add(string.Format("{0}.{1}.{2}", tempKey, dyn.Attributes["property"].Value.ToLower(), i));
                                             result.sql.Add(string.Format("{0}{1}", dyn.Attributes["prepend"].Value.ToLower(), dyn.InnerText));
                                         }
-                                        else if (string.Compare( dyn.Name,"choose",false)!=0)
+                                        else if (string.Compare( dyn.Name,"choose", true) !=0)
                                         {
                                             //属性和值
                                             result.key.Add(string.Format("{0}.{1}.{2}", tempKey, dyn.Attributes["property"].Value.ToLower(), i));
@@ -998,7 +998,7 @@ namespace FastData.Base
         /// <param name="query"></param>
         internal static void CreateLogTable(DataQuery query)
         {
-            if (string.Compare( query.Config.SqlErrorType, SqlErrorType.Db,false)==0)
+            if (string.Compare( query.Config.SqlErrorType, SqlErrorType.Db, true) ==0)
             {
                 query.Config.DesignModel = FastData.Base.Config.CodeFirst;
                 if (query.Config.DbType == DataDbType.Oracle)

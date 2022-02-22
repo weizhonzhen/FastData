@@ -208,7 +208,7 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                if (string.Compare( item.Config.SqlErrorType, SqlErrorType.Db,false)==0)
+                if (string.Compare( item.Config.SqlErrorType, SqlErrorType.Db, true) ==0)
                     DbLogTable.LogException(item.Config, ex, "ToPageDataReader", "");
                 else
                     DbLog.LogException(true, item.Config.DbType, ex, "ToPageDataReader", "");
@@ -256,7 +256,7 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                if (string.Compare(item.Config.SqlErrorType, SqlErrorType.Db, false) == 0)
+                if (string.Compare(item.Config.SqlErrorType, SqlErrorType.Db, true) == 0)
                     DbLogTable.LogException(item.Config, ex, "ToPageCount", "");
                 else
                     DbLog.LogException(true, item.Config.DbType, ex, "ToPageCount", "");
@@ -295,7 +295,7 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                if (string.Compare(config.SqlErrorType, SqlErrorType.Db, false) == 0)
+                if (string.Compare(config.SqlErrorType, SqlErrorType.Db, true) == 0)
                     DbLogTable.LogException(config, ex, "ToPageCountSql", "");
                 else
                     DbLog.LogException(config.IsOutError, config.DbType, ex, "ToPageCountSql", "");
@@ -359,7 +359,7 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                if (string.Compare(config.SqlErrorType, SqlErrorType.Db, false) == 0)
+                if (string.Compare(config.SqlErrorType, SqlErrorType.Db, true) == 0)
                     DbLogTable.LogException(config, ex, "ToPageDataReaderSql", "");
                 else
                     DbLog.LogException(config.IsOutError, config.DbType, ex, "ToPageDataReaderSql", "");

@@ -87,7 +87,7 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                if (string.Compare( config.SqlErrorType, SqlErrorType.Db,false)==0)
+                if (string.Compare( config.SqlErrorType, SqlErrorType.Db, true) ==0)
                     DbLogTable.LogException(config, ex, "UpdateToSql<T>", result.Sql);
                 else
                     DbLog.LogException(config.IsOutError, config.DbType, ex, "UpdateToSql<T>", result.Sql);
@@ -142,7 +142,7 @@ namespace FastData.Base
             }
             catch (Exception ex)
             {
-                if (string.Compare( config.SqlErrorType, SqlErrorType.Db,false)==0)
+                if (string.Compare( config.SqlErrorType, SqlErrorType.Db, true) ==0)
                     DbLogTable.LogException(config, ex, "InsertToSql<T>", result.Sql);
                 else
                     DbLog.LogException(config.IsOutError, config.DbType, ex, "InsertToSql<T>", result.Sql);
@@ -669,9 +669,9 @@ namespace FastData.Base
                 dr.Close();
 
                 type.GetProperties().ToList().ForEach(a => {
-                    if (list.Exists(l => string.Compare( l, a.Name,false)==0))
+                    if (list.Exists(l => string.Compare( l, a.Name, true) ==0))
                     {
-                        list.RemoveAll(r => string.Compare( r,a.Name,false)==0);
+                        list.RemoveAll(r => string.Compare( r,a.Name, true) ==0);
                         list.Add(a.Name);
                     }
                 });
