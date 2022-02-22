@@ -123,7 +123,7 @@ namespace FastData.Config
                 list = DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
             else if (projectName == null)
             {
-                if (string.Compare( dbFile,"web.config",false)==0 || string.Compare( dbFile, "app.config",false)==0)
+                if (string.Compare( dbFile,"web.config", true) ==0 || string.Compare( dbFile, "app.config", true) ==0)
                     config = (DataConfig)ConfigurationManager.GetSection("DataConfig");
                 else
                 {
@@ -308,42 +308,42 @@ namespace FastData.Config
                                     foreach (XmlNode db in leaf.ChildNodes)
                                     {
                                         var item = new ConfigModel();
-                                        if (string.Compare( leaf.Name, DataDbType.DB2,false)==0)
+                                        if (string.Compare( leaf.Name, DataDbType.DB2, true) ==0)
                                         {
                                             item.DbType = DataDbType.DB2;
                                             item.Flag = "@";
                                             item.ProviderName = Provider.DB2;
                                         }
 
-                                        if (string.Compare(leaf.Name, DataDbType.Oracle, false) == 0)
+                                        if (string.Compare(leaf.Name, DataDbType.Oracle, true) == 0)
                                         {
                                             item.DbType = DataDbType.Oracle;
                                             item.Flag = ":";
                                             item.ProviderName = Provider.Oracle;
                                         }
 
-                                        if (string.Compare(leaf.Name, DataDbType.MySql, false) == 0)
+                                        if (string.Compare(leaf.Name, DataDbType.MySql, true) == 0)
                                         {
                                             item.DbType = DataDbType.MySql;
                                             item.Flag = "@";
                                             item.ProviderName = Provider.MySql;
                                         }
 
-                                        if (string.Compare(leaf.Name, DataDbType.SqlServer, false) == 0)
+                                        if (string.Compare(leaf.Name, DataDbType.SqlServer, true) == 0)
                                         {
                                             item.DbType = DataDbType.SqlServer;
                                             item.Flag = "@";
                                             item.ProviderName = Provider.SqlServer;
                                         }
 
-                                        if (string.Compare(leaf.Name, DataDbType.SQLite, false) == 0)
+                                        if (string.Compare(leaf.Name, DataDbType.SQLite, true) == 0)
                                         {
                                             item.DbType = DataDbType.SQLite;
                                             item.Flag = "@";
                                             item.ProviderName = Provider.SQLite;
                                         }
 
-                                        if (string.Compare(leaf.Name, DataDbType.PostgreSql, false) == 0)
+                                        if (string.Compare(leaf.Name, DataDbType.PostgreSql, true) == 0)
                                         {
                                             item.DbType = DataDbType.PostgreSql;
                                             item.Flag = "@";
@@ -353,14 +353,14 @@ namespace FastData.Config
                                         if (item.DbType != null)
                                         {
                                             item.ConnStr = db.Attributes["ConnStr"]?.Value;
-                                            item.IsOutError = string.Compare( db.Attributes["IsOutError"]?.Value.ToStr(), "true",false)==0 || db.Attributes["IsOutError"]?.Value.ToStr() == null;
-                                            item.IsOutSql =string.Compare( db.Attributes["IsOutSql"]?.Value.ToStr(), "true",false)==0 || db.Attributes["IsOutSql"]?.Value.ToStr() == null;
-                                            item.IsPropertyCache =string.Compare( db.Attributes["IsPropertyCache"]?.Value.ToStr(), "true",false)==0 || db.Attributes["IsPropertyCache"]?.Value.ToStr() == null;
+                                            item.IsOutError = string.Compare( db.Attributes["IsOutError"]?.Value.ToStr(), "true", true) ==0 || db.Attributes["IsOutError"]?.Value.ToStr() == null;
+                                            item.IsOutSql =string.Compare( db.Attributes["IsOutSql"]?.Value.ToStr(), "true", true) ==0 || db.Attributes["IsOutSql"]?.Value.ToStr() == null;
+                                            item.IsPropertyCache =string.Compare( db.Attributes["IsPropertyCache"]?.Value.ToStr(), "true", true) ==0 || db.Attributes["IsPropertyCache"]?.Value.ToStr() == null;
                                             item.Key = db.Attributes["Key"]?.Value;
                                             item.DbLinkName = db.Attributes["DbLinkName"]?.Value;
                                             item.DesignModel = db.Attributes["DesignModel"]?.Value;
-                                            item.IsEncrypt = string.Compare( db.Attributes["IsEncrypt"]?.Value.ToStr(),"true",false)==0;
-                                            item.IsMapSave = string.Compare( db.Attributes["IsMapSave"]?.Value.ToStr(),"true",false)==0;
+                                            item.IsEncrypt = string.Compare( db.Attributes["IsEncrypt"]?.Value.ToStr(),"true", true) ==0;
+                                            item.IsMapSave = string.Compare( db.Attributes["IsMapSave"]?.Value.ToStr(),"true", true) ==0;
                                             item.SqlErrorType = db.Attributes["SqlErrorType"]?.Value;
                                             item.CacheType = db.Attributes["CacheType"]?.Value;
                                             item.IsUpdateCache = false;
