@@ -162,17 +162,14 @@ namespace FastData.Base
             else if (exp is MemberExpression)
             {
                 if ((exp as MemberExpression).Expression is ParameterExpression)
-                {
-                    //typeList.Add("".GetType());
                     return (exp as MemberExpression).Member.Name;
-                }
                 else
                 {
                     if (Expression.Lambda(exp).Compile().DynamicInvoke() == null)
                         typeList.Add("".GetType());
                     else
                         typeList.Add(Expression.Lambda(exp).Compile().DynamicInvoke().GetType());
-                    return Expression.Lambda(exp).Compile().DynamicInvoke() + "";
+                    return Expression.Lambda(exp).Compile().DynamicInvoke().ToStr();
                 }
             }
             else if (exp is NewArrayExpression)
@@ -191,11 +188,10 @@ namespace FastData.Base
                 if (isRight)
                 {
                     typeList.Add(Expression.Lambda(exp).Compile().DynamicInvoke().GetType());
-                    return Expression.Lambda(exp).Compile().DynamicInvoke() + "";
+                    return Expression.Lambda(exp).Compile().DynamicInvoke().ToStr();
                 }
                 else
                 {
-                    //typeList.Add("".GetType());
                     isRight = false;
                     try
                     {
@@ -206,9 +202,9 @@ namespace FastData.Base
                         if (meExp.Object != null)
                         {
                             if (meExp.Object is MemberExpression)
-                                asName = ((meExp.Object as MemberExpression).Expression as ParameterExpression).Name + ".";
+                                asName = string.Format("{0}", ((meExp.Object as MemberExpression).Expression as ParameterExpression).Name);
                             else if (meExp.Object is UnaryExpression)
-                                asName = (((meExp.Object as UnaryExpression).Operand as MemberExpression).Expression as ParameterExpression).Name + ".";
+                                asName = string.Format("{0}", (((meExp.Object as UnaryExpression).Operand as MemberExpression).Expression as ParameterExpression).Name);
                         }
                         #endregion
 
@@ -270,7 +266,6 @@ namespace FastData.Base
                                     sb.AppendFormat(" substr({4}{0},{2},{3}) {6} {5}{0}{1}", mName, i, mStar, mLength, asName, config.Flag, tempType);
 
                                 leftList.Add(mName);
-                                //rightList.Add(mValue.ToString());
                                 i++;
                             }
                             else if (string.Compare( mMethod, "toupper", true) ==0)
@@ -283,7 +278,19 @@ namespace FastData.Base
                                 sb.AppendFormat(" upper({0}{1}) {4} {2}{1}{3}", asName, mName, config.Flag, i, tempType);
 
                                 leftList.Add(mName);
-                                //rightList.Add(mValue.ToString());
+                                i++;
+                            }
+                            else if (string.Compare(mMethod, "CompareTo", true) == 0)
+                            {
+                                var tempType = "";
+                                if (expType == ExpressionType.Goto)
+                                    tempType = "=";
+                                else
+                                    tempType = ExpressionTypeCast(expType);
+                                sb.AppendFormat(" upper({0}{1}) {4} upper({2}{1}{3})", asName, mName, config.Flag, i, tempType);
+
+                                leftList.Add(mName);
+                                rightList.Add(mValue.ToString());
                                 i++;
                             }
                             else if (string.Compare( mMethod, "tolower", true) ==0)
@@ -296,7 +303,6 @@ namespace FastData.Base
                                 sb.AppendFormat(" lower({0}{1}) {4} {2}{1}{3}", asName, mName, config.Flag, i, tempType);
 
                                 leftList.Add(mName);
-                                //rightList.Add(mValue.ToString());
                                 i++;
                             }
                             #endregion
@@ -490,32 +496,5 @@ namespace FastData.Base
             return mValue;
         }
         #endregion
-
-        #region 替换
-        /// <summary>
-        /// 替换
-        /// </summary>
-        /// <param name="param"></param>
-        /// <param name="sql"></param>
-        /// <returns></returns>
-        private static VisitModel BaseReplace(VisitModel item, ConfigModel config)
-        {
-            var result = new VisitModel();
-            result.Where = item.Where;
-            result.Param = item.Param;
-
-            item.Param.ForEach(a => {
-                var replace = string.Format("#{0}#", a.ParameterName.ToLower());
-                if (item.Where.ToLower().IndexOf(replace) >= 0)
-                {
-                    result.Param.RemoveAll(p => p.ParameterName == a.ParameterName);
-                    result.Where = result.Where.ToLower().Replace(replace, a.Value.ToString());
-                }
-            });
-
-            return result;
-        }
-        #endregion
-
     }
 }
