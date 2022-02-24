@@ -201,14 +201,14 @@ namespace FastData.Base
                         #region 表别名
                         if (meExp.Object != null)
                         {
-                            if (meExp.Object is MemberExpression)
-                                asName = string.Format("{0}", ((meExp.Object as MemberExpression).Expression as ParameterExpression).Name);
+                            if (meExp.Object is MemberExpression && (meExp.Object as MemberExpression).Expression is ParameterExpression)
+                                    asName = string.Format("{0}", ((meExp.Object as MemberExpression).Expression as ParameterExpression).Name);
                             else if (meExp.Object is UnaryExpression)
                                 asName = string.Format("{0}", (((meExp.Object as UnaryExpression).Operand as MemberExpression).Expression as ParameterExpression).Name);
                         }
                         #endregion
 
-                        if ((MemberExpression)meExp.Object != null)
+                        if ((MemberExpression)meExp.Object != null && !string.IsNullOrEmpty(asName))
                         {
                             #region system的方法转sql的系统函数
                             var mMethod = meExp.Method.Name;
@@ -305,6 +305,47 @@ namespace FastData.Base
                                 leftList.Add(mName);
                                 i++;
                             }
+                            #endregion
+                        }
+
+                        if (meExp.Object == null && meExp.Method.Name == "Contains" && meExp.Arguments.Count == 2)
+                        {
+                            #region array.Contains
+                            var array = Expression.Lambda(meExp.Arguments[0]).Compile().DynamicInvoke() as Array;
+                            var mName = (meExp.Arguments[1] as MemberExpression).Member.Name;
+                            asName = string.Format("{0}.", ((meExp.Arguments[1] as MemberExpression).Expression as ParameterExpression).Name);
+
+                            sb.AppendFormat(" {0}{1} in (", asName, mName);
+                            for (int ary = 0; ary < array.Length; ary++)
+                            {
+                                sb.AppendFormat("{0}{1}{2},", config.Flag, mName, i);
+                                leftList.Add(mName);
+                                rightList.Add(array.GetValue(ary).ToStr());
+                                i++;
+                            }
+                            sb.Remove(sb.Length - 1, 1);
+                            sb.Append(")");
+                            #endregion
+                        }
+
+                        if (string.IsNullOrEmpty(asName) && meExp.Method.Name == "Contains" && meExp.Arguments.Count == 1)
+                        {
+                            #region list.Contains
+                            var mName = (meExp.Arguments[0] as MemberExpression).Member.Name;
+                            asName = string.Format("{0}.", ((meExp.Arguments[0] as MemberExpression).Expression as ParameterExpression).Name);
+                            var model = Expression.Lambda(meExp.Object).Compile().DynamicInvoke();
+                            var count = (int)BaseEmit.Invoke(model, model.GetType().GetMethod("get_Count"), null);
+
+                            sb.AppendFormat(" {0}{1} in (", asName, mName);
+                            for (var j = 0; j < count; j++)
+                            {
+                                sb.AppendFormat("{0}{1}{2},", config.Flag, mName, i);
+                                leftList.Add(mName);
+                                rightList.Add(BaseEmit.Invoke(model, model.GetType().GetMethod("get_Item"), new object[] { j }).ToStr());
+                                i++;
+                            }
+                            sb.Remove(sb.Length - 1, 1);
+                            sb.Append(")");
                             #endregion
                         }
 
