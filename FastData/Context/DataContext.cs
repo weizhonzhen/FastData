@@ -251,12 +251,14 @@ namespace FastData.Context
                                 result = BaseDataReader.ToModel(instance, dr, config);
 
                             dr.Close();
+                            dr.Dispose();
+                            dr = null;
                             BaseAop.AopAfter(table, cmd.CommandText, paramList, config, true, AopType.Navigate, result);
                             if (result != null)
                                 d.GetType().GetProperties().ToList().ForEach(p =>
                                 {
                                     if (p.Name == a.MemberName)
-                                        p.SetValue(d, Convert.ChangeType(result, a.MemberType));
+                                        BaseEmit.Set<T>(d, p.Name, result);
                                 });
                         });
                     });
@@ -310,6 +312,8 @@ namespace FastData.Context
                         result = BaseDataReader.ToModel(instance, dr, config);
 
                     dr.Close();
+                    dr.Dispose();
+                    dr = null;
                     BaseAop.AopAfter(null, cmd.CommandText, param, config, true, AopType.FastRead, result);
                 }
 
@@ -333,6 +337,12 @@ namespace FastData.Context
         /// </summary>
         public void Dispose()
         {
+            if (this.trans != null)
+            {
+                this.trans.Rollback();
+                this.trans.Dispose();
+                this.trans = null;
+            }
             Dispose(cmd);
             conn.Close();
             cmd.Dispose();
@@ -445,6 +455,7 @@ namespace FastData.Context
 
                 dr.Close();
                 dr.Dispose();
+                dr = null;
 
                 BaseAop.AopAfter(item.TableName, sql.ToString(), param, config, true, AopType.Query_List_Lambda, data);
 
@@ -504,6 +515,7 @@ namespace FastData.Context
 
                     dr.Close();
                     dr.Dispose();
+                    dr = null;
 
                     Navigate<T>(result, item.Config, true);
                 }
@@ -563,6 +575,7 @@ namespace FastData.Context
 
                     dr.Close();
                     dr.Dispose();
+                    dr = null;
 
                     BaseAop.AopAfter(item.TableName,cmd.CommandText, param, config, true, AopType.Query_Page_Lambda_Dic, result.PageResult.list);
                 }
@@ -624,6 +637,7 @@ namespace FastData.Context
 
                     dr.Close();
                     dr.Dispose();
+                    dr = null;
 
                     if(isAop)
                         BaseAop.AopAfter(null, cmd.CommandText, param?.ToList(), config, true, AopType.Query_Page_Sql_Dic, result.PageResult.list);
@@ -745,6 +759,7 @@ namespace FastData.Context
 
                     dr.Close();
                     dr.Dispose();
+                    dr = null;
 
                     if (isAop)
                         BaseAop.AopAfter(null, cmd.CommandText, param?.ToList(), config, true, AopType.Query_Page_Sql_Model, result.pageResult.list);
@@ -836,6 +851,7 @@ namespace FastData.Context
 
                 dr.Close();
                 dr.Dispose();
+                dr = null;
 
                 BaseAop.AopAfter(null, sql.ToString(), param?.ToList(), config, true, AopType.Query_Json_Lambda, result.Json);
 
@@ -960,6 +976,7 @@ namespace FastData.Context
 
                 dr.Close();
                 dr.Dispose();
+                dr = null;
 
                 BaseAop.AopAfter(tableName, sql.ToString(), param?.ToList(), config, true, AopType.Execute_Sql_Model, result.list);
 
@@ -1012,6 +1029,7 @@ namespace FastData.Context
 
                 dr.Close();
                 dr.Dispose();
+                dr = null;
 
                 if (isAop)
                     BaseAop.AopAfter(null, sql.ToString(), param?.ToList(), config, true, AopType.Execute_Sql_Dic, result.writeReturn);
@@ -1111,6 +1129,7 @@ namespace FastData.Context
 
                 dr.Close();
                 dr.Dispose();
+                dr = null;
 
                 BaseAop.AopAfter(item.TableName, sql.ToString(), param, config, true, AopType.Query_Dic_Lambda, data);
 
@@ -1197,6 +1216,7 @@ namespace FastData.Context
 
                 dr.Close();
                 dr.Dispose();
+                dr = null;
 
                 BaseAop.AopAfter(item.TableName, sql.ToString(), param, config, true, AopType.Query_DataTable_Lambda, result.Table);
 
@@ -2266,6 +2286,8 @@ namespace FastData.Context
         #region 开始事务
         public void BeginTrans()
         {
+            if (this.trans != null)
+                this.trans.Rollback();
             this.trans = this.conn.BeginTransaction();
             this.cmd.Transaction = trans;
         }
@@ -2275,6 +2297,8 @@ namespace FastData.Context
         public void SubmitTrans()
         {
             this.trans.Commit();
+            this.trans.Dispose();
+            this.trans = null;
         }
         #endregion
 
@@ -2282,6 +2306,8 @@ namespace FastData.Context
         public void RollbackTrans()
         {
             this.trans.Rollback();
+            this.trans.Dispose();
+            this.trans = null;
         }
         #endregion
     }
