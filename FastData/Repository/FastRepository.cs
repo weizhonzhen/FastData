@@ -23,6 +23,7 @@ namespace FastData.Repository
 {
     public class FastRepository : IFastRepository
     {
+        internal DataQuery data = new DataQuery();
         internal Query query { get; set; } = new Query();
 
         #region maq 执行返回结果
@@ -1299,6 +1300,52 @@ namespace FastData.Repository
             return query;
         }
         #endregion
+
+        #region 表查询
+        /// <summary>
+        /// 表查询
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="predicate">条件</param>
+        /// <param name="field">字段</param>
+        /// <param name="Key"></param>
+        /// <returns></returns>
+        public Queryable<T> Queryable<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> field = null, string key = null, string dbFile = "db.json") where T : class, new()
+        {
+            var projectName = Assembly.GetCallingAssembly().GetName().Name;
+            var cacheKey = $"FastData.Key.{typeof(ConfigKey).Name}";
+
+            if (DbCache.Exists(CacheType.Web, cacheKey) && key == null)
+                key = DbCache.Get<ConfigKey>(CacheType.Web, cacheKey).dbKey;
+            else if (DataConfig.DataType(key, projectName, dbFile) && key == null)
+                throw new Exception("数据库查询key不能为空,数据库类型有多个");
+
+            if (this.data.Config != null && this.data.Config.IsChangeDb)
+            {
+                this.data = new DataQuery();
+                key = this.data.Key;
+                this.data.Config = DataConfig.GetConfig(key);
+                this.data.Key = key;
+            }
+            else
+            {
+                this.data = new DataQuery();
+                this.data.Config = DataConfig.GetConfig(key);
+                this.data.Key = key;
+            }
+
+            var queryField = BaseField.QueryField<T>(predicate, field, this.data.Config);
+            this.data.Field.Add(queryField.Field);
+            this.data.AsName.AddRange(queryField.AsName);
+
+            var condtion = VisitExpression.LambdaWhere<T>(predicate, this.data.Config);
+            this.data.Predicate.Add(condtion);
+            this.data.Table.Add(string.Format("{0} {1}", typeof(T).Name, predicate.Parameters[0].Name));
+            this.data.TableName.Add(typeof(T).Name);
+            return new Queryable<T>() { Data = this.data };
+        }
+        #endregion
+
 
         #region 多种数据库类型切换
         /// <summary>
