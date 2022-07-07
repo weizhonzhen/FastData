@@ -49,6 +49,21 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FastUntility, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fast.Untility.1.2.63\lib\net45\FastUntility.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI, Version=2.1.3.1, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fast.Untility.1.2.63\lib\net45\NPOI.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OOXML, Version=2.1.3.1, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fast.Untility.1.2.63\lib\net45\NPOI.OOXML.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXml4Net, Version=2.1.3.1, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fast.Untility.1.2.63\lib\net45\NPOI.OpenXml4Net.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXmlFormats, Version=2.1.3.1, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fast.Untility.1.2.63\lib\net45\NPOI.OpenXmlFormats.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -119,8 +134,6 @@
     <Compile Include="Model\VisitModel.cs" />
     <Compile Include="Model\XmlModel.cs" />
     <Compile Include="Property\ColumnAttribute.cs" />
-    <Compile Include="Property\DynamicGet.cs" />
-    <Compile Include="Property\DynamicSet.cs" />
     <Compile Include="Property\FastMapAttribute.cs" />
     <Compile Include="Property\FastReadAttribute.cs" />
     <Compile Include="Property\FastWriteAttribute.cs" />
@@ -134,7 +147,9 @@
     <Compile Include="Repository\FastRepository.cs" />
     <Compile Include="Repository\IFastRepository.cs" />
     <Compile Include="Repository\IQuery.cs" />
+    <Compile Include="Repository\IQueryable.cs" />
     <Compile Include="Repository\Query.cs" />
+    <Compile Include="Repository\Queryable.cs" />
     <Compile Include="Type\DataDbType.cs" />
     <Compile Include="Base\DbLog.cs" />
     <Compile Include="Base\BaseModel.cs" />
@@ -144,16 +159,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastRedis\FastRedis.csproj">
       <Project>{0be95cbf-5b8b-4e53-bf3f-73b22f597247}</Project>
       <Name>FastRedis</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FastUntility\FastUntility.csproj">
-      <Project>{209cd228-0837-467d-b869-0db31af04362}</Project>
-      <Name>FastUntility</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
