@@ -433,7 +433,7 @@ namespace FastData.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override Task<int> ToCountAsy<T1>(DataContext db = null, bool isOutSql = false)
+        public override Task<int> ToCountAsy(DataContext db = null, bool isOutSql = false)
         {
             return Task.Run(() =>
             {

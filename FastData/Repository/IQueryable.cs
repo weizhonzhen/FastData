@@ -58,7 +58,7 @@ namespace FastData.Repository
 
         public abstract int ToCount(DataContext db = null, bool isOutSql = false);
 
-        public abstract Task<int> ToCountAsy<T1>(DataContext db = null, bool isOutSql = false);
+        public abstract Task<int> ToCountAsy(DataContext db = null, bool isOutSql = false);
 
         public abstract PageResult<T> ToPage(PageModel pModel, DataContext db = null, bool isOutSql = false);
 
