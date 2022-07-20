@@ -21,6 +21,7 @@ using FastData.Property;
 using System.Linq.Expressions;
 using FastData.Filter;
 using FastData.Proxy;
+using FastAop;
 
 namespace FastData
 {
@@ -459,6 +460,47 @@ namespace FastData
             });
         }
         #endregion
+
+        #region 注入
+        public static void InitAopGeneric(string NameSpaceServie, string NameSpaceModel, FastAopAttribute Aop)
+        {
+            if (string.IsNullOrEmpty(NameSpaceServie))
+                return;
+
+            if (string.IsNullOrEmpty(NameSpaceModel))
+                return;
+
+            if (Aop != null)
+            {
+                FastAop.FastAop.InitGeneric("FastData.Repository", NameSpaceModel, Aop.GetType());
+                FastAop.FastAop.InitGeneric(NameSpaceServie, NameSpaceModel, Aop.GetType());
+                FastAop.FastAop.Init(NameSpaceServie, Aop.GetType());
+            }
+
+            if (Aop == null)
+            {
+                FastAop.FastAop.InitGeneric("FastData.Repository", NameSpaceModel);
+                FastAop.FastAop.InitGeneric(NameSpaceServie, NameSpaceModel);
+                FastAop.FastAop.Init(NameSpaceServie);
+            }
+        }
+        #endregion
+
+        #region 注入
+        public static void InitAopGeneric(string NameSpaceServie, string NameSpaceModel)
+        {
+            if (string.IsNullOrEmpty(NameSpaceServie))
+                return;
+
+            if (string.IsNullOrEmpty(NameSpaceModel))
+                return;
+
+            FastAop.FastAop.InitGeneric("FastData.Repository", NameSpaceModel);
+            FastAop.FastAop.InitGeneric(NameSpaceServie, NameSpaceModel);
+            FastAop.FastAop.Init(NameSpaceServie);
+        }
+        #endregion
+
 
         #region 服务参数
         /// <summary>
