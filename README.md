@@ -35,6 +35,23 @@ aop
 ```
 start config
 ```csharp
+//ioc aop
+ FastMap.InitAopGeneric("Test.Service", "Test.Models",typeof(FastAopAttribute));
+
+    public class MoethodAop : FastAop.FastAopAttribute
+    {
+        public override void After(FastAop.Context.AfterContext context)
+        {  }
+       
+        public override void Before(FastAop.Context.BeforeContext context)
+        {  }
+
+        public void Exception(FastData.Aop.ExceptionContext context)
+        {  }
+
+        public override void Exception(FastAop.Context.ExceptionContext exception)
+        { }
+    }
 
 //cache model
 FastMap.InstanceProperties(namespace, "db.config",new TestAop());
