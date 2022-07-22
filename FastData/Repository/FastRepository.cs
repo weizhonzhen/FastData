@@ -1289,11 +1289,14 @@ namespace FastData.Repository
                 this.query.Data.Key = key;
             }
 
-            var queryField = BaseField.QueryField<T>(predicate, field, query.Data.Config);
+            this.data.TableName.Add(typeof(T).Name);
+            this.data.TableAsName.Add(typeof(T).Name, predicate.Parameters[0].Name);
+
+            var queryField = BaseField.QueryField<T>(predicate, field, query.Data);
             query.Data.Field.Add(queryField.Field);
             query.Data.AsName.AddRange(queryField.AsName);
 
-            var condtion = VisitExpression.LambdaWhere<T>(predicate, query.Data.Config);
+            var condtion = VisitExpression.LambdaWhere<T>(predicate, query.Data);
             query.Data.Predicate.Add(condtion);
             query.Data.Table.Add(string.Format("{0} {1}", typeof(T).Name, predicate.Parameters[0].Name));
 
@@ -1334,14 +1337,16 @@ namespace FastData.Repository
                 this.data.Key = key;
             }
 
-            var queryField = BaseField.QueryField<T>(predicate, field, this.data.Config);
+            this.data.TableName.Add(typeof(T).Name);
+            this.data.TableAsName.Add(typeof(T).Name, predicate.Parameters[0].Name);
+
+            var queryField = BaseField.QueryField<T>(predicate, field, this.data);
             this.data.Field.Add(queryField.Field);
             this.data.AsName.AddRange(queryField.AsName);
 
-            var condtion = VisitExpression.LambdaWhere<T>(predicate, this.data.Config);
+            var condtion = VisitExpression.LambdaWhere<T>(predicate, this.data);
             this.data.Predicate.Add(condtion);
             this.data.Table.Add(string.Format("{0} {1}", typeof(T).Name, predicate.Parameters[0].Name));
-            this.data.TableName.Add(typeof(T).Name);
             return new Queryable<T>() { Data = this.data };
         }
         #endregion
@@ -1779,14 +1784,16 @@ namespace FastData.Repository
                 this.data.Key = key;
             }
 
-            var queryField = BaseField.QueryField<T>(predicate, field, this.data.Config);
+            this.data.TableName.Add(typeof(T).Name);
+            this.data.TableAsName.Add(typeof(T).Name, predicate.Parameters[0].Name);
+
+            var queryField = BaseField.QueryField<T>(predicate, field, this.data);
             this.data.Field.Add(queryField.Field);
             this.data.AsName.AddRange(queryField.AsName);
 
-            var condtion = VisitExpression.LambdaWhere<T>(predicate, this.data.Config);
+            var condtion = VisitExpression.LambdaWhere<T>(predicate, this.data);
             this.data.Predicate.Add(condtion);
             this.data.Table.Add(string.Format("{0} {1}", typeof(T).Name, predicate.Parameters[0].Name));
-            this.data.TableName.Add(typeof(T).Name);
             return new Queryable<T>() { Data = this.data };
         }
         #endregion

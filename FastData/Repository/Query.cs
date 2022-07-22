@@ -29,11 +29,11 @@ namespace FastData.Repository
         /// <returns></returns>
         private IQuery JoinType<T, T1>(string joinType, Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false)
         {
-            var queryField = BaseField.QueryField<T, T1>(predicate, field, this.Data.Config);
+            var queryField = BaseField.QueryField<T, T1>(predicate, field, this.Data);
             this.Data.Field.Add(queryField.Field);
             this.Data.AsName.AddRange(queryField.AsName);
 
-            var condtion = VisitExpression.LambdaWhere<T, T1>(predicate, this.Data.Config);
+            var condtion = VisitExpression.LambdaWhere<T, T1>(predicate, this.Data);
             this.Data.Predicate.Add(condtion);
             this.Data.Table.Add(string.Format("{2} {0}{3} {1}", typeof(T1).Name, predicate.Parameters[1].Name
             , joinType, isDblink && !string.IsNullOrEmpty(this.Data.Config.DbLinkName) ? string.Format("@", this.Data.Config.DbLinkName) : ""));
@@ -100,7 +100,7 @@ namespace FastData.Repository
         /// <returns></returns>
         public override IQuery OrderBy<T>(Expression<Func<T, object>> field, bool isDesc = true)
         {
-            var orderBy = BaseField.OrderBy<T>(field, this.Data.Config, isDesc);
+            var orderBy = BaseField.OrderBy<T>(field, this.Data, isDesc);
             this.Data.OrderBy.AddRange(orderBy);
             return this;
         }
@@ -116,7 +116,7 @@ namespace FastData.Repository
         /// <returns></returns>
         public override IQuery GroupBy<T>(Expression<Func<T, object>> field)
         {
-            var groupBy = BaseField.GroupBy<T>(field, this.Data.Config);
+            var groupBy = BaseField.GroupBy<T>(field, this.Data);
             this.Data.GroupBy.AddRange(groupBy);
             return this;
         }
