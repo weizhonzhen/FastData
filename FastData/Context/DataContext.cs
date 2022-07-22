@@ -1254,7 +1254,12 @@ namespace FastData.Context
                 if (isTrans)
                     BeginTrans();
 
-                visitModel = VisitExpression.LambdaWhere<T>(predicate, config);
+                var query = new DataQuery();
+                query.Table.Add(typeof(T).Name);
+                query.Config = config;
+                query.TableAsName.Add(typeof(T).Name, predicate.Parameters[0].Name);
+
+                visitModel = VisitExpression.LambdaWhere<T>(predicate, query);
 
                 sql.AppendFormat("delete from {0} {1}", typeof(T).Name
                     , string.IsNullOrEmpty(visitModel.Where) ? "" : string.Format("where {0}", visitModel.Where.Replace(string.Format("{0}.", predicate.Parameters[0].Name), "")));
@@ -1458,8 +1463,13 @@ namespace FastData.Context
                 if (isTrans)
                     BeginTrans();
 
+                var query = new DataQuery();
+                query.Table.Add(typeof(T).Name);
+                query.Config = config;
+                query.TableAsName.Add(typeof(T).Name, predicate.Parameters[0].Name);
+                visitModel = VisitExpression.LambdaWhere<T>(predicate, query);
+
                 update = BaseModel.UpdateToSql<T>(model, config, field, cmd);
-                visitModel = VisitExpression.LambdaWhere<T>(predicate, config);
 
                 tableName.Add(typeof(T).Name);
                 BaseAop.AopBefore(tableName, sql, Parameter.ParamMerge(update.Param, visitModel.Param), config, false, AopType.Update_Lambda, model);
