@@ -595,7 +595,13 @@ namespace FastData
         public static void AddFastFilter<T>(Expression<Func<T, bool>> predicate, FilterType type)
         {
             var config = DbCache.Get<ConfigModel>(CacheType.Web, configKey);
-            var model = VisitExpression.LambdaWhere<T>(predicate, config);
+
+            var query = new DataQuery();
+            query.Table.Add(typeof(T).Name);
+            query.Config = config;
+            query.TableAsName.Add(typeof(T).Name, predicate.Parameters[0].Name);
+
+            var model = VisitExpression.LambdaWhere<T>(predicate, query);
 
             if (predicate.Parameters.Count > 0)
             {

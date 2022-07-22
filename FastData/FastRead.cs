@@ -32,11 +32,11 @@ namespace FastData
         /// <returns></returns>
         private static DataQuery JoinType<T, T1>(string joinType, DataQuery item, Expression<Func<T, T1, bool>> predicate, Expression<Func<T1, object>> field = null, bool isDblink = false)
         {
-            var queryField = BaseField.QueryField<T, T1>(predicate, field, item.Config);
+            var queryField = BaseField.QueryField<T, T1>(predicate, field, item);
             item.Field.Add(queryField.Field);
             item.AsName.AddRange(queryField.AsName);
 
-            var condtion = VisitExpression.LambdaWhere<T, T1>(predicate, item.Config);
+            var condtion = VisitExpression.LambdaWhere<T, T1>(predicate, item);
             item.Predicate.Add(condtion);
             item.Table.Add(string.Format("{2} {0}{3} {1}", typeof(T1).Name, predicate.Parameters[1].Name
             , joinType, isDblink && !string.IsNullOrEmpty(item.Config.DbLinkName) ? string.Format("@", item.Config.DbLinkName) : ""));
@@ -84,11 +84,11 @@ namespace FastData
             result.Key = key;
 
 
-            var queryField = BaseField.QueryField<T>(predicate, field, result.Config);
+            var queryField = BaseField.QueryField<T>(predicate, field, result);
             result.Field.Add(queryField.Field);
             result.AsName.AddRange(queryField.AsName);
 
-            var condtion = VisitExpression.LambdaWhere<T>(predicate, result.Config);
+            var condtion = VisitExpression.LambdaWhere<T>(predicate, result);
             result.Predicate.Add(condtion);
             result.Table.Add(string.Format("{0} {1}", typeof(T).Name, predicate.Parameters[0].Name));
             result.TableName.Add(typeof(T).Name);
@@ -121,11 +121,11 @@ namespace FastData
             result.Query.Config = DataConfig.GetConfig(key, projectName, dbFile);
             result.Query.Key = key;
 
-            var queryField = BaseField.QueryField<T>(predicate, field, result.Query.Config);
+            var queryField = BaseField.QueryField<T>(predicate, field, result.Query);
             result.Query.Field.Add(queryField.Field);
             result.Query.AsName.AddRange(queryField.AsName);
 
-            var condtion = VisitExpression.LambdaWhere<T>(predicate, result.Query.Config);
+            var condtion = VisitExpression.LambdaWhere<T>(predicate, result.Query);
             result.Query.Predicate.Add(condtion);
             result.Query.Table.Add(string.Format("{0} {1}", typeof(T).Name, predicate.Parameters[0].Name));
             result.Query.TableName.Add(typeof(T).Name);
@@ -191,7 +191,7 @@ namespace FastData
         /// <returns></returns>
         public static DataQuery OrderBy<T>(this DataQuery item, Expression<Func<T, object>> field, bool isDesc = true)
         {
-            var orderBy = BaseField.OrderBy<T>(field, item.Config, isDesc);
+            var orderBy = BaseField.OrderBy<T>(field, item, isDesc);
             item.OrderBy.AddRange(orderBy);
             return item;
         }
@@ -207,7 +207,7 @@ namespace FastData
         /// <returns></returns>
         public static DataQuery GroupBy<T>(this DataQuery item, Expression<Func<T, object>> field)
         {
-            var groupBy = BaseField.GroupBy<T>(field, item.Config);
+            var groupBy = BaseField.GroupBy<T>(field, item);
             item.GroupBy.AddRange(groupBy);
             return item;
         }
