@@ -111,25 +111,28 @@ namespace FastData.Property
         }
         #endregion
 
-        #region 泛型特性成员
+        #region 特性列
         /// <summary>
-        /// 泛型特性成员
+        /// 特性列
         /// </summary>
         public static List<ColumnModel> GetAttributesColumnInfo(string tableName, List<PropertyInfo> ListInfo)
         {
             var list = new List<ColumnModel>();
 
-            ListInfo.ForEach(p => {
+            ListInfo.ForEach(a => {
                 var temp = new ColumnModel();
-                temp.Name = p.Name;
+                temp.Name = a.Name;
                 var paramList = GetPropertyInfo<ColumnModel>(true);
 
-                p.CustomAttributes.ToList().ForEach(c => {
-                    if (c.AttributeType.Name == typeof(ColumnAttribute).Name)
+                a.CustomAttributes.ToList().ForEach(b => {
+                    if (b.AttributeType.Name == typeof(ColumnAttribute).Name)
                     {
-                        c.NamedArguments.ToList().ForEach(n => {
-                            if (paramList.Exists(b =>string.Compare(  b.Name, n.MemberName, true) ==0))
-                                BaseEmit.Set(temp, n.MemberName, n.TypedValue.Value);
+                        b.NamedArguments.ToList().ForEach(c => {
+                            if (c.MemberName == "Name" && c.TypedValue.Value != null)
+                                temp.Name = c.TypedValue.Value.ToStr();
+
+                            if (paramList.Exists(p => string.Compare(p.Name, c.MemberName, true) == 0))
+                                BaseEmit.Set(temp, c.MemberName, c.TypedValue.Value);
                         });
                     }
                 });
@@ -139,21 +142,22 @@ namespace FastData.Property
 
                 list.Add(temp);
             });
-            
+
             return list;
         }
         #endregion
 
-        #region 泛型缓存特性成员
+        #region 特性表
         /// <summary>
-        /// 泛型缓存特性成员
+        /// 特性表
         /// </summary>
-        public static string GetAttributesTableInfo(List<Attribute> listAttribute)
+        public static TableAttribute GetAttributesTableInfo(List<Attribute> listAttribute)
         {
-            var result = "";
+            var result = new TableAttribute();
+
             listAttribute.ForEach(a => {
                 if (a is TableAttribute)
-                    result = (a as TableAttribute).Comments;
+                    result = a as TableAttribute;
             });
 
             return result;
