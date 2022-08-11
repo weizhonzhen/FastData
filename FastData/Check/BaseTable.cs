@@ -65,7 +65,7 @@ namespace FastData.Check
                             table.Column = model;
                         }
 
-                        var comments = PropertyCache.GetAttributesTableInfo(listAttribute);
+                        var comments = PropertyCache.GetAttributesTableInfo(listAttribute).Comments;
                         if (table.Comments != comments)
                         {
                             table.Comments = comments;
@@ -76,7 +76,7 @@ namespace FastData.Check
                     {
                         table.Column = PropertyCache.GetAttributesColumnInfo(tableName, listInfo);
                         table.Name = tableName;
-                        table.Comments = PropertyCache.GetAttributesTableInfo(listAttribute);
+                        table.Comments = PropertyCache.GetAttributesTableInfo(listAttribute).Comments;
                         AddTable(item, table.Column, tableName);
                         UpdateComments(item, table.Comments, tableName);
                     }
