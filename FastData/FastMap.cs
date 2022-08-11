@@ -225,8 +225,11 @@ namespace FastData
                     assembly.ExportedTypes.ToList().ForEach(a =>
                     {
                         var typeInfo = (a as TypeInfo);
-                        if (typeInfo.Namespace != null && typeInfo.Namespace == nameSpace)
-                            BaseTable.Check(query, a.Name, typeInfo.DeclaredProperties.ToList(), typeInfo.GetCustomAttributes().ToList());
+                        if (typeInfo.Namespace != null && typeInfo.Namespace == nameSpace && typeInfo.GetCustomAttribute<TableAttribute>() != null)
+                        {
+                            var tableName = typeInfo.GetCustomAttribute<TableAttribute>().Name ?? a.Name;
+                            BaseTable.Check(query, tableName, typeInfo.DeclaredProperties.ToList(), typeInfo.GetCustomAttributes().ToList());
+                        }
                     });
                 }
                 catch (Exception ex) { }
