@@ -475,9 +475,9 @@ namespace FastData
 
             if (Aop != null)
             {
-                FastAop.FastAop.InitGeneric("FastData.Repository", NameSpaceModel, Aop.GetType(),webType);
-                FastAop.FastAop.InitGeneric(NameSpaceServie, NameSpaceModel, Aop.GetType(), webType);
-                FastAop.FastAop.Init(NameSpaceServie, Aop.GetType(), webType);
+                FastAop.FastAop.InitGeneric("FastData.Repository", NameSpaceModel,webType, Aop.GetType());
+                FastAop.FastAop.InitGeneric(NameSpaceServie, NameSpaceModel, webType, Aop.GetType());
+                FastAop.FastAop.Init(NameSpaceServie, webType, Aop.GetType());
             }
 
             if (Aop == null)
