@@ -40,9 +40,23 @@ namespace FastData
         /// <param name="action"></param>
         public static void Init(Action<ConfigData> action)
         {
+           var projectName = Assembly.GetCallingAssembly().GetName().Name;
             var config = new ConfigData();
             action(config);
 
+            if (!string.IsNullOrEmpty(config.NamespaceProperties))
+                InstanceProperties(config.NamespaceProperties, config.dbFile, config.IsResource, config.aop,projectName);
+
+            if (config.IsResource)
+                InstanceMapResource(config.dbKey, config.dbFile, config.mapFile, config.aop, projectName);
+            else
+                InstanceMap(config.dbKey, config.dbFile, config.mapFile,config.aop, projectName);
+
+            if (config.IsCodeFirst && !string.IsNullOrEmpty(config.NamespaceCodeFirst))
+            {
+                InstanceProperties(config.NamespaceCodeFirst, config.dbFile, config.IsResource, config.aop, projectName);
+                InstanceTable(config.NamespaceCodeFirst, config.dbKey, config.dbFile, config.IsResource, config.aop, projectName);
+            }
         }
         #endregion
 
@@ -52,12 +66,10 @@ namespace FastData
         /// </summary>
         /// <param name="action"></param>
         /// <param name="repository"></param>
-        public static void InitGeneric(Action<ConfigData> action, Action<ConfigRepository> repository)
+        public static void InitGeneric(Action<ConfigRepository> repository)
         {
             var config = new ConfigRepository();
             repository(config);
-
-            Init(action);
             InitAopGeneric(config.NameSpaceServie, config.NameSpaceModel, config.webType, config.Aop);
         }
         #endregion
@@ -92,20 +104,21 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceProperties(string nameSpace, string dbFile = "web.config", bool isResource = false, IFastAop aop = null)
+        public static void InstanceProperties(string nameSpace, string dbFile = "web.config", bool isResource = false, IFastAop aop = null, string projectName = null)
         {
+            projectName = projectName ?? Assembly.GetCallingAssembly().GetName().Name;
             InitAssembly();
             var config = new ConfigModel();
             if (aop != null)
                 fastAop = aop;
 
             if (isResource)
-                config = DataConfig.GetConfig(null, Assembly.GetCallingAssembly().GetName().Name, dbFile);
+                config = DataConfig.GetConfig(null, projectName, dbFile);
             else
                 config = DataConfig.GetConfig(null, null, dbFile);
 
             if (config.CacheType == CacheType.Redis && isResource)
-                FastRedis.RedisInfo.Init(dbFile, Assembly.GetCallingAssembly().GetName().Name);
+                FastRedis.RedisInfo.Init(dbFile, projectName);
 
             if (config.CacheType == CacheType.Redis)
                 FastRedis.RedisInfo.Init(dbFile);
@@ -225,8 +238,10 @@ namespace FastData
         /// <param name="list"></param>
         /// <param name="nameSpace">命名空间</param>
         /// <param name="dll">dll名称</param>
-        public static void InstanceTable(string nameSpace, string dbKey = null, string dbFile = "web.config", bool isResource = false, IFastAop aop = null)
+        public static void InstanceTable(string nameSpace, string dbKey = null, string dbFile = "web.config", bool isResource = false, IFastAop aop = null, string projectName = null)
         {
+            projectName = projectName ?? Assembly.GetCallingAssembly().GetName().Name;
+
             InitAssembly();
             if (aop != null)
                 fastAop = aop;
@@ -234,14 +249,14 @@ namespace FastData
             var query = new DataQuery();
 
             if (isResource)
-                query.Config = DataConfig.GetConfig(dbKey, Assembly.GetCallingAssembly().GetName().Name, dbFile);
+                query.Config = DataConfig.GetConfig(dbKey, projectName, dbFile);
             else
                 query.Config = DataConfig.GetConfig(dbKey, null, dbFile);
 
             query.Key = dbKey;
 
             if (query.Config.CacheType == CacheType.Redis && isResource)
-                FastRedis.RedisInfo.Init(dbFile, Assembly.GetCallingAssembly().GetName().Name);
+                FastRedis.RedisInfo.Init(dbFile, projectName);
 
             if (query.Config.CacheType == CacheType.Redis && isResource)
                 FastRedis.RedisInfo.Init(dbFile);
@@ -267,12 +282,12 @@ namespace FastData
         #endregion
 
         #region 初始化map 3  by Resource
-        public static void InstanceMapResource(string dbKey = null, string dbFile = "web.config", string mapFile = "SqlMap.config", IFastAop aop =null)
+        public static void InstanceMapResource(string dbKey = null, string dbFile = "web.config", string mapFile = "SqlMap.config", IFastAop aop =null, string projectName = null)
         {
             if (aop != null)
                 fastAop = aop;
 
-            var projectName = Assembly.GetCallingAssembly().GetName().Name;
+            projectName = projectName ?? Assembly.GetCallingAssembly().GetName().Name;
             var config = DataConfig.GetConfig(dbKey, projectName, dbFile);
 
             if (config.CacheType == CacheType.Redis)
@@ -352,13 +367,14 @@ namespace FastData
         /// 初始化map 3
         /// </summary>
         /// <returns></returns>
-        public static void InstanceMap(string dbKey = null, string dbFile = "web.config", string mapFile = "SqlMap.config", IFastAop aop = null)
+        public static void InstanceMap(string dbKey = null, string dbFile = "web.config", string mapFile = "SqlMap.config", IFastAop aop = null, string projectName = null)
         {
             if (aop != null)
                 fastAop = aop;
 
+            projectName = projectName ?? Assembly.GetCallingAssembly().GetName().Name;
             var list = MapConfig.GetConfig(mapFile);
-            var config = DataConfig.GetConfig(dbKey, null, dbFile);
+            var config = DataConfig.GetConfig(dbKey, projectName, dbFile);
             DbCache.Set<ConfigModel>(CacheType.Web, configKey, config);
 
             using (var db = new DataContext(dbKey))
