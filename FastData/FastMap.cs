@@ -33,6 +33,35 @@ namespace FastData
         public static IFastAop fastAop;
         private static string configKey = Guid.NewGuid().ToString();
 
+        #region 统一入口
+        /// <summary>
+        /// 统一入口
+        /// </summary>
+        /// <param name="action"></param>
+        public static void Init(Action<ConfigData> action)
+        {
+            var config = new ConfigData();
+            action(config);
+
+        }
+        #endregion
+
+        #region 统一入口含注入
+        /// <summary>
+        /// 统一入口含注入
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="repository"></param>
+        public static void InitGeneric(Action<ConfigData> action, Action<ConfigRepository> repository)
+        {
+            var config = new ConfigRepository();
+            repository(config);
+
+            Init(action);
+            InitAopGeneric(config.NameSpaceServie, config.NameSpaceModel, config.webType, config.Aop);
+        }
+        #endregion
+
         #region 获取导航属性
         /// <summary>
         /// 获取导航属性
@@ -465,7 +494,7 @@ namespace FastData
         #endregion
 
         #region 注入
-        public static void InitAopGeneric(string NameSpaceServie, string NameSpaceModel, FastAopAttribute Aop,FastAop.FastAop.WebType webType)
+        public static void InitAopGeneric(string NameSpaceServie, string NameSpaceModel, FastAop.FastAop.WebType webType, FastAopAttribute Aop=null)
         {
             if (string.IsNullOrEmpty(NameSpaceServie))
                 return;
@@ -486,21 +515,6 @@ namespace FastData
                 FastAop.FastAop.InitGeneric(NameSpaceServie, NameSpaceModel, webType);
                 FastAop.FastAop.Init(NameSpaceServie, webType);
             }
-        }
-        #endregion
-
-        #region 注入
-        public static void InitAopGeneric(string NameSpaceServie, string NameSpaceModel, FastAop.FastAop.WebType webTyp)
-        {
-            if (string.IsNullOrEmpty(NameSpaceServie))
-                return;
-
-            if (string.IsNullOrEmpty(NameSpaceModel))
-                return;
-
-            FastAop.FastAop.InitGeneric("FastData.Repository", NameSpaceModel, webTyp);
-            FastAop.FastAop.InitGeneric(NameSpaceServie, NameSpaceModel, webTyp);
-            FastAop.FastAop.Init(NameSpaceServie, webTyp);
         }
         #endregion
 
