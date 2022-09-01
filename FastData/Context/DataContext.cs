@@ -694,9 +694,9 @@ namespace FastData.Context
 
                     result.GetType().GetFields().ToList().ForEach(a => {
                         if (a.Name == "pModel")
-                            a.SetValue(result, pModel);
+                            a.SetValueDirect(__makeref(result), pModel);
                         if (a.Name == "list")
-                            a.SetValue(result, list);
+                            a.SetValueDirect(__makeref(result), list);
                     });
 
                     dr.Close();
