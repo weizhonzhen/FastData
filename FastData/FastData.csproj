@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>52bb2e23</NuGetPackageImportStamp>
     <TargetFrameworkProfile />
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -108,7 +108,9 @@
     <Compile Include="Model\ColumnComments.cs" />
     <Compile Include="Model\ColumnType.cs" />
     <Compile Include="Model\CompareModel.cs" />
+    <Compile Include="Model\ConfigData.cs" />
     <Compile Include="Model\ConfigModel.cs" />
+    <Compile Include="Model\ConfigRepository.cs" />
     <Compile Include="Model\DataReturn.cs" />
     <Compile Include="Model\DataQuery.cs" />
     <Compile Include="Model\FieldModel.cs" />
@@ -149,13 +151,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Fast.Redis">
-      <Version>1.1.7</Version>
+      <Version>1.1.8</Version>
     </PackageReference>
     <PackageReference Include="Fast.Untility">
-      <Version>1.2.63</Version>
+      <Version>1.2.66</Version>
     </PackageReference>
     <PackageReference Include="FastAop">
-      <Version>2.0.7</Version>
+      <Version>2.2.3</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

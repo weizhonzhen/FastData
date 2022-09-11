@@ -510,7 +510,7 @@ namespace FastData
         #endregion
 
         #region 注入
-        public static void InitAopGeneric(string NameSpaceServie, string NameSpaceModel, FastAop.FastAop.WebType webType, FastAopAttribute Aop=null)
+        public static void InitAopGeneric(string NameSpaceServie, string NameSpaceModel, FastAop.WebType webType, FastAopAttribute Aop=null)
         {
             if (string.IsNullOrEmpty(NameSpaceServie))
                 return;
