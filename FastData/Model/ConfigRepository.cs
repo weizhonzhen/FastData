@@ -10,6 +10,6 @@ namespace FastData.Model
 
         public string NameSpaceServie { get; set; }
 
-        public FastAop.FastAop.WebType webType { get; set; }
+        public WebType webType { get; set; }
     }
 }
