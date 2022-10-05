@@ -444,67 +444,71 @@ namespace FastData
             InitAssembly();
             AppDomain.CurrentDomain.GetAssemblies().ToList().ForEach(assembly =>
             {
-                try {
-                    assembly.ExportedTypes.ToList().ForEach(a =>
+                try
                 {
-                    if (a.Namespace == nameSpace)
+                    foreach (var a in assembly.ExportedTypes.ToList())
                     {
-                        var isRegister = false;
-                        a.GetMethods().ToList().ForEach(m =>
+                        if (a.Namespace == nameSpace)
                         {
-                            ConfigModel config = new ConfigModel();
-                            var model = new ServiceModel();
-                            var read = m.GetCustomAttribute<FastReadAttribute>();
-                            var write = m.GetCustomAttribute<FastWriteAttribute>();
-                            var map = m.GetCustomAttribute<FastMapAttribute>();
-
-                            if (read != null)
+                            var isRegister = false;
+                            a.GetMethods().ToList().ForEach(m =>
                             {
-                                isRegister = true;
-                                model.isWrite = false;
-                                model.sql = read.sql.ToLower();
-                                model.dbKey = read.dbKey;
-                                config = DataConfig.GetConfig(model.dbKey);
-                                model.isPage = read.isPage;
-                                model.type = m.ReturnType;
-                                ServiceParam(m, model, config);
-                            }
+                                ConfigModel config = new ConfigModel();
+                                var model = new ServiceModel();
+                                var read = m.GetCustomAttribute<FastReadAttribute>();
+                                var write = m.GetCustomAttribute<FastWriteAttribute>();
+                                var map = m.GetCustomAttribute<FastMapAttribute>();
 
-                            if (write != null)
-                            {
-                                isRegister = true;
-                                model.isWrite = true;
-                                model.sql = write.sql.ToLower();
-                                model.dbKey = write.dbKey;
-                                model.type = m.ReturnType;
-                                config = DataConfig.GetConfig(model.dbKey);
-                                ServiceParam(m, model, config);
-                                model.isList = false;
-                            }
+                                if (read != null)
+                                {
+                                    isRegister = true;
+                                    model.isWrite = false;
+                                    model.sql = read.sql.ToLower();
+                                    model.dbKey = read.dbKey;
+                                    config = DataConfig.GetConfig(model.dbKey);
+                                    model.isPage = read.isPage;
+                                    model.type = m.ReturnType;
+                                    ServiceParam(m, model, config);
+                                }
 
-                            if (map != null)
-                            {
-                                isRegister = true;
-                                model.isWrite = false;
-                                model.isXml = true;
-                                model.dbKey = map.dbKey;
-                                model.isPage = map.isPage;
-                                model.type = m.ReturnType;
-                                config = DataConfig.GetConfig(model.dbKey);
-                                MapXml.ReadFastMap(map.xml, m, config);
-                                ServiceParam(m, model, config);
-                            }
+                                if (write != null)
+                                {
+                                    isRegister = true;
+                                    model.isWrite = true;
+                                    model.sql = write.sql.ToLower();
+                                    model.dbKey = write.dbKey;
+                                    model.type = m.ReturnType;
+                                    config = DataConfig.GetConfig(model.dbKey);
+                                    ServiceParam(m, model, config);
+                                    model.isList = false;
+                                }
 
-                            if (isRegister)
-                            {
-                                var key = string.Format("{0}.{1}", a.FullName, m.Name);
-                                DbCache.Set<ServiceModel>(config.CacheType, key, model);
-                            }
-                        });
+                                if (map != null)
+                                {
+                                    isRegister = true;
+                                    model.isWrite = false;
+                                    model.isXml = true;
+                                    model.dbKey = map.dbKey;
+                                    model.isPage = map.isPage;
+                                    model.type = m.ReturnType;
+                                    config = DataConfig.GetConfig(model.dbKey);
+                                    MapXml.ReadFastMap(map.xml, m, config);
+                                    ServiceParam(m, model, config);
+                                }
+
+                                if (isRegister)
+                                {
+                                    var key = string.Format("{0}.{1}", a.FullName, m.Name);
+                                    DbCache.Set<ServiceModel>(config.CacheType, key, model);
+                                }
+                            });
+                        }
                     }
-                });
                 }
-                catch (Exception ex) { }
+                catch (Exception ex) {
+                    if (ex is ProxyException)
+                        throw ex;
+                }
             });
         }
         #endregion
@@ -544,29 +548,29 @@ namespace FastData
         private static void ServiceParam(MethodInfo info, ServiceModel model, ConfigModel config)
         {
             if (info.ReturnType != typeof(WriteReturn) && model.isWrite)
-                throw new Exception($"[return type only WriteReturn, service:{info.DeclaringType.Name}, method:{info.Name}, return type:{info.ReturnType} is not support]");
+                throw new ProxyException($"[return type only WriteReturn, service:{info.DeclaringType.Name}, method:{info.Name}, return type:{info.ReturnType} is not support]");
 
             if (string.IsNullOrEmpty(model.dbKey))
-                throw new Exception($"[service:{info.DeclaringType.Name}, method:{info.Name}, dbkey is not null]");
+                throw new ProxyException($"[service:{info.DeclaringType.Name}, method:{info.Name}, dbkey is not null]");
 
             if (info.ReturnType.isSysType())
-                throw new Exception($"[service:{info.DeclaringType.Name}, method:{info.Name}, return type:{info.ReturnType} is not support]");
+                throw new ProxyException($"[service:{info.DeclaringType.Name}, method:{info.Name}, return type:{info.ReturnType} is not support]");
 
             if (string.IsNullOrEmpty(model.sql) && !model.isXml)
-                throw new Exception($"[service:{info.DeclaringType.Name}, method:{info.Name}, sql is not null]");
+                throw new ProxyException($"[service:{info.DeclaringType.Name}, method:{info.Name}, sql is not null]");
 
             if (model.isPage && !info.GetParameters().ToList().Exists(a => a.ParameterType == typeof(PageModel)))
-                throw new Exception($"[service:{info.DeclaringType.Name}, method:{info.Name}, read data by page , parameter type:{typeof(PageModel).FullName} not exists]");
+                throw new ProxyException($"[service:{info.DeclaringType.Name}, method:{info.Name}, read data by page , parameter type:{typeof(PageModel).FullName} not exists]");
 
             if (info.GetParameters().Length == 1 && info.GetParameters()[0].ParameterType.IsGenericType)
-                throw new Exception($"[service:{info.DeclaringType.Name}, method:{info.Name}, parameter type:{info.GetParameters()[0].ParameterType} is not support]");
+                throw new ProxyException($"[service:{info.DeclaringType.Name}, method:{info.Name}, parameter type:{info.GetParameters()[0].ParameterType} is not support]");
 
             if (model.isPage && info.ReturnType.GetGenericArguments().Length > 0 && info.ReturnType == typeof(PageResult<>).MakeGenericType(new System.Type[] { info.ReturnType.GetGenericArguments()[0] }))
                 model.type = info.ReturnType.GetGenericArguments()[0];
             else if (model.isPage && info.ReturnType == typeof(PageResult))
                 model.type = null;
             else if (model.isPage)
-                throw new Exception($"[service:{info.DeclaringType.Name}, method:{info.Name}, read data by page , return type:{info.ReturnType} is not support]");
+                throw new ProxyException($"[service:{info.DeclaringType.Name}, method:{info.Name}, read data by page , return type:{info.ReturnType} is not support]");
 
             if (info.ReturnType == typeof(Dictionary<string, object>) && (!model.isWrite || model.isXml))
                 model.isList = false;
@@ -583,7 +587,7 @@ namespace FastData
                     argType = info.ReturnType;
 
                 if (argType.isSysType())
-                    throw new Exception($"[service:{info.DeclaringType.Name}, method:{info.Name}, return type:{info.ReturnType} is not support]");
+                    throw new ProxyException($"[service:{info.DeclaringType.Name}, method:{info.Name}, return type:{info.ReturnType} is not support]");
             }
             var dic = new Dictionary<int, string>();
 
