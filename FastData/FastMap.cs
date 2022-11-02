@@ -931,6 +931,7 @@ namespace FastData
 
             config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
             DbLog.LogSql(config.IsOutSql, result.Sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch = null;
 
             return result.PageResult;
         }
@@ -1050,6 +1051,7 @@ namespace FastData
 
             config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
             DbLog.LogSql(config.IsOutSql, result.sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch = null;
 
             return result.pageResult;
         }
