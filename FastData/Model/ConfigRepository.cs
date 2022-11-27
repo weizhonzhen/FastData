@@ -1,4 +1,5 @@
 ﻿using FastAop;
+using static FastAop.FastAop;
 
 namespace FastData.Model
 {
@@ -11,5 +12,7 @@ namespace FastData.Model
         public string NameSpaceServie { get; set; }
 
         public WebType webType { get; set; }
+
+        public ServiceLifetime ServiceLifetime { get; set; } = ServiceLifetime.Scoped;
     }
 }
