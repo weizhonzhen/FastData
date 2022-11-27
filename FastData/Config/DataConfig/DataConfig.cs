@@ -17,6 +17,8 @@ namespace FastData.Config
     /// </summary>
     internal class DataConfig : ConfigurationSection
     {
+        private static readonly string cacheKey = "FastData.db.config";
+
         #region oralce 节点
         /// <summary>
         /// oralce 节点
@@ -114,7 +116,6 @@ namespace FastData.Config
         /// <returns></returns>
         public static ConfigModel GetConfig(string key = null, string projectName = null, string dbFile = "web.config")
         {
-            var cacheKey = "FastData.db.config";
             var result = new ConfigModel();
             var list = new List<ConfigModel>();
             var config = new DataConfig();
@@ -392,7 +393,6 @@ namespace FastData.Config
         public static bool DataType(string key = null, string projectName = null, string dbFile = "web.config")
         {
             var result = new List<bool>();
-            var cacheKey = "FastData.db.config";
 
             if (!DbCache.Exists(CacheType.Web, cacheKey))
                 DataConfig.GetConfig(key, projectName, dbFile);
@@ -407,6 +407,14 @@ namespace FastData.Config
             result.Add(list.Count(a => a.DbType == DataDbType.MySql) > 0);
 
             return result.Count(a => a == true) > 1;
+        }
+
+        public static List<ConfigModel> List
+        {
+            get
+            {
+                return DbCache.Get<List<ConfigModel>>(CacheType.Web, cacheKey);
+            }
         }
     }
 }
