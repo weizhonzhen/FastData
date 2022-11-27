@@ -25,6 +25,7 @@ namespace FastData.Context
         private DbConnection conn;
         private DbCommand cmd;
         private DbTransaction trans;
+        internal bool isDispose;
 
         #region Navigate Add
         /// <summary>
@@ -347,6 +348,7 @@ namespace FastData.Context
             conn.Close();
             cmd.Dispose();
             conn.Dispose();
+            isDispose = true;
             GC.SuppressFinalize(this);
         }
         #endregion
