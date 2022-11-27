@@ -83,6 +83,8 @@ namespace FastData
             result.Config = DataConfig.GetConfig(key, projectName, dbFile);
             result.Key = key;
 
+            result.TableName.Add(typeof(T).Name);
+            result.TableAsName.Add(typeof(T).Name, predicate.Parameters[0].Name);
 
             var queryField = BaseField.QueryField<T>(predicate, field, result);
             result.Field.Add(queryField.Field);
@@ -120,6 +122,9 @@ namespace FastData
 
             result.Query.Config = DataConfig.GetConfig(key, projectName, dbFile);
             result.Query.Key = key;
+
+            result.Query.TableName.Add(typeof(T).Name);
+            result.Query.TableAsName.Add(typeof(T).Name, predicate.Parameters[0].Name);
 
             var queryField = BaseField.QueryField<T>(predicate, field, result.Query);
             result.Query.Field.Add(queryField.Field);
@@ -246,15 +251,8 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(item.Key))
-                {
-                    result = tempDb.GetList<T>(item);
-                }
-            }
-            else
-                result = db.GetList<T>(item);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(item.Key) : db;
+            result = db.GetList<T>(item);
 
             stopwatch.Stop();
 
@@ -327,15 +325,8 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(item.Key))
-                {
-                    result = tempDb.GetJson(item);
-                }
-            }
-            else
-                result = db.GetJson(item);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(item.Key) : db;
+            result = db.GetJson(item);
 
             stopwatch.Stop();
 
@@ -408,15 +399,8 @@ namespace FastData
 
             item.Take = 1;
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(item.Key))
-                {
-                    result = tempDb.GetList<T>(item);
-                }
-            }
-            else
-                result = db.GetList<T>(item);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(item.Key) : db;
+            result = db.GetList<T>(item);
 
             stopwatch.Stop();
 
@@ -490,15 +474,8 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(item.Key))
-                {
-                    result = tempDb.GetCount(item);
-                }
-            }
-            else
-                result = db.GetCount(item);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(item.Key) : db;
+            result = db.GetCount(item);
 
             stopwatch.Stop();
 
@@ -544,15 +521,8 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(item.Key))
-                {
-                    result = tempDb.GetPage<T>(item, pModel);
-                }
-            }
-            else
-                result = db.GetPage<T>(item, pModel);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(item.Key) : db;
+            result = db.GetPage<T>(item, pModel);
 
             stopwatch.Stop();
 
@@ -630,15 +600,8 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(item.Key))
-                {
-                    result = tempDb.GetPage(item, pModel);
-                }
-            }
-            else
-                result = db.GetPage(item, pModel);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(item.Key) : db;
+            result = db.GetPage(item, pModel);
 
             stopwatch.Stop();
 
@@ -713,20 +676,10 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    result = tempDb.ExecuteSql<T>(sql, param);
-                    config = tempDb.config;
-                }
-            }
-            else
-            {
-                result = db.ExecuteSql<T>(sql, param);
-                config = db.config;
-            }
-
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            result = db.ExecuteSql<T>(sql, param);
+            config = db.config;
+            
             stopwatch.Stop();
 
             config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
@@ -802,15 +755,8 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(item.Key))
-                {
-                    result = tempDb.GetDic(item);
-                }
-            }
-            else
-                result = db.GetDic(item);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(item.Key) : db;
+            result = db.GetDic(item);
 
             stopwatch.Stop();
 
@@ -882,15 +828,8 @@ namespace FastData
             stopwatch.Start();
             item.Take = 1;
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(item.Key))
-                {
-                    result = tempDb.GetDic(item);
-                }
-            }
-            else
-                result = db.GetDic(item);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(item.Key) : db;
+            result = db.GetDic(item);
 
             stopwatch.Stop();
 
@@ -962,15 +901,8 @@ namespace FastData
             stopwatch.Start();
             item.Take = 1;
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(item.Key))
-                {
-                    result = tempDb.GetDataTable(item);
-                }
-            }
-            else
-                result = db.GetDataTable(item);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(item.Key) : db;
+            result = db.GetDataTable(item);
 
             stopwatch.Stop();
 
@@ -1040,19 +972,9 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    result = tempDb.ExecuteSqlList(sql, param, false);
-                    config = tempDb.config;
-                }
-            }
-            else
-            {
-                result = db.ExecuteSqlList(sql, param, false);
-                config = db.config;
-            }
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            result = db.ExecuteSqlList(sql, param, false);
+            config = db.config;
 
             stopwatch.Stop();
 

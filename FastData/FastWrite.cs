@@ -82,20 +82,10 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    result = tempDb.Add<T>(model, false);
-                    config = tempDb.config;
-                }
-            }
-            else
-            {
-                result = db.Add<T>(model, false);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            result = db.Add<T>(model, false);
                 config = db.config;
-            }
-
+            
             stopwatch.Stop();
 
             config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
@@ -141,20 +131,10 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    result = tempDb.Delete<T>(predicate);
-                    config = tempDb.config;
-                }
-            }
-            else
-            {
-                result = db.Delete<T>(predicate);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            result = db.Delete<T>(predicate);
                 config = db.config;
-            }
-
+            
             stopwatch.Stop();
 
             config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
@@ -197,20 +177,10 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    result = tempDb.Delete(model, isTrans);
-                    config = tempDb.config;
-                }
-            }
-            else
-            {
-                result = db.Delete(model, isTrans);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            result = db.Delete(model, isTrans);
                 config = db.config;
-            }
-
+            
             stopwatch.Stop();
 
             config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
@@ -254,20 +224,10 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    result = tempDb.Update<T>(model, predicate, field);
-                    config = tempDb.config;
-                }
-            }
-            else
-            {
-                result = db.Update<T>(model, predicate, field);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            result = db.Update<T>(model, predicate, field);
                 config = db.config;
-            }
-
+            
             stopwatch.Stop();
 
             config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
@@ -312,20 +272,10 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    result = tempDb.Update(model, field);
-                    config = tempDb.config;
-                }
-            }
-            else
-            {
-                result = db.Update(model, field);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            result = db.Update(model, field);
                 config = db.config;
-            }
-
+            
             stopwatch.Stop();
 
             config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
@@ -365,20 +315,10 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    result = tempDb.UpdateList(list, field);
-                    config = tempDb.config;
-                }
-            }
-            else
-            {
-                result = db.UpdateList(list, field);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            result = db.UpdateList(list, field);
                 config = db.config;
-            }
-
+            
             stopwatch.Stop();
 
             config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
@@ -419,22 +359,11 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    config = tempDb.config;
-                    config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
-                    result = tempDb.ExecuteSql(sql, param, false,config.IsOutSql);
-                }
-            }
-            else
-            {
-                config = db.config;
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            config = db.config;
                 config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
                 result = db.ExecuteSql(sql, param, false, config.IsOutSql);
-            }
-
+            
             stopwatch.Stop();
             DbLog.LogSql(config.IsOutSql, result.Sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
             stopwatch = null;
@@ -475,21 +404,11 @@ namespace FastData
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    config = tempDb.config;
-                    config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
-                    result = tempDb.ExecuteDDL(sql, param, config.IsOutSql);
-                }
-            }
-            else
-            {
-                config = db.config;
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            config = db.config;
                 config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
                 result = db.ExecuteSql(sql, param, false, config.IsOutSql);
-            }
+            
 
             stopwatch.Stop();
 
