@@ -1,4 +1,5 @@
-﻿using FastData.Base;
+﻿using FastAop;
+using FastData.Base;
 using FastData.Context;
 using FastData.Model;
 using FastUntility.Page;
@@ -168,15 +169,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetList<T>(this.Data);
-                }
-            }
-            else
-                result = db.GetList<T>(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetList<T>(this.Data);
 
             stopwatch.Stop();
 
@@ -249,15 +243,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetJson(this.Data);
-                }
-            }
-            else
-                result = db.GetJson(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetJson(this.Data);
 
             stopwatch.Stop();
 
@@ -330,15 +317,8 @@ namespace FastData.Repository
 
             this.Data.Take = 1;
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetList<T>(this.Data);
-                }
-            }
-            else
-                result = db.GetList<T>(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetList<T>(this.Data);
 
             stopwatch.Stop();
 
@@ -411,15 +391,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetCount(this.Data);
-                }
-            }
-            else
-                result = db.GetCount(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetCount(this.Data);
 
             stopwatch.Stop();
 
@@ -465,15 +438,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetPage<T>(this.Data, pModel);
-                }
-            }
-            else
-                result = db.GetPage<T>(this.Data, pModel);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetPage<T>(this.Data, pModel);
 
             stopwatch.Stop();
 
@@ -550,15 +516,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetPage(this.Data, pModel);
-                }
-            }
-            else
-                result = db.GetPage(this.Data, pModel);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetPage(this.Data, pModel);
 
             stopwatch.Stop();
 
@@ -633,15 +592,8 @@ namespace FastData.Repository
             stopwatch.Start();
             this.Data.Take = 1;
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetDataTable(this.Data);
-                }
-            }
-            else
-                result = db.GetDataTable(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetDataTable(this.Data);
 
             stopwatch.Stop();
 
@@ -711,15 +663,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetDic(this.Data);
-                }
-            }
-            else
-                result = db.GetDic(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetDic(this.Data);
 
             stopwatch.Stop();
 
@@ -790,15 +735,8 @@ namespace FastData.Repository
             stopwatch.Start();
             this.Data.Take = 1;
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetDic(this.Data);
-                }
-            }
-            else
-                result = db.GetDic(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetDic(this.Data);
 
             stopwatch.Stop();
 
@@ -872,15 +810,8 @@ namespace FastData.Repository
 
             this.Data.Take = 1;
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetList<R>(this.Data);
-                }
-            }
-            else
-                result = db.GetList<R>(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetList<R>(this.Data);
 
             stopwatch.Stop();
 
@@ -959,15 +890,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetPage<R>(this.Data, pModel);
-                }
-            }
-            else
-                result = db.GetPage<R>(this.Data, pModel);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetPage<R>(this.Data, pModel);
 
             stopwatch.Stop();
 
@@ -1048,15 +972,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetList<R>(this.Data);
-                }
-            }
-            else
-                result = db.GetList<R>(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetList<R>(this.Data);
 
             stopwatch.Stop();
 
@@ -1376,15 +1293,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetJson(this.Data);
-                }
-            }
-            else
-                result = db.GetJson(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetJson(this.Data);
 
             stopwatch.Stop();
 
@@ -1456,17 +1366,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            this.Data.Take = 1;
-
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetList<R>(this.Data);
-                }
-            }
-            else
-                result = db.GetList<R>(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetList<R>(this.Data);
 
             stopwatch.Stop();
 
@@ -1542,15 +1443,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetCount(this.Data);
-                }
-            }
-            else
-                result = db.GetCount(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetCount(this.Data);
 
             stopwatch.Stop();
 
@@ -1597,15 +1491,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetPage<R>(this.Data, pModel);
-                }
-            }
-            else
-                result = db.GetPage<R>(this.Data, pModel);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetPage<R>(this.Data, pModel);
 
             stopwatch.Stop();
 
@@ -1685,15 +1572,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetPage(this.Data, pModel);
-                }
-            }
-            else
-                result = db.GetPage(this.Data, pModel);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetPage(this.Data, pModel);
 
             stopwatch.Stop();
 
@@ -1768,15 +1648,8 @@ namespace FastData.Repository
             stopwatch.Start();
             this.Data.Take = 1;
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetDataTable(this.Data);
-                }
-            }
-            else
-                result = db.GetDataTable(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetDataTable(this.Data);
 
             stopwatch.Stop();
 
@@ -1846,15 +1719,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetDic(this.Data);
-                }
-            }
-            else
-                result = db.GetDic(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetDic(this.Data);
 
             stopwatch.Stop();
 
@@ -1925,15 +1791,8 @@ namespace FastData.Repository
             stopwatch.Start();
             this.Data.Take = 1;
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetDic(this.Data);
-                }
-            }
-            else
-                result = db.GetDic(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetDic(this.Data);
 
             stopwatch.Stop();
 
@@ -2005,15 +1864,8 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(this.Data.Key))
-                {
-                    result = tempDb.GetList<R>(this.Data);
-                }
-            }
-            else
-                result = db.GetList<R>(this.Data);
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetList<R>(this.Data);
 
             stopwatch.Stop();
 

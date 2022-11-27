@@ -40,7 +40,7 @@ namespace FastData.Repository
             {
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
-                BaseAop.AopMapBefore(name, sql, param, config,AopType.Map_List_Model);
+                BaseAop.AopMapBefore(name, sql, param, config, AopType.Map_List_Model);
                 var result = FastRead.ExecuteSql<T>(sql, param, db, key, isOutSql);
                 if (MapXml.MapIsForEach(name, config))
                 {
@@ -205,7 +205,7 @@ namespace FastData.Repository
             {
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
-                BaseAop.AopMapBefore(name, sql, param, config,AopType.Map_Write);
+                BaseAop.AopMapBefore(name, sql, param, config, AopType.Map_Write);
                 var result = FastWrite.ExecuteSql(sql, param, db, key, isOutSql);
                 BaseAop.AopMapAfter(name, sql, param, config, AopType.Map_Write, result);
                 return result;
@@ -307,7 +307,7 @@ namespace FastData.Repository
             {
                 var sql = MapXml.GetMapSql(name, ref param, db, key);
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
-                BaseAop.AopMapBefore(name, sql, param, config,AopType.Map_Page_Dic);
+                BaseAop.AopMapBefore(name, sql, param, config, AopType.Map_Page_Dic);
                 var result = ExecuteSqlPage(pModel, sql, param, db, key, isOutSql);
 
                 if (MapXml.MapIsForEach(name, config))
@@ -428,7 +428,7 @@ namespace FastData.Repository
 
                 isOutSql = isOutSql ? isOutSql : IsMapLog(name);
 
-                BaseAop.AopMapBefore(name, sql, param, config,AopType.Map_Page_Model);
+                BaseAop.AopMapBefore(name, sql, param, config, AopType.Map_Page_Model);
                 var result = ExecuteSqlPage<T>(pModel, sql, param, db, key, isOutSql);
 
                 if (MapXml.MapIsForEach(name, config))
@@ -685,7 +685,7 @@ namespace FastData.Repository
         #region 获取map日志
         public bool IsMapLog(string name)
         {
-            return string.Compare( DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.log", name.ToLower())).ToStr(),"true", true) ==0;
+            return string.Compare(DbCache.Get(DataConfig.GetConfig().CacheType, string.Format("{0}.log", name.ToLower())).ToStr(), "true", true) == 0;
         }
         #endregion
 
@@ -1163,7 +1163,7 @@ namespace FastData.Repository
                 {
                     config = tempDb.config;
                     config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
-                    result = tempDb.ExecuteSql(sql, param,false,config.IsOutSql);
+                    result = tempDb.ExecuteSql(sql, param, false, config.IsOutSql);
                 }
             }
             else
@@ -1447,19 +1447,9 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    result = tempDb.Add(model, false);
-                    config = tempDb.config;
-                }
-            }
-            else
-            {
-                result = db.Add(model, false);
-                config = db.config;
-            }
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            result = db.Add(model, false);
+            config = db.config;
 
             stopwatch.Stop();
             config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
@@ -1503,19 +1493,9 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    result = tempDb.Delete(predicate);
-                    config = tempDb.config;
-                }
-            }
-            else
-            {
-                result = db.Delete(predicate);
-                config = db.config;
-            }
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            result = db.Delete(predicate);
+            config = db.config;
 
             stopwatch.Stop();
             config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
@@ -1556,19 +1536,9 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    result = tempDb.Delete(model, isTrans);
-                    config = tempDb.config;
-                }
-            }
-            else
-            {
-                result = db.Delete(model, isTrans);
-                config = db.config;
-            }
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            result = db.Delete(model, isTrans);
+            config = db.config;
 
             stopwatch.Stop();
             config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
@@ -1611,19 +1581,9 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    result = tempDb.Update(model, predicate, field);
-                    config = tempDb.config;
-                }
-            }
-            else
-            {
-                result = db.Update(model, predicate, field);
-                config = db.config;
-            }
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            result = db.Update(model, predicate, field);
+            config = db.config;
 
             stopwatch.Stop();
             config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
@@ -1667,19 +1627,9 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    result = tempDb.Update(model, field, isTrans);
-                    config = tempDb.config;
-                }
-            }
-            else
-            {
-                result = db.Update(model, field, isTrans);
-                config = db.config;
-            }
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            result = db.Update(model, field, isTrans);
+            config = db.config;
 
             stopwatch.Stop();
             config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
@@ -1718,19 +1668,9 @@ namespace FastData.Repository
 
             stopwatch.Start();
 
-            if (db == null)
-            {
-                using (var tempDb = new DataContext(key))
-                {
-                    result = tempDb.UpdateList(list, field);
-                    config = tempDb.config;
-                }
-            }
-            else
-            {
-                result = db.UpdateList(list, field);
-                config = db.config;
-            }
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            result = db.UpdateList(list, field);
+            config = db.config;
 
             stopwatch.Stop();
 
@@ -1755,7 +1695,7 @@ namespace FastData.Repository
             });
         }
         #endregion
-              
+
         #region 服务实例
         /// <summary>
         /// 服务实例
