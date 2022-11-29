@@ -686,14 +686,18 @@ namespace FastData
 
             AppDomain.CurrentDomain.GetAssemblies().ToList().ForEach(assembly =>
             {
-                if (assembly.IsDynamic)
-                    return;
-
-                assembly.ExportedTypes.Where(a => a.Namespace != null && a.Namespace.Contains(nameSpaceModel)).ToList().ForEach(b =>
+                try
                 {
-                    if (b.IsPublic && b.IsClass && !b.IsAbstract && !b.IsGenericType)
-                        list.Add(b);
-                });
+                    if (assembly.IsDynamic)
+                        return;
+
+                    assembly.ExportedTypes.Where(a => a.Namespace != null && a.Namespace.Contains(nameSpaceModel)).ToList().ForEach(b =>
+                    {
+                        if (b.IsPublic && b.IsClass && !b.IsAbstract && !b.IsGenericType)
+                            list.Add(b);
+                    });
+                }
+                catch { }
             });
 
             return list;
