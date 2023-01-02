@@ -123,6 +123,29 @@ namespace FastData.Repository
         public abstract Lazy<List<R>> ToLazyList<R>(DataContext db = null, bool isOutSql = false) where R : class, new();
 
         public abstract Task<Lazy<List<R>>> ToLazyListAsy<R>(DataContext db = null, bool isOutSql = false) where R : class, new();
+        public abstract dynamic ToDyn(DataContext db = null, bool isOutSql = false);
+
+        public abstract Task<dynamic> ToDynAsy(DataContext db = null, bool isOutSql = false);
+
+        public abstract Lazy<dynamic> ToLazyDyn(DataContext db = null, bool isOutSql = false);
+
+        public abstract Task<Lazy<dynamic>> ToLazyDynAsy(DataContext db = null, bool isOutSql = false);
+
+        public abstract List<dynamic> ToDyns(DataContext db = null, bool isOutSql = false);
+
+        public abstract Task<List<dynamic>> ToDynsAsy(DataContext db = null, bool isOutSql = false);
+
+        public abstract Lazy<List<dynamic>> ToLazyDyns(DataContext db = null, bool isOutSql = false);
+
+        public abstract Task<Lazy<List<dynamic>>> ToLazyDynsAsy(DataContext db = null, bool isOutSql = false);
+
+        public abstract PageResultDyn ToDynPage(PageModel pModel, DataContext db = null, bool isOutSql = false);
+
+        public abstract Task<PageResultDyn> ToDynPageAsy(PageModel pModel, DataContext db = null, bool isOutSql = false);
+
+        public abstract Lazy<PageResultDyn> ToLazyDynPage(PageModel pModel, DataContext db = null, bool isOutSql = false);
+
+        public abstract Task<Lazy<PageResultDyn>> ToLazyDynPageAsy(PageModel pModel, DataContext db = null, bool isOutSql = false);
     }
 
     public abstract class IQueryable<T,T1> where T : class, new()
@@ -210,5 +233,29 @@ namespace FastData.Repository
         public abstract Lazy<List<R>> ToLazyList<R>(DataContext db = null, bool isOutSql = false) where R : class, new();
 
         public abstract Task<Lazy<List<R>>> ToLazyListAsy<R>(DataContext db = null, bool isOutSql = false) where R : class, new();
+
+        public abstract dynamic ToDyn(DataContext db = null, bool isOutSql = false);
+
+        public abstract Task<dynamic> ToDynAsy(DataContext db = null, bool isOutSql = false);
+
+        public abstract Lazy<dynamic> ToLazyDyn(DataContext db = null, bool isOutSql = false);
+
+        public abstract Task<Lazy<dynamic>> ToLazyDynAsy(DataContext db = null, bool isOutSql = false);
+
+        public abstract List<dynamic> ToDyns(DataContext db = null, bool isOutSql = false);
+
+        public abstract Task<List<dynamic>> ToDynsAsy(DataContext db = null, bool isOutSql = false);
+
+        public abstract Lazy<List<dynamic>> ToLazyDyns(DataContext db = null, bool isOutSql = false);
+
+        public abstract Task<Lazy<List<dynamic>>> ToLazyDynsAsy(DataContext db = null, bool isOutSql = false);
+
+        public abstract PageResultDyn ToDynPage(PageModel pModel, DataContext db = null, bool isOutSql = false);
+
+        public abstract Task<PageResultDyn> ToDynPageAsy(PageModel pModel, DataContext db = null, bool isOutSql = false);
+
+        public abstract Lazy<PageResultDyn> ToLazyDynPage(PageModel pModel, DataContext db = null, bool isOutSql = false);
+
+        public abstract Task<Lazy<PageResultDyn>> ToLazyDynPageAsy(PageModel pModel, DataContext db = null, bool isOutSql = false);
     }
 }

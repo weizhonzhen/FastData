@@ -1124,6 +1124,118 @@ namespace FastData.Repository
             return this;
         }
         #endregion
+
+        #region dyn
+        public override dynamic ToDyn(DataContext db = null, bool isOutSql = false)
+        {
+            var result = new DataReturnDyn();
+            var stopwatch = new Stopwatch();
+
+            if (Data.Predicate.Exists(a => a.IsSuccess == false))
+                return result.Item;
+
+            stopwatch.Start();
+            Data.Take = 1;
+
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetDyns(Data);
+
+            stopwatch.Stop();
+
+            Data.Config.IsOutSql = Data.Config.IsOutSql ? Data.Config.IsOutSql : isOutSql;
+            DbLog.LogSql(Data.Config.IsOutSql, result.Sql, Data.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch = null;
+            return result.Item;
+        }
+
+        public override Task<dynamic> ToDynAsy(DataContext db = null, bool isOutSql = false)
+        {
+            return Task.Run(() => { return ToDyn(db, isOutSql); });
+        }
+
+        public override Lazy<dynamic> ToLazyDyn(DataContext db = null, bool isOutSql = false)
+        {
+            return new Lazy<dynamic>(() => { return ToDyn(db, isOutSql); });
+        }
+
+        public override Task<Lazy<dynamic>> ToLazyDynAsy(DataContext db = null, bool isOutSql = false)
+        {
+            return Task.Run(() => { return ToLazyDyn(db, isOutSql); });
+        }
+
+        public override List<dynamic> ToDyns(DataContext db = null, bool isOutSql = false)
+        {
+            var result = new DataReturnDyn();
+            var stopwatch = new Stopwatch();
+
+            if (Data.Predicate.Exists(a => a.IsSuccess == false))
+                return result.List;
+
+            stopwatch.Start();
+
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetDyns(Data);
+
+            stopwatch.Stop();
+
+            Data.Config.IsOutSql = Data.Config.IsOutSql ? Data.Config.IsOutSql : isOutSql;
+            DbLog.LogSql(Data.Config.IsOutSql, result.Sql, Data.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch = null;
+            return result.List;
+        }
+
+        public override Task<List<dynamic>> ToDynsAsy(DataContext db = null, bool isOutSql = false)
+        {
+            return Task.Run(() => { return ToDyns(db, isOutSql); });
+        }
+
+        public override Lazy<List<dynamic>> ToLazyDyns(DataContext db = null, bool isOutSql = false)
+        {
+            return new Lazy<List<dynamic>>(() => { return ToDyns(db, isOutSql); });
+        }
+
+        public override Task<Lazy<List<dynamic>>> ToLazyDynsAsy(DataContext db = null, bool isOutSql = false)
+        {
+            return Task.Run(() => { return ToLazyDyns(db, isOutSql); });
+        }
+        #endregion
+
+        #region dyn page
+        public override PageResultDyn ToDynPage(PageModel pModel, DataContext db = null, bool isOutSql = false)
+        {
+            var result = new DataReturnDyn();
+            var stopwatch = new Stopwatch();
+
+            if (Data.Predicate.Exists(a => a.IsSuccess == false))
+                return result.PageResult;
+
+            stopwatch.Start();
+
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetDynPage(Data, pModel);
+
+            stopwatch.Stop();
+            Data.Config.IsOutSql = Data.Config.IsOutSql ? Data.Config.IsOutSql : isOutSql;
+            DbLog.LogSql(Data.Config.IsOutSql, result.Sql, Data.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch = null;
+            return result.PageResult;
+        }
+
+        public override Task<PageResultDyn> ToDynPageAsy(PageModel pModel, DataContext db = null, bool isOutSql = false)
+        {
+            return Task.Run(() => { return ToDynPage(pModel, db, isOutSql); });
+        }
+
+        public override Lazy<PageResultDyn> ToLazyDynPage(PageModel pModel, DataContext db = null, bool isOutSql = false)
+        {
+            return new Lazy<PageResultDyn>(() => { return ToDynPage(pModel, db, isOutSql); });
+        }
+
+        public override Task<Lazy<PageResultDyn>> ToLazyDynPageAsy(PageModel pModel, DataContext db = null, bool isOutSql = false)
+        {
+            return Task.Run(() => { return ToLazyDynPage(pModel, db, isOutSql); });
+        }
+        #endregion
     }
 
     public class Queryable<T,T1> : IQueryable<T,T1> where T : class, new()
@@ -1921,6 +2033,118 @@ namespace FastData.Repository
             {
                 return new Lazy<List<R>>(() => ToList<R>(db, isOutSql));
             });
+        }
+        #endregion
+
+        #region dyn
+        public override dynamic ToDyn(DataContext db = null, bool isOutSql = false)
+        {
+            var result = new DataReturnDyn();
+            var stopwatch = new Stopwatch();
+
+            if (Data.Predicate.Exists(a => a.IsSuccess == false))
+                return result.Item;
+
+            stopwatch.Start();
+            Data.Take = 1;
+
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetDyns(Data);
+
+            stopwatch.Stop();
+
+            Data.Config.IsOutSql = Data.Config.IsOutSql ? Data.Config.IsOutSql : isOutSql;
+            DbLog.LogSql(Data.Config.IsOutSql, result.Sql, Data.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch = null;
+            return result.Item;
+        }
+
+        public override Task<dynamic> ToDynAsy(DataContext db = null, bool isOutSql = false)
+        {
+            return Task.Run(() => { return ToDyn(db, isOutSql); });
+        }
+
+        public override Lazy<dynamic> ToLazyDyn(DataContext db = null, bool isOutSql = false)
+        {
+            return new Lazy<dynamic>(() => { return ToDyn(db, isOutSql); });
+        }
+
+        public override Task<Lazy<dynamic>> ToLazyDynAsy(DataContext db = null, bool isOutSql = false)
+        {
+            return Task.Run(() => { return ToLazyDyn(db, isOutSql); });
+        }
+
+        public override List<dynamic> ToDyns(DataContext db = null, bool isOutSql = false)
+        {
+            var result = new DataReturnDyn();
+            var stopwatch = new Stopwatch();
+
+            if (Data.Predicate.Exists(a => a.IsSuccess == false))
+                return result.List;
+
+            stopwatch.Start();
+
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetDyns(Data);
+
+            stopwatch.Stop();
+
+            Data.Config.IsOutSql = Data.Config.IsOutSql ? Data.Config.IsOutSql : isOutSql;
+            DbLog.LogSql(Data.Config.IsOutSql, result.Sql, Data.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch = null;
+            return result.List;
+        }
+
+        public override Task<List<dynamic>> ToDynsAsy(DataContext db = null, bool isOutSql = false)
+        {
+            return Task.Run(() => { return ToDyns(db, isOutSql); });
+        }
+
+        public override Lazy<List<dynamic>> ToLazyDyns(DataContext db = null, bool isOutSql = false)
+        {
+            return new Lazy<List<dynamic>>(() => { return ToDyns(db, isOutSql); });
+        }
+
+        public override Task<Lazy<List<dynamic>>> ToLazyDynsAsy(DataContext db = null, bool isOutSql = false)
+        {
+            return Task.Run(() => { return ToLazyDyns(db, isOutSql); });
+        }
+        #endregion
+
+        #region dyn page
+        public override PageResultDyn ToDynPage(PageModel pModel, DataContext db = null, bool isOutSql = false)
+        {
+            var result = new DataReturnDyn();
+            var stopwatch = new Stopwatch();
+
+            if (Data.Predicate.Exists(a => a.IsSuccess == false))
+                return result.PageResult;
+
+            stopwatch.Start();
+
+            db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(this.Data.Key) : db;
+            result = db.GetDynPage(Data, pModel);
+
+            stopwatch.Stop();
+            Data.Config.IsOutSql = Data.Config.IsOutSql ? Data.Config.IsOutSql : isOutSql;
+            DbLog.LogSql(Data.Config.IsOutSql, result.Sql, Data.Config.DbType, stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch = null;
+            return result.PageResult;
+        }
+
+        public override Task<PageResultDyn> ToDynPageAsy(PageModel pModel, DataContext db = null, bool isOutSql = false)
+        {
+            return Task.Run(() => { return ToDynPage(pModel, db, isOutSql); });
+        }
+
+        public override Lazy<PageResultDyn> ToLazyDynPage(PageModel pModel, DataContext db = null, bool isOutSql = false)
+        {
+            return new Lazy<PageResultDyn>(() => { return ToDynPage(pModel, db, isOutSql); });
+        }
+
+        public override Task<Lazy<PageResultDyn>> ToLazyDynPageAsy(PageModel pModel, DataContext db = null, bool isOutSql = false)
+        {
+            return Task.Run(() => { return ToLazyDynPage(pModel, db, isOutSql); });
         }
         #endregion
     }
