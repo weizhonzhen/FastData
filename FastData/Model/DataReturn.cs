@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using FastUntility.Page;
 
@@ -40,7 +40,44 @@ namespace FastData.Model
         public WriteReturn writeReturn { set; get; } = new WriteReturn();
     }
 
-     /// <summary>
+
+    /// <summary>
+    /// 返回动态类型
+    /// </summary>
+    public class DataReturnDyn
+    {
+        /// <summary>
+        /// 条数
+        /// </summary>
+        public int Count { get; set; }
+
+        /// <summary>
+        /// 实体
+        /// </summary>
+        public dynamic Item { set; get; }
+
+        /// <summary>
+        /// 列表
+        /// </summary>
+        public List<dynamic> List { set; get; } = new List<dynamic>();
+
+        /// <summary>
+        /// sql
+        /// </summary>
+        public string Sql { get; set; }
+
+        /// <summary>
+        /// 分页
+        /// </summary>
+        public PageResultDyn PageResult { set; get; } = new PageResultDyn();
+
+        /// <summary>
+        /// 写返回结果
+        /// </summary>
+        public dynamic WriteReturn { set; get; }
+    }
+
+    /// <summary>
     /// 返回操作数据结果
     /// </summary>
     public class DataReturn
