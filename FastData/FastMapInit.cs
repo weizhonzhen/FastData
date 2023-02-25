@@ -1,4 +1,5 @@
 ﻿using FastAop;
+using FastAop.Factory;
 using FastData.Aop;
 using FastData.Base;
 using FastData.CacheModel;
@@ -14,6 +15,7 @@ using FastUntility.Base;
 using FastUntility.Page;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -58,6 +60,25 @@ namespace FastData
 
             AddScoped(typeof(IUnitOfWorK),new UnitOfWorK());
             AddScoped(typeof(IFastRepository), new FastRepository());
+
+            InitModelType(config.NamespaceProperties).ForEach(m =>
+            {
+                var type = typeof(FastRepository<>).MakeGenericType(new System.Type[1] { m });
+                var obj = Activator.CreateInstance(type);
+                AddScoped(type.GetInterfaces().First(), obj);
+            });
+
+            if (config.webType == WebType.Mvc)
+                System.Web.Mvc.ControllerBuilder.Current.SetControllerFactory(new AopMvcFactory());
+
+            if (config.webType == WebType.WebApi)
+                System.Web.Http.GlobalConfiguration.Configuration.Services.Replace(typeof(System.Web.Http.Dispatcher.IHttpControllerActivator), new AopWebApiFactory());
+
+            if (config.webType == WebType.MvcAndWebApi)
+            {
+                System.Web.Mvc.ControllerBuilder.Current.SetControllerFactory(new AopMvcFactory());
+                System.Web.Http.GlobalConfiguration.Configuration.Services.Replace(typeof(System.Web.Http.Dispatcher.IHttpControllerActivator), new AopWebApiFactory());
+            }
         }
         #endregion
 
