@@ -1,4 +1,5 @@
-﻿using FastData.Aop;
+﻿using FastAop;
+using FastData.Aop;
 
 namespace FastData.Model
 {
@@ -19,6 +20,8 @@ namespace FastData.Model
         public string mapFile { get; set; } = "map.json";
 
         public string NamespaceService { get; set; }
+
+        public WebType webType { get; set; }
 
         public IFastAop aop { get; set; }
     }
