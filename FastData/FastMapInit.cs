@@ -59,13 +59,20 @@ namespace FastData
                 InstanceService(config.NamespaceService);
 
             AddScoped(typeof(IUnitOfWorK),new UnitOfWorK());
+            AddSingleton(typeof(IUnitOfWorK), new UnitOfWorK());
+            AddTransient(typeof(IUnitOfWorK), new UnitOfWorK());
+
             AddScoped(typeof(IFastRepository), new FastRepository());
+            AddSingleton(typeof(IFastRepository), new FastRepository());
+            AddTransient(typeof(IFastRepository), new FastRepository());
 
             InitModelType(config.NamespaceProperties).ForEach(m =>
             {
                 var type = typeof(FastRepository<>).MakeGenericType(new System.Type[1] { m });
                 var obj = Activator.CreateInstance(type);
                 AddScoped(type.GetInterfaces().First(), obj);
+                AddSingleton(type.GetInterfaces().First(), obj);
+                AddTransient(type.GetInterfaces().First(), obj);
             });
 
             if (config.webType == WebType.Mvc)
