@@ -5,7 +5,6 @@ using System.CodeDom.Compiler;
 using FastUntility.Base;
 using System.Linq;
 using System.Reflection;
-using System.Collections.Generic;
 
 namespace FastData.Base
 {
@@ -26,7 +25,7 @@ namespace FastData.Base
             param.ReferencedAssemblies.Add("mscorlib.dll");
 
             var assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == references);
-            if (assembly == null)
+            if (assembly == null && references != null)
                 assembly = Assembly.Load(references);
                         
             param.ReferencedAssemblies.Add(assembly.Location);
