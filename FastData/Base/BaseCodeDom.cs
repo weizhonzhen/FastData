@@ -26,9 +26,10 @@ namespace FastData.Base
 
             var assembly = AppDomain.CurrentDomain.GetAssemblies().ToList().Find(a => a.FullName.Split(',')[0] == references);
             if (assembly == null && references != null)
+            {
                 assembly = Assembly.Load(references);
-                        
-            param.ReferencedAssemblies.Add(assembly.Location);
+                param.ReferencedAssemblies.Add(assembly.Location);
+            }
 
             param.GenerateExecutable = false;
             param.GenerateInMemory = true;                        
