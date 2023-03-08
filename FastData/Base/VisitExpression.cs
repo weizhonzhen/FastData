@@ -202,9 +202,9 @@ namespace FastData.Base
                         if (meExp.Object != null)
                         {
                             if (meExp.Object is MemberExpression && (meExp.Object as MemberExpression).Expression is ParameterExpression)
-                                asName = query.TableAsName.GetValue((meExp.Object as MemberExpression).Expression.Type.Name).ToStr();
-                            else if (meExp.Object is UnaryExpression)                                
-                                asName = string.Format("{0}", query.TableAsName.GetValue(((meExp.Object as UnaryExpression).Operand as MemberExpression).Expression.Type.Name));
+                                asName = string.Format("{0}.", query.TableAsName.GetValue((meExp.Object as MemberExpression).Expression.Type.Name));
+                            else if (meExp.Object is UnaryExpression)
+                                asName = string.Format("{0}.", query.TableAsName.GetValue(((meExp.Object as UnaryExpression).Operand as MemberExpression).Expression.Type.Name));
                         }
                         #endregion
 
