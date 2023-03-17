@@ -26,6 +26,7 @@ namespace FastData.Context
         private DbCommand cmd;
         private DbTransaction trans;
         internal bool isDispose;
+        private List<bool> IsSuccess = new List<bool>();
 
         #region Navigate Add
         /// <summary>
@@ -50,6 +51,8 @@ namespace FastData.Context
                     result.Add(AddList(model, navigate).writeReturn);
             });
 
+            if (this.trans != null)
+                IsSuccess.AddRange(result.Select(a => a.IsSuccess));
             return result;
         }
         #endregion
@@ -80,6 +83,8 @@ namespace FastData.Context
                 }
             });
 
+            if (this.trans != null)
+                IsSuccess.AddRange(result.Select(a => a.IsSuccess));
             return result;
         }
         #endregion
@@ -108,6 +113,8 @@ namespace FastData.Context
                 });
             });
 
+            if (this.trans != null)
+                IsSuccess.AddRange(result.Select(a => a.IsSuccess));
             return result;
         }
         #endregion
@@ -349,6 +356,7 @@ namespace FastData.Context
             cmd.Dispose();
             conn.Dispose();
             isDispose = true;
+            this.IsSuccess = null;
             GC.SuppressFinalize(this);
         }
         #endregion
@@ -1403,6 +1411,8 @@ namespace FastData.Context
 
             try
             {
+                isTrans = this.trans == null && isTrans;
+
                 if (isTrans)
                     BeginTrans();
 
@@ -1435,6 +1445,9 @@ namespace FastData.Context
                     SubmitTrans();
                 else if (isTrans && result.writeReturn.IsSuccess == false)
                     RollbackTrans();
+
+                if (this.trans != null && !isTrans)
+                    IsSuccess.Add(result.writeReturn.IsSuccess);
             }
             catch (Exception ex)
             {
@@ -1471,6 +1484,10 @@ namespace FastData.Context
 
             try
             {
+                isTrans = this.trans == null && isTrans;
+                if (isTrans)
+                    BeginTrans();
+
                 optionModel = BaseModel.DeleteToSql<T>(cmd, model, config);
 
                 tableName.Add(typeof(T).Name);
@@ -1481,9 +1498,6 @@ namespace FastData.Context
                     var dic = CheckNavigate<T>(model, AopType.Navigate_Delete);
                     if (dic.Count > 0)
                     {
-                        isTrans = true;
-                        BeginTrans();
-
                         var tempResult = NavigateDelete(dic);
                         if (tempResult.Exists(a => a.IsSuccess == false))
                         {
@@ -1496,8 +1510,6 @@ namespace FastData.Context
                             return result;
                         }
                     }
-                    else if (isTrans)
-                        BeginTrans();
 
                     Dispose(cmd);
 
@@ -1513,7 +1525,9 @@ namespace FastData.Context
                     result.writeReturn.IsSuccess = false;
                     result.writeReturn.Message = optionModel.Message;
                 }
-                
+
+                if (this.trans != null && !isTrans)
+                    IsSuccess.Add(result.writeReturn.IsSuccess);
 
                 if (isTrans && result.writeReturn.IsSuccess)
                     SubmitTrans();
@@ -1523,6 +1537,9 @@ namespace FastData.Context
             catch (Exception ex)
             {
                 BaseAop.AopException(ex, $"Delete by Primary Key tableName：{typeof(T).Name}",config, AopType.Delete_PrimaryKey, model);
+
+                if (this.trans != null && !isTrans)
+                    IsSuccess.Add(false);
 
                 if (isTrans)
                     RollbackTrans();
@@ -1612,6 +1629,8 @@ namespace FastData.Context
 
             try
             {
+                isTrans = this.trans == null && isTrans;
+
                 if (isTrans)
                     BeginTrans();
 
@@ -1651,6 +1670,9 @@ namespace FastData.Context
                     result.writeReturn.IsSuccess = false;
                 }
 
+                if (this.trans != null && !isTrans)
+                    IsSuccess.Add(result.writeReturn.IsSuccess);
+
                 if (isTrans && result.writeReturn.IsSuccess)
                     SubmitTrans();
                 else if (isTrans && result.writeReturn.IsSuccess == false)
@@ -1666,6 +1688,9 @@ namespace FastData.Context
                     DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Update<T>", result.sql);
                 result.writeReturn.IsSuccess = false;
                 result.writeReturn.Message = ex.Message;
+
+                if (this.trans != null && !isTrans)
+                    IsSuccess.Add(false);
 
                 if (isTrans)
                     RollbackTrans();
@@ -1698,11 +1723,12 @@ namespace FastData.Context
 
                 if (update.IsSuccess)
                 {
+                    isTrans = this.trans == null && isTrans;
                     var dic = CheckNavigate<T>(model, AopType.Navigate_Update);
                     if (dic.Count > 0)
                     {
-                        isTrans = true;
-                        BeginTrans();
+                        if (isTrans)
+                            BeginTrans();
 
                         var tempResult = NavigateUpdate(dic);
                         if (tempResult.Exists(a => a.IsSuccess == false))
@@ -1716,8 +1742,6 @@ namespace FastData.Context
                             return result;
                         }
                     }
-                    else if (isTrans)
-                        BeginTrans();
 
                     Dispose(cmd);
 
@@ -1734,6 +1758,9 @@ namespace FastData.Context
                     result.writeReturn.IsSuccess = false;
                 }
 
+                if (this.trans != null && !isTrans)
+                    IsSuccess.Add(result.writeReturn.IsSuccess);
+
                 if (isTrans && result.writeReturn.IsSuccess)
                     SubmitTrans();
                 else if (isTrans && result.writeReturn.IsSuccess == false)
@@ -1742,6 +1769,9 @@ namespace FastData.Context
             catch (Exception ex)
             {
                 BaseAop.AopException(ex, $"Update by Primary Key tableName:{typeof(T).Name}",config, AopType.Update_PrimaryKey, model);
+
+                if (this.trans != null && !isTrans)
+                    IsSuccess.Add(false);
 
                 if (isTrans)
                     RollbackTrans();
@@ -1844,7 +1874,10 @@ namespace FastData.Context
                 {
                     using (var adapter = DbProviderFactories.GetFactory(config.ProviderName).CreateDataAdapter())
                     {
-                        BeginTrans();
+                        var isTrans = this.trans == null;
+                        if (isTrans)
+                            BeginTrans();
+
                         Dispose(cmd);
                         adapter.InsertCommand = cmd;
                         adapter.InsertCommand.CommandText = update.Sql;
@@ -1855,11 +1888,13 @@ namespace FastData.Context
                             adapter.InsertCommand.Parameters.AddRange(update.Param.ToArray());
 
                         result.sql = ParameterToSql.ObjectParamToSql(update.Param, update.Sql, config);
-                        
-                        result.writeReturn.IsSuccess = adapter.Update(update.table) > 0;
-                        if (result.writeReturn.IsSuccess)
+
+                        if (this.trans != null)
+                            IsSuccess.Add(result.writeReturn.IsSuccess);
+
+                        if (result.writeReturn.IsSuccess && isTrans)
                             SubmitTrans();
-                        else
+                        else if (isTrans)
                             RollbackTrans();
                     }
                 }
@@ -1879,6 +1914,9 @@ namespace FastData.Context
                     DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "UpdateList<T>", result.sql);
                 result.writeReturn.IsSuccess = false;
                 result.writeReturn.Message = ex.Message;
+
+                if (this.trans != null)
+                    IsSuccess.Add(false);
             }
 
             BaseAop.AopAfter(tableName, update.Sql, update.Param, config, false, AopType.UpdateList, result.writeReturn, list);
@@ -1908,11 +1946,12 @@ namespace FastData.Context
 
                 if (insert.IsSuccess)
                 {
+                    isTrans = this.trans == null && isTrans;
                     var dic = CheckNavigate<T>(model,AopType.Navigate_Add);
                     if (dic.Count > 0)
                     {
-                        isTrans = true;
-                        BeginTrans();
+                        if (isTrans)
+                            BeginTrans();
 
                         var tempResult = NavigateAdd(dic);
                         if (tempResult.Exists(a => a.IsSuccess == false))
@@ -1926,8 +1965,6 @@ namespace FastData.Context
                             return result;
                         }
                     }
-                    else if (isTrans)
-                        BeginTrans();
 
                     result.sql = ParameterToSql.ObjectParamToSql(insert.Param, insert.Sql, config);
 
@@ -1938,8 +1975,13 @@ namespace FastData.Context
 
                     result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, insert.Sql);
 
-                    if (isTrans)
+                    if (this.trans != null && !isTrans)
+                        IsSuccess.Add(result.writeReturn.IsSuccess);
+
+                    if (isTrans && result.writeReturn.IsSuccess)
                         SubmitTrans();
+                    else if (isTrans && result.writeReturn.IsSuccess == false)
+                        RollbackTrans();
                 }
 
                 return result;
@@ -1953,9 +1995,10 @@ namespace FastData.Context
                 else
                     DbLog.LogException<T>(config.IsOutError, config.DbType, ex, "Add<T>", result.sql);
 
-                if (isTrans && result.writeReturn.IsSuccess)
-                    SubmitTrans();
-                else if (isTrans && result.writeReturn.IsSuccess == false)
+                if (this.trans != null && !isTrans)
+                    IsSuccess.Add(false);
+
+                if (isTrans)
                     RollbackTrans();
 
                 result.writeReturn.Message = ex.Message;
@@ -2030,6 +2073,7 @@ namespace FastData.Context
 
             try
             {
+                IsTrans = this.trans == null && IsTrans;
                 if (IsTrans)
                     BeginTrans();
 
@@ -2056,6 +2100,7 @@ namespace FastData.Context
 
                     PropertyCache.GetPropertyInfo<T>().ForEach(a =>
                     {
+
                         var pValue = new List<object>();
                         var param = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
 
@@ -2155,16 +2200,25 @@ namespace FastData.Context
                     #endregion
                 }
 
+                if (this.trans != null && !IsTrans)
+                    IsSuccess.Add(result.writeReturn.IsSuccess);
+
                 if (result.writeReturn.IsSuccess && IsTrans)
                     SubmitTrans();
                 else if (result.writeReturn.IsSuccess == false && IsTrans)
                     RollbackTrans();
+
+                if (this.trans != null && !IsTrans)
+                    IsSuccess.Add(result.writeReturn.IsSuccess);
 
                 BaseAop.AopAfter(tableName, cmd.CommandText, null, config, false, AopType.AddList, result.writeReturn,list);
             }
             catch (Exception ex)
             {
                 BaseAop.AopException(ex, $"Add List tableName:{typeof(T).Name}",config,AopType.AddList,list);
+
+                if (this.trans != null && !IsTrans)
+                    IsSuccess.Add(false);
 
                 if (IsTrans)
                     RollbackTrans();
@@ -2335,6 +2389,7 @@ namespace FastData.Context
             var result = new DataReturn();
             try
             {
+                isTrans = this.trans == null && isTrans;
                 if (isTrans)
                     BeginTrans();
 
@@ -2355,6 +2410,9 @@ namespace FastData.Context
 
                 result.writeReturn.IsSuccess = BaseExecute.ToBool(cmd, sql, IsProcedure);
 
+                if (this.trans != null && !isTrans)
+                    IsSuccess.Add(result.writeReturn.IsSuccess);
+
                 if (isTrans && result.writeReturn.IsSuccess)
                     SubmitTrans();
                 else if (isTrans && result.writeReturn.IsSuccess == false)
@@ -2366,6 +2424,9 @@ namespace FastData.Context
             catch (Exception ex)
             {
                 BaseAop.AopException(ex, "Excute Sql",config, AopType.Execute_Sql_Bool);
+
+                if (this.trans != null && !isTrans)
+                    IsSuccess.Add(false);
 
                 if (isTrans)
                     RollbackTrans();
@@ -2451,6 +2512,7 @@ namespace FastData.Context
             if (this.trans != null)
                 this.trans.Rollback();
             this.trans = this.conn.BeginTransaction();
+            this.IsSuccess.Clear();
             this.cmd.Transaction = trans;
         }
         #endregion
@@ -2458,7 +2520,14 @@ namespace FastData.Context
         #region 提交事务
         public void SubmitTrans()
         {
-            this.trans.Commit();
+            if (this.IsSuccess.Count(a => a) == this.IsSuccess.Count)
+                this.trans.Commit();
+            else
+            {
+                this.IsSuccess.Clear();
+                this.trans.Rollback();
+            }
+
             this.trans.Dispose();
             this.trans = null;
         }
@@ -2467,6 +2536,7 @@ namespace FastData.Context
         #region 回滚事务
         public void RollbackTrans()
         {
+            this.IsSuccess.Clear();
             this.trans.Rollback();
             this.trans.Dispose();
             this.trans = null;
