@@ -1,7 +1,9 @@
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using FastData.Model;
 
-namespace FastData.Core.Base
+namespace FastData.Base
 {
     /// <summary>
     /// 标签：2015.9.6，魏中针
@@ -18,10 +20,15 @@ namespace FastData.Core.Base
         /// <returns></returns>
         public static List<DbParameter> ParamMerge(List<DbParameter> param1, List<DbParameter> param2)
         {
-            if (param2.Count != 0)
-                 param1.AddRange(param2);
+            var result = new List<DbParameter>();
 
-            return param1;
+            if (param1.Count != 0)
+                result.AddRange(param1);
+
+            if (param2.Count != 0)
+                result.AddRange(param2);
+
+            return result;
         }
         #endregion
     }
