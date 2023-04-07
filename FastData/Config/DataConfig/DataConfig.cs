@@ -154,6 +154,7 @@ namespace FastData.Config
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         item.CacheType = (temp as ElementConfig).CacheType;
                         item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                        item.FactoryClient = Provider.DB2Factory;
                         list.Add(item);
                     }
                 }
@@ -180,6 +181,7 @@ namespace FastData.Config
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         item.CacheType = (temp as ElementConfig).CacheType;
                         item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                        item.FactoryClient = Provider.OracleFactory;
                         list.Add(item);
                     }
                 }
@@ -206,6 +208,7 @@ namespace FastData.Config
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         item.CacheType = (temp as ElementConfig).CacheType;
                         item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                        item.FactoryClient = Provider.MySqlFactory;
                         list.Add(item);
                     }
                 }
@@ -232,6 +235,7 @@ namespace FastData.Config
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         item.CacheType = (temp as ElementConfig).CacheType;
                         item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                        item.FactoryClient = Provider.SqlServerFactory;
                         list.Add(item);
                     }
                 }
@@ -258,6 +262,7 @@ namespace FastData.Config
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         item.CacheType = (temp as ElementConfig).CacheType;
                         item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                        item.FactoryClient = Provider.SQLiteFactory;
                         list.Add(item);
                     }
                 }
@@ -284,6 +289,7 @@ namespace FastData.Config
                         item.SqlErrorType = (temp as ElementConfig).SqlErrorType;
                         item.CacheType = (temp as ElementConfig).CacheType;
                         item.IsUpdateCache = (temp as ElementConfig).IsUpdateCache;
+                        item.FactoryClient = Provider.PostgreSqlFactory;
                         list.Add(item);
                     }
                 }
@@ -314,6 +320,7 @@ namespace FastData.Config
                                             item.DbType = DataDbType.DB2;
                                             item.Flag = "@";
                                             item.ProviderName = Provider.DB2;
+                                            item.FactoryClient = Provider.DB2Factory;
                                         }
 
                                         if (string.Compare(leaf.Name, DataDbType.Oracle, true) == 0)
@@ -321,6 +328,7 @@ namespace FastData.Config
                                             item.DbType = DataDbType.Oracle;
                                             item.Flag = ":";
                                             item.ProviderName = Provider.Oracle;
+                                            item.FactoryClient = Provider.OracleFactory;
                                         }
 
                                         if (string.Compare(leaf.Name, DataDbType.MySql, true) == 0)
@@ -328,6 +336,7 @@ namespace FastData.Config
                                             item.DbType = DataDbType.MySql;
                                             item.Flag = "@";
                                             item.ProviderName = Provider.MySql;
+                                            item.FactoryClient = Provider.MySqlFactory;
                                         }
 
                                         if (string.Compare(leaf.Name, DataDbType.SqlServer, true) == 0)
@@ -335,6 +344,7 @@ namespace FastData.Config
                                             item.DbType = DataDbType.SqlServer;
                                             item.Flag = "@";
                                             item.ProviderName = Provider.SqlServer;
+                                            item.FactoryClient = Provider.SQLiteFactory;
                                         }
 
                                         if (string.Compare(leaf.Name, DataDbType.SQLite, true) == 0)
@@ -342,6 +352,7 @@ namespace FastData.Config
                                             item.DbType = DataDbType.SQLite;
                                             item.Flag = "@";
                                             item.ProviderName = Provider.SQLite;
+                                            item.FactoryClient = Provider.SQLiteFactory;
                                         }
 
                                         if (string.Compare(leaf.Name, DataDbType.PostgreSql, true) == 0)
@@ -349,6 +360,7 @@ namespace FastData.Config
                                             item.DbType = DataDbType.PostgreSql;
                                             item.Flag = "@";
                                             item.ProviderName = Provider.PostgreSql;
+                                            item.FactoryClient = Provider.PostgreSqlFactory;
                                         }
 
                                         if (item.DbType != null)
