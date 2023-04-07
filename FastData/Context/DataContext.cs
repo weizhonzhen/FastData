@@ -15,6 +15,7 @@ using FastData.Property;
 using FastData.Aop;
 using FastData.CacheModel;
 using FastData.Filter;
+using DbProviderFactories = FastData.Base.DbProviderFactories;
 
 namespace FastData.Context
 {
@@ -225,7 +226,7 @@ namespace FastData.Context
                                 if (!string.IsNullOrEmpty(a.Appand[i]) && !a.Appand[i].ToLower().TrimStart().StartsWith("and"))
                                     sql.AppendFormat(" and {0} ", a.Appand[i]);
 
-                                var param = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                                var param = DbProviderFactories.GetFactory(config).CreateParameter();
                                 param.ParameterName = a.Name[i];
                                 param.Value = BaseEmit.Get<T>(d, a.Key[i]);
                                 cmd.Parameters.Add(param);
@@ -370,7 +371,7 @@ namespace FastData.Context
             try
             {
                 this.config = DataConfig.GetConfig(key);
-                conn = DbProviderFactories.GetFactory(this.config.ProviderName).CreateConnection();
+                conn = DbProviderFactories.GetFactory(this.config).CreateConnection();
                 conn.ConnectionString = this.config.ConnStr;
                 conn.Open();
                 cmd = conn.CreateCommand();
@@ -1872,7 +1873,7 @@ namespace FastData.Context
 
                 if (update.IsSuccess)
                 {
-                    using (var adapter = DbProviderFactories.GetFactory(config.ProviderName).CreateDataAdapter())
+                    using (var adapter = DbProviderFactories.GetFactory(config).CreateDataAdapter())
                     {
                         var isTrans = this.trans == null;
                         if (isTrans)
@@ -2102,7 +2103,7 @@ namespace FastData.Context
                     {
 
                         var pValue = new List<object>();
-                        var param = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        var param = DbProviderFactories.GetFactory(config).CreateParameter();
 
                         if (a.PropertyType.Name.ToLower() == "nullable`1")
                             param.DbType = CommandParam.GetOracleDbType(a.PropertyType.GetGenericArguments()[0].Name);
@@ -2272,7 +2273,7 @@ namespace FastData.Context
                     PropertyCache.GetPropertyInfo(list[0]).ForEach(a =>
                     {
                         var pValue = new List<object>();
-                        var param = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        var param = DbProviderFactories.GetFactory(config).CreateParameter();
                         if (a.PropertyType.Name.ToLower() == "nullable`1")
                             param.DbType = CommandParam.GetOracleDbType(a.PropertyType.GetGenericArguments()[0].Name);
                         else
