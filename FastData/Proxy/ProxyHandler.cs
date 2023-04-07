@@ -8,6 +8,7 @@ using System.Data.Common;
 using System.Reflection;
 using System.Linq;
 using FastUntility.Page;
+using DbProviderFactories = FastData.Base.DbProviderFactories;
 
 namespace FastData.Proxy
 {
@@ -35,7 +36,7 @@ namespace FastData.Proxy
                         if (args[i].GetType() == typeof(PageModel))
                             continue;
 
-                        var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                         temp.ParameterName = model.param.GetValue(i.ToString()).ToStr();
                         temp.Value = args[i];
                         param.Add(temp);
@@ -60,7 +61,7 @@ namespace FastData.Proxy
                     var list = tempDic.OrderBy(d => d.Key).ToList();
                     foreach (KeyValuePair<int, string> keyValue in list)
                     {
-                        var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                         temp.ParameterName = keyValue.Value;
                         temp.Value = dic.GetValue(keyValue.Value);
                         param.Add(temp);
@@ -72,7 +73,7 @@ namespace FastData.Proxy
                     var type = method.GetParameters().ToList().Find(a => a.ParameterType != typeof(PageModel)).ParameterType;
                     for (int i = 0; i < model.param.Count; i++)
                     {
-                        var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                         temp.ParameterName = model.param.GetValue(i.ToString()).ToStr();
                         temp.Value = BaseEmit.Get(data, temp.ParameterName);
                         temp.ParameterName = temp.ParameterName.ToLower();
