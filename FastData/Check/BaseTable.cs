@@ -12,6 +12,7 @@ using FastUntility.Base;
 using System.Reflection;
 using FastData.Context;
 using FastData.Aop;
+using DbProviderFactories = FastData.Base.DbProviderFactories;
 
 namespace FastData.Check
 {
@@ -498,12 +499,12 @@ namespace FastData.Check
                 var sql = "";
                 if (item.Config.DbType == DataDbType.SqlServer)
                 {
-                    var tempParam = DbProviderFactories.GetFactory(item.Config.ProviderName).CreateParameter();
+                    var tempParam = DbProviderFactories.GetFactory(item.Config).CreateParameter();
                     tempParam.ParameterName = "tableName";
                     tempParam.Value = tableName.ToUpper();
                     param.Add(tempParam);
 
-                    tempParam = DbProviderFactories.GetFactory(item.Config.ProviderName).CreateParameter();
+                    tempParam = DbProviderFactories.GetFactory(item.Config).CreateParameter();
                     tempParam.ParameterName = "colName";
                     tempParam.Value = name.ToUpper();
                     param.Add(tempParam);
@@ -513,12 +514,12 @@ namespace FastData.Check
 
                 if (item.Config.DbType == DataDbType.Oracle)
                 {
-                    var tempParam = DbProviderFactories.GetFactory(item.Config.ProviderName).CreateParameter();
+                    var tempParam = DbProviderFactories.GetFactory(item.Config).CreateParameter();
                     tempParam.ParameterName = "tableName";
                     tempParam.Value = tableName.ToUpper();
                     param.Add(tempParam);
 
-                    tempParam = DbProviderFactories.GetFactory(item.Config.ProviderName).CreateParameter();
+                    tempParam = DbProviderFactories.GetFactory(item.Config).CreateParameter();
                     tempParam.ParameterName = "colName";
                     tempParam.Value = name.ToUpper();
                     param.Add(tempParam);
@@ -530,12 +531,12 @@ namespace FastData.Check
 
                 if (item.Config.DbType == DataDbType.MySql)
                 {
-                    var tempParam = DbProviderFactories.GetFactory(item.Config.ProviderName).CreateParameter();
+                    var tempParam = DbProviderFactories.GetFactory(item.Config).CreateParameter();
                     tempParam.ParameterName = "tableName";
                     tempParam.Value = tableName.ToUpper();
                     param.Add(tempParam);
 
-                    tempParam = DbProviderFactories.GetFactory(item.Config.ProviderName).CreateParameter();
+                    tempParam = DbProviderFactories.GetFactory(item.Config).CreateParameter();
                     tempParam.ParameterName = "colName";
                     tempParam.Value = name.ToUpper();
                     param.Add(tempParam);
@@ -562,7 +563,7 @@ namespace FastData.Check
                 var param = new List<DbParameter>();
                 var result = false;
 
-                var tempParam = DbProviderFactories.GetFactory(query.Config.ProviderName).CreateParameter();
+                var tempParam = DbProviderFactories.GetFactory(query.Config).CreateParameter();
                 tempParam.ParameterName = "name";
                 tempParam.Value = tableName.ToUpper();
                 param.Add(tempParam);
@@ -607,7 +608,7 @@ namespace FastData.Check
                 {
                     #region oracle
                     //参数
-                    var tempParam = DbProviderFactories.GetFactory(item.Config.ProviderName).CreateParameter();
+                    var tempParam = DbProviderFactories.GetFactory(item.Config).CreateParameter();
                     tempParam.ParameterName = "name";
                     tempParam.Value = tableName.ToUpper();
                     param.Add(tempParam);
@@ -647,7 +648,7 @@ namespace FastData.Check
                 {
                     #region MySql
                     //参数
-                    var tempParam = DbProviderFactories.GetFactory(item.Config.ProviderName).CreateParameter();
+                    var tempParam = DbProviderFactories.GetFactory(item.Config).CreateParameter();
                     tempParam.ParameterName = "name";
                     tempParam.Value = tableName.ToUpper();
                     param.Add(tempParam);
@@ -685,7 +686,7 @@ namespace FastData.Check
                 {
                     #region SqlServer
                     //参数
-                    var tempParam = DbProviderFactories.GetFactory(item.Config.ProviderName).CreateParameter();
+                    var tempParam = DbProviderFactories.GetFactory(item.Config).CreateParameter();
                     tempParam.ParameterName = "name";
                     tempParam.Value = tableName.ToUpper();
                     param.Add(tempParam);
