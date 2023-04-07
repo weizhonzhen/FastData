@@ -48,7 +48,7 @@ namespace FastData.Base
 
                 for (i = 0; i < leftList.Count; i++)
                 {
-                    var temp = DbProviderFactories.GetFactory(query.Config.ProviderName).CreateParameter();
+                    var temp = DbProviderFactories.GetFactory(query.Config).CreateParameter();
                     temp.ParameterName = leftList[i] + i.ToString();
                     temp.Value = rightList[i];
 
@@ -111,7 +111,7 @@ namespace FastData.Base
 
                 for (i = 0; i < leftList.Count; i++)
                 {
-                    var temp = DbProviderFactories.GetFactory(query.Config.ProviderName).CreateParameter();
+                    var temp = DbProviderFactories.GetFactory(query.Config).CreateParameter();
                     temp.ParameterName = leftList[i] + i.ToString();
                     temp.Value = rightList[i];
 

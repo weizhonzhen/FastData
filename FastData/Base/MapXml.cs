@@ -415,7 +415,7 @@ namespace FastData.Base
                 {
                     foreach (var split in field.Split(','))
                     {
-                        var tempParam = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        var tempParam = DbProviderFactories.GetFactory(config).CreateParameter();
                         tempParam.ParameterName = split;
                         tempParam.Value = a.GetValue(split);
                         param.Add(tempParam);
@@ -423,7 +423,7 @@ namespace FastData.Base
                 }
                 else
                 {
-                    var tempParam = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                    var tempParam = DbProviderFactories.GetFactory(config).CreateParameter();
                     tempParam.ParameterName = field;
                     tempParam.Value = a.GetValue(field);
                     param.Add(tempParam);
@@ -487,7 +487,7 @@ namespace FastData.Base
                             foreach (var split in field.Split(','))
                             {
                                 var infoField = BaseDic.PropertyInfo<T>().Find(a => string.Compare( a.Name,split, true) ==0);
-                                var tempParam = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                                var tempParam = DbProviderFactories.GetFactory(config).CreateParameter();
                                 tempParam.ParameterName = split;
                                 tempParam.Value = infoField.GetValue(item, null);
                                 param.Add(tempParam);
@@ -496,7 +496,7 @@ namespace FastData.Base
                         else
                         {
                             var infoField = BaseDic.PropertyInfo<T>().Find(a =>string.Compare( a.Name, field, true) ==0);
-                            var tempParam = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                            var tempParam = DbProviderFactories.GetFactory(config).CreateParameter();
                             tempParam.ParameterName = field;
                             tempParam.Value = BaseEmit.Get(item, infoField.Name);
                             param.Add(tempParam);

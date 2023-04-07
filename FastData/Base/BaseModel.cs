@@ -44,7 +44,7 @@ namespace FastData.Base
                     {
                         result.Sql = string.Format("{2} {0}={1}{0},", a.Name, config.Flag, result.Sql);
                         var itemValue = BaseEmit.Get<T>(model, a.Name);
-                        var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                         temp.ParameterName = a.Name;
                         temp.Value = itemValue == null ? DBNull.Value : itemValue;
                         result.Param.Add(temp);
@@ -58,7 +58,7 @@ namespace FastData.Base
                     {
                         result.Sql = string.Format("{2} {0}={1}{0},", a.Name, config.Flag, result.Sql);
                         var itemValue = BaseEmit.Get<T>(model, a.Name);
-                        var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                         temp.ParameterName = a.Name;
                         temp.Value = itemValue == null ? DBNull.Value : itemValue;
                         result.Param.Add(temp);
@@ -128,7 +128,7 @@ namespace FastData.Base
                         sbValue.AppendFormat("{1}{0},", p.Name, config.Flag);
 
                         var itemValue = BaseEmit.Get<T>(model, p.Name);
-                        var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                         temp.ParameterName = p.Name;
                         temp.Value = itemValue == null ? DBNull.Value : itemValue;
                         result.Param.Add(temp);
@@ -179,7 +179,7 @@ namespace FastData.Base
                         sbName.AppendFormat("{0},", p.Name);
                         sbValue.AppendFormat("{1}{0},", p.Name, config.Flag);
                         var itemValue = BaseEmit.Get(model, p.Name);
-                        var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                         temp.ParameterName = p.Name;
                         temp.Value = itemValue == null ? DBNull.Value : itemValue;
                         result.Param.Add(temp);
@@ -238,7 +238,7 @@ namespace FastData.Base
                     {
                         result.Sql = string.Format("{2} {0}={1}{0},", a.Name, config.Flag, result.Sql);
                         var itemValue = BaseEmit.Get<T>(model, a.Name);
-                        var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                         temp.ParameterName = a.Name;
                         temp.Value = itemValue == null ? DBNull.Value : itemValue;
                         result.Param.Add(temp);
@@ -252,7 +252,7 @@ namespace FastData.Base
                     {
                         result.Sql = string.Format("{2} {0}={1}{0},", a.Name, config.Flag, result.Sql);
                         var itemValue = BaseEmit.Get<T>(model, a.Name);
-                        var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                         temp.ParameterName = a.Name;
                         temp.Value = itemValue == null ? DBNull.Value : itemValue;
                         result.Param.Add(temp);
@@ -279,7 +279,7 @@ namespace FastData.Base
                     else
                         result.Sql = string.Format("{2} and {0}={1}{0}{3} ", item, config.Flag, result.Sql, count);
 
-                    var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                    var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                     temp.ParameterName = string.Format("{0}{1}", item, count);
                     temp.Value = itemValue == null ? DBNull.Value : itemValue;
 
@@ -339,7 +339,7 @@ namespace FastData.Base
                     result.Sql = string.Format("{2} {0}={1}{0},", item.Name, config.Flag, result.Sql);
 
                     var itemValue = BaseEmit.Get(model, item.Name);
-                    var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                    var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                     temp.ParameterName = item.Name;
                     temp.Value = itemValue == null ? DBNull.Value : itemValue;
                     result.Param.Add(temp);
@@ -364,7 +364,7 @@ namespace FastData.Base
                     else
                         result.Sql = string.Format("{2} and {0}={1}{0} ", item, config.Flag, result.Sql);
 
-                    var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                    var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                     temp.ParameterName = item;
                     temp.Value = itemValue == null ? DBNull.Value : itemValue;
 
@@ -426,7 +426,7 @@ namespace FastData.Base
                         if (where.Exists(a => a == item.Name))
                             continue;
                         result.Sql = string.Format("{2} {0}={1}{0},", item.Name, config.Flag, result.Sql);
-                        var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                         temp.ParameterName = item.Name;
                         temp.SourceColumn = item.Name;
                         result.Param.Add(temp);
@@ -441,7 +441,7 @@ namespace FastData.Base
                         if (where.Exists(a => a == item.Name))
                             continue;
                         result.Sql = string.Format("{2} {0}={1}{0},", item.Name, config.Flag, result.Sql);
-                        var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                        var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                         temp.ParameterName = item.Name;
                         temp.SourceColumn = item.Name;
                         result.Param.Add(temp);
@@ -459,7 +459,7 @@ namespace FastData.Base
                     else
                         result.Sql = string.Format("{2} and {0}={1}{0} ", a, config.Flag, result.Sql);
 
-                    var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                    var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                     temp.ParameterName = a;
                     temp.SourceColumn = a;
                     result.Param.Add(temp);
@@ -537,7 +537,7 @@ namespace FastData.Base
                     else
                         result.Sql = string.Format("{2} and {0}={1}{0} ", item, config.Flag, result.Sql);
 
-                    var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                    var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                     temp.ParameterName = item;
                     temp.Value = itemValue == null ? DBNull.Value : itemValue;
 
@@ -605,7 +605,7 @@ namespace FastData.Base
                     else
                         result.Sql = string.Format("{2} and {0}={1}{0} ", item, config.Flag, result.Sql);
 
-                    var temp = DbProviderFactories.GetFactory(config.ProviderName).CreateParameter();
+                    var temp = DbProviderFactories.GetFactory(config).CreateParameter();
                     temp.ParameterName = item;
                     temp.Value = itemValue == null ? DBNull.Value : itemValue;
 
