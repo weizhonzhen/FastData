@@ -486,7 +486,7 @@ namespace FastData
         {
             var config = DataConfig.GetConfig(dbKey);
             var info = new FileInfo(xml);
-            return MapXml.GetXmlList(info.FullName, "sqlMap", config).isSuccess;
+            return MapXml.GetXmlList(info.FullName, "sqlMap", config).IsSuccess;
         }
         #endregion
 
