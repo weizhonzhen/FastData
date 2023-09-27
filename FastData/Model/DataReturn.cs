@@ -121,6 +121,11 @@ namespace FastData.Model
         /// 写返回结果
         /// </summary>
         public WriteReturn writeReturn { set; get; } = new WriteReturn();
+
+        /// <summary>
+        /// list
+        /// </summary>
+        public object List { get; set; }
     }
 
     /// <summary>
