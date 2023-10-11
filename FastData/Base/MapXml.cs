@@ -42,6 +42,7 @@ namespace FastData.Base
         /// <returns></returns>
         public static string GetMapSql(string name, ref DbParameter[] param, DataContext db, string key)
         {
+            name = name.ToLower();
             var tempParam = new List<DbParameter>();
             var sql = new StringBuilder();
             var flag = "";
@@ -58,22 +59,22 @@ namespace FastData.Base
                 cacheType = DataConfig.GetConfig(key).CacheType;
             }
 
-            for (var i = 0; i <= DbCache.Get(cacheType, name.ToLower()).ToInt(0); i++)
+            for (var i = 0; i <= DbCache.Get(cacheType, name).ToInt(0); i++)
             {
                 #region 文本
-                var txtKey = string.Format("{0}.{1}", name.ToLower(), i);
+                var txtKey = string.Format("{0}.{1}", name, i);
                 if (DbCache.Exists(cacheType, txtKey))
                     sql.Append(DbCache.Get(cacheType, txtKey));
                 #endregion
 
                 #region 动态
-                var dynKey = string.Format("{0}.format.{1}", name.ToLower(), i);
+                var dynKey = string.Format("{0}.format.{1}", name, i);
                 if (DbCache.Exists(cacheType, dynKey))
                 {
                     if (param != null)
                     {
                         var tempSql = new StringBuilder();
-                        foreach (var item in DbCache.Get<List<string>>(cacheType, string.Format("{0}.param", name.ToLower())))
+                        foreach (var item in DbCache.Get<List<string>>(cacheType, string.Format("{0}.param", name)))
                         {
                             if (!param.ToList().Exists(a =>string.Compare( a.ParameterName, item, true) ==0))
                                 continue;
@@ -81,243 +82,58 @@ namespace FastData.Base
                             if (!tempParam.ToList().Exists(a => a.ParameterName == temp.ParameterName))
                                 tempParam.Add(temp);
 
-                            var paramKey = string.Format("{0}.{1}.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
-                            var conditionKey = string.Format("{0}.{1}.condition.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
-                            var conditionValueKey = string.Format("{0}.{1}.condition.value.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
-                            if (DbCache.Exists(cacheType, paramKey))
+                            var sqlModel = new SqlModel() { CacheType = cacheType, I = i, MapName = name, Param = temp, Flag = flag };
+                            if (DbCache.Exists(cacheType, sqlModel.ParamKey) || string.Compare(DbCache.Get(cacheType, dynKey), "include", true) == 0)
                             {
-                                var flagParam = string.Format("{0}{1}", flag, temp.ParameterName).ToLower();
-                                var tempKey = string.Format("#{0}#", temp.ParameterName).ToLower();
-                                var paramSql = DbCache.Get(cacheType, paramKey.ToLower()).ToLower();
-                                var condition = DbCache.Get(cacheType, conditionKey).ToStr().ToLower();
-                                var conditionValue = DbCache.Get(cacheType, conditionValueKey).ToStr().ToLower();
+                                var condition = DbCache.Get(cacheType, sqlModel.ConditionKey).ToStr().ToLower();
                                 switch (condition)
                                 {
                                     case "isequal":
                                         {
-                                            if (conditionValue == temp.Value.ToStr())
-                                            {
-                                                if (paramSql.IndexOf(tempKey) >= 0)
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToStr()));
-                                                }
-                                                else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                                }
-                                                else
-                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                            }
-                                            else
-                                                tempParam.Remove(temp);
+                                            XmlOption.IsEqualSql(sqlModel, tempParam);
                                             break;
                                         }
                                     case "isnotequal":
                                         {
-                                            if (conditionValue != temp.Value.ToStr())
-                                            {
-                                                if (paramSql.IndexOf(tempKey) >= 0)
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(paramSql.ToString().Replace(temp.ParameterName.ToLower(), temp.Value.ToStr()));
-                                                }
-                                                else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                                }
-                                                else
-                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                            }
-                                            else
-                                                tempParam.Remove(temp);
+                                            XmlOption.IsNotEqualSql(sqlModel, tempParam);
                                             break;
                                         }
                                     case "isgreaterthan":
                                         {
-                                            if (temp.Value.ToStr().ToDecimal(0) > conditionValue.ToDecimal(0))
-                                            {
-                                                if (paramSql.IndexOf(tempKey) >= 0)
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToStr()));
-                                                }
-                                                else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                                }
-                                                else
-                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                            }
-                                            else
-                                                tempParam.Remove(temp);
+                                            XmlOption.IsGreaterThanSql(sqlModel, tempParam);
                                             break;
                                         }
                                     case "islessthan":
                                         {
-                                            if (temp.Value.ToStr().ToDecimal(0) < conditionValue.ToDecimal(0))
-                                            {
-                                                if (paramSql.IndexOf(tempKey) >= 0)
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToStr()));
-                                                }
-                                                else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                                }
-                                                else
-                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                            }
-                                            else
-                                                tempParam.Remove(temp);
+                                            XmlOption.IsLessThanSql(sqlModel, tempParam);
                                             break;
                                         }
                                     case "isnullorempty":
                                         {
-                                            if (string.IsNullOrEmpty(temp.Value.ToStr()))
-                                            {
-                                                if (paramSql.IndexOf(tempKey) >= 0)
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToStr()));
-                                                }
-                                                else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                                }
-                                                else
-                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                            }
-                                            else
-                                                tempParam.Remove(temp);
+                                            XmlOption.IsNullOrEmptySql(sqlModel, tempParam);
                                             break;
                                         }
                                     case "isnotnullorempty":
                                         {
-                                            if (!string.IsNullOrEmpty(temp.Value.ToStr()))
-                                            {
-                                                if (paramSql.IndexOf(tempKey) >= 0)
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToStr()));
-                                                }
-                                                else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                                }
-                                                else
-                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                            }
-                                            else
-                                                tempParam.Remove(temp);
+                                            XmlOption.IsNotNullOrEmptySql(sqlModel, tempParam);
                                             break;
                                         }
                                     case "if":
                                         {
-                                            var referencesKey = string.Format("{0}.{1}.references.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
-                                            conditionValue = DbCache.Get(cacheType, conditionValueKey).ToStr();
-                                            conditionValue = conditionValue.Replace(temp.ParameterName, temp.Value == null ? null : temp.Value.ToStr());
-                                            conditionValue = conditionValue.Replace("#", "\"");
-                                            if (BaseCodeDom.GetResult(conditionValue, DbCache.Get(cacheType, referencesKey)))
-                                            {
-                                                if (paramSql.IndexOf(tempKey) >= 0)
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToStr()));
-                                                }
-                                                else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                                }
-                                                else
-                                                    tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                            }
-                                            else
-                                                tempParam.Remove(temp);
+                                            XmlOption.IfSql(sqlModel, tempParam);
                                             break;
                                         }
                                     case "choose":
                                         {
-                                            var conditionOther = "";
-                                            var isSuccess = false;
-                                            for (int j = 0; j < DbCache.Get(cacheType, paramKey).ToStr().ToInt(0); j++)
-                                            {
-                                                var conditionOtherKey = string.Format("{0}.choose.other.{1}", paramKey, j);
-                                                if (DbCache.Get(cacheType, conditionOtherKey).ToStr() != "")
-                                                    conditionOther = DbCache.Get(cacheType, conditionOtherKey).ToLower();
-
-                                                //references
-                                                var referencesKey = string.Format("{0}.{1}.references.{2}", name.ToLower(), temp.ParameterName.ToLower(), i);
-
-                                                conditionKey = string.Format("{0}.choose.{1}", paramKey, j);
-                                                condition = DbCache.Get(cacheType, conditionKey).ToStr().ToLower();
-
-                                                conditionValueKey = string.Format("{0}.choose.condition.{1}", paramKey, j);
-                                                conditionValue = DbCache.Get(cacheType, conditionValueKey).ToStr();
-                                                conditionValue = conditionValue.Replace(temp.ParameterName, temp.Value == null ? null : temp.Value.ToStr());
-                                                conditionValue = conditionValue.Replace("#", "\"");
-                                                if (BaseCodeDom.GetResult(conditionValue, DbCache.Get(cacheType, referencesKey)))
-                                                {
-                                                    isSuccess = true;
-                                                    if (condition.IndexOf(tempKey) >= 0)
-                                                    {
-                                                        tempParam.Remove(temp);
-                                                        tempSql.Append(condition.Replace(tempKey, temp.Value.ToStr()));
-                                                    }
-                                                    else if (condition.IndexOf(flagParam) < 0 && flag != "")
-                                                    {
-                                                        tempParam.Remove(temp);
-                                                        tempSql.Append(condition.Replace(tempKey, temp.Value.ToStr()));
-                                                    }
-                                                    else
-                                                        tempSql.Append(condition);
-                                                    break;
-                                                }
-                                            }
-
-                                            if (!isSuccess)
-                                            {
-                                                if (conditionOther == "")
-                                                    tempParam.Remove(temp);
-                                                else if (conditionOther.IndexOf(tempKey) >= 0)
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(conditionOther.Replace(tempKey, temp.Value.ToStr()));
-                                                }
-                                                else if (conditionOther.IndexOf(flagParam) < 0 && flag != "")
-                                                {
-                                                    tempParam.Remove(temp);
-                                                    tempSql.Append(conditionOther.Replace(tempKey, temp.Value.ToStr()));
-                                                }
-                                                else
-                                                    tempSql.Append(conditionOther);
-                                            }
+                                            XmlOption.ChooseSql(sqlModel, tempParam);
                                             break;
                                         }
                                     default:
                                         {
-                                            //isPropertyAvailable
-                                            if (paramSql.IndexOf(tempKey) >= 0)
-                                            {
-                                                tempParam.Remove(temp);
-                                                tempSql.Append(paramSql.ToString().Replace(tempKey, temp.Value.ToStr()));
-                                            }
-                                            else if (paramSql.IndexOf(flagParam) < 0 && flag != "")
-                                            {
-                                                tempParam.Remove(temp);
-                                                tempSql.Append(DbCache.Get(cacheType, paramKey));
-                                            }
+                                            if (string.Compare(DbCache.Get(cacheType, sqlModel.IncludeKey), "include", true) == 0)
+                                                XmlOption.IncludeSql(sqlModel, tempParam, param);
                                             else
-                                                tempSql.Append(DbCache.Get(cacheType, paramKey));
-
+                                                XmlOption.IsPropertyAvailableSql(sqlModel, tempParam);
                                             break;
                                         }
                                 }
@@ -326,7 +142,8 @@ namespace FastData.Base
 
                         if (tempSql.ToString() != "")
                         {
-                            sql.Append(DbCache.Get(cacheType, dynKey));
+                            var dynKeySql = DbCache.Get(cacheType, dynKey);
+                            sql.Append(string.Compare(dynKeySql, "include", true) == 0 ? "" : dynKeySql);
                             sql.Append(tempSql.ToString());
                         }
                     }
@@ -334,7 +151,7 @@ namespace FastData.Base
                 #endregion
             }
 
-            if (DbCache.Get<List<string>>(cacheType, string.Format("{0}.param", name.ToLower())).Count > 0)
+            if (DbCache.Get<List<string>>(cacheType, string.Format("{0}.param", name)).Count > 0)
                 param = tempParam.ToArray();
             else
             {
@@ -383,9 +200,10 @@ namespace FastData.Base
         /// <returns></returns>
         internal static bool MapIsForEach(string name, ConfigModel config, int i = 1)
         {
-            var keyName = string.Format("{0}.foreach.name.{1}", name.ToLower(), i);
-            var keyField = string.Format("{0}.foreach.field.{1}", name.ToLower(), i);
-            var keySql = string.Format("{0}.foreach.sql.{1}", name.ToLower(), i);
+            name = name.ToLower();
+            var keyName = string.Format("{0}.foreach.name.{1}", name, i);
+            var keyField = string.Format("{0}.foreach.field.{1}", name, i);
+            var keySql = string.Format("{0}.foreach.sql.{1}", name, i);
 
             return !string.IsNullOrEmpty(DbCache.Get(config.CacheType, keyName)) &&
                 !string.IsNullOrEmpty(DbCache.Get(config.CacheType, keyField)) &&
@@ -449,12 +267,13 @@ namespace FastData.Base
         /// <returns></returns>
         internal static List<T> MapForEach<T>(List<T> data, string name, DataContext db,ConfigModel config, int i = 1) where T : class, new()
         {
+            name = name.ToLower();
             var result = new List<T>();
             var param = new List<DbParameter>();
-            var dicName = DbCache.Get(config.CacheType, string.Format("{0}.foreach.name.{1}", name.ToLower(), i));
-            var type = DbCache.Get(config.CacheType, string.Format("{0}.foreach.type.{1}", name.ToLower(), i));
-            var field = DbCache.Get(config.CacheType, string.Format("{0}.foreach.field.{1}", name.ToLower(), i));
-            var sql = DbCache.Get(config.CacheType, string.Format("{0}.foreach.sql.{1}", name.ToLower(), i));
+            var dicName = DbCache.Get(config.CacheType, string.Format("{0}.foreach.name.{1}", name, i));
+            var type = DbCache.Get(config.CacheType, string.Format("{0}.foreach.type.{1}", name, i));
+            var field = DbCache.Get(config.CacheType, string.Format("{0}.foreach.field.{1}", name, i));
+            var sql = DbCache.Get(config.CacheType, string.Format("{0}.foreach.sql.{1}", name, i));
             Assembly assembly;
 
             if (type.IndexOf(',') > 0)
