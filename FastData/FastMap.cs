@@ -28,6 +28,7 @@ namespace FastData
         {
             key = key == null ? MapDb(name) : key;
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            param = Parameter.ToDbParameter(param, config);
             if (config.IsUpdateCache)
                 InstanceMap(config.Key);
 
@@ -107,6 +108,7 @@ namespace FastData
         {
             key = key == null ? MapDb(name) : key;
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            param = Parameter.ToDbParameter(param, config);
             if (config.IsUpdateCache)
                 InstanceMap(config.Key);
 
@@ -174,6 +176,7 @@ namespace FastData
         {
             key = key == null ? MapDb(name) : key;
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            param = Parameter.ToDbParameter(param, config);
             if (config.IsUpdateCache)
                 InstanceMap(config.Key);
 
@@ -256,6 +259,7 @@ namespace FastData
         {
             var result = new DataReturn();
             var config = DataConfig.GetConfig(key);
+            param = Parameter.ToDbParameter(param, config);
             var stopwatch = new Stopwatch();
 
             stopwatch.Start();
@@ -281,6 +285,7 @@ namespace FastData
         {
             key = key == null ? MapDb(name) : key;
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            param = Parameter.ToDbParameter(param, config);
             if (config.IsUpdateCache)
                 InstanceMap(config.Key);
             if (DbCache.Exists(config.CacheType, name.ToLower()))
@@ -362,6 +367,7 @@ namespace FastData
         {
             var result = new DataReturn<T>();
             var config = DataConfig.GetConfig(key);
+            param = Parameter.ToDbParameter(param, config);
             var stopwatch = new Stopwatch();
 
             stopwatch.Start();
@@ -394,6 +400,7 @@ namespace FastData
         {
             key = key == null ? MapDb(name) : key;
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            param = Parameter.ToDbParameter(param, config);
             if (config.IsUpdateCache)
                 InstanceMap(config.Key);
             if (DbCache.Exists(config.CacheType, name.ToLower()))

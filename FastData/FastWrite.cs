@@ -361,9 +361,10 @@ namespace FastData
 
             db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
             config = db.config;
-                config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
-                result = db.ExecuteSql(sql, param, false, config.IsOutSql);
-            
+            config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
+            param = Parameter.ToDbParameter(param, config);
+            result = db.ExecuteSql(sql, param, false, config.IsOutSql);
+
             stopwatch.Stop();
             DbLog.LogSql(config.IsOutSql, result.Sql, config.DbType, stopwatch.Elapsed.TotalMilliseconds);
             stopwatch = null;
@@ -406,9 +407,10 @@ namespace FastData
 
             db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
             config = db.config;
-                config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
-                result = db.ExecuteSql(sql, param, false, config.IsOutSql);
-            
+            param = Parameter.ToDbParameter(param, config);
+            config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
+            result = db.ExecuteSql(sql, param, false, config.IsOutSql);
+
 
             stopwatch.Stop();
 

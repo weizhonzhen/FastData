@@ -11,7 +11,6 @@ using System.Diagnostics;
 using FastData.Context;
 using System.Data;
 using System.Reflection;
-using NServiceKit.Common;
 
 namespace FastData
 {
@@ -678,6 +677,7 @@ namespace FastData
             stopwatch.Start();
 
             db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            param = Parameter.ToDbParameter(param, db.config);
             result = db.ExecuteSql<T>(sql, param);
             config = db.config;
             
@@ -974,6 +974,7 @@ namespace FastData
             stopwatch.Start();
 
             db = db == null ? FastAop.FastAop.Resolve<IUnitOfWorK>().Contexts(key) : db;
+            param = Parameter.ToDbParameter(param, db.config);
             result = db.ExecuteSqlList(sql, param, false);
             config = db.config;
 
