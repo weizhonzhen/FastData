@@ -34,6 +34,7 @@ namespace FastData.Repository
         {
             key = key == null ? MapDb(name) : key;
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            param = Parameter.ToDbParameter(param, config);
             if (config.IsUpdateCache)
                 InstanceMap(key);
             if (DbCache.Exists(config.CacheType, name.ToLower()))
@@ -115,6 +116,7 @@ namespace FastData.Repository
         {
             key = key == null ? MapDb(name) : key;
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            param = Parameter.ToDbParameter(param, config);
             if (config.IsUpdateCache)
                 InstanceMap(key);
 
@@ -198,6 +200,7 @@ namespace FastData.Repository
         {
             key = key == null ? MapDb(name) : key;
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            param = Parameter.ToDbParameter(param, config);
             if (config.IsUpdateCache)
                 InstanceMap(key);
 
@@ -268,6 +271,7 @@ namespace FastData.Repository
         {
             var result = new DataReturn();
             var config = DataConfig.GetConfig(key);
+            param = Parameter.ToDbParameter(param, config);
             var stopwatch = new Stopwatch();
 
             stopwatch.Start();
@@ -300,6 +304,7 @@ namespace FastData.Repository
         {
             key = key == null ? MapDb(name) : key;
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            param = Parameter.ToDbParameter(param, config);
             if (config.IsUpdateCache)
                 InstanceMap(key);
 
@@ -387,6 +392,7 @@ namespace FastData.Repository
         {
             var result = new DataReturn<T>();
             var config = DataConfig.GetConfig(key);
+            param = Parameter.ToDbParameter(param, config);
             var stopwatch = new Stopwatch();
 
             stopwatch.Start();
@@ -419,6 +425,7 @@ namespace FastData.Repository
         {
             key = key == null ? MapDb(name) : key;
             var config = db == null ? DataConfig.GetConfig(key) : db.config;
+            param = Parameter.ToDbParameter(param, config);
             if (config.IsUpdateCache)
                 InstanceMap(key);
 
@@ -1162,6 +1169,7 @@ namespace FastData.Repository
                 using (var tempDb = new DataContext(key))
                 {
                     config = tempDb.config;
+                    param = Parameter.ToDbParameter(param, config);
                     config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
                     result = tempDb.ExecuteSql(sql, param, false, config.IsOutSql);
                 }
@@ -1169,6 +1177,7 @@ namespace FastData.Repository
             else
             {
                 config = db.config;
+                param = Parameter.ToDbParameter(param, config);
                 config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
                 result = db.ExecuteSql(sql, param, false, config.IsOutSql);
             }
@@ -1218,6 +1227,7 @@ namespace FastData.Repository
                 using (var tempDb = new DataContext(key))
                 {
                     config = tempDb.config;
+                    param = Parameter.ToDbParameter(param, config);
                     config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
                     result = tempDb.ExecuteDDL(sql, param, config.IsOutSql);
                 }
@@ -1226,6 +1236,7 @@ namespace FastData.Repository
             {
                 config = db.config;
                 config.IsOutSql = config.IsOutSql ? config.IsOutSql : isOutSql;
+                param = Parameter.ToDbParameter(param, config);
                 result = db.ExecuteSql(sql, param, false, config.IsOutSql);
             }
 
