@@ -1,6 +1,6 @@
 ```csharp
 code firest ,db first ,map
-nuget url : https://www.nuget.org/packages/Fast.Data/
+nuget url : https://www.nuget.org/ckages/Fast.Data/
 in Application_Start method
 ```
 aop
@@ -201,8 +201,8 @@ interface  Service
  ``` 
 
  ```csharp
-        var param = new List<OracleParameter>();
-        param.Add(new OracleParameter { ParameterName = "userid", Value = "dd5c99f2-0892-4179-83db-c2ccf243104c" });
+        var param = new List<DataParameter>();
+        param.Add(new DataParameter { ParameterName = "userid", Value = "dd5c99f2-0892-4179-83db-c2ccf243104c" });
         var tt = FastMap.Query<TestResult>("Patient.Test", param.ToArray(), null, "test");
         
         //Navigate
@@ -264,7 +264,7 @@ interface  Service
                 public string ROLEID{ get; set; }
                 public string ROLENAME{ get; set; }
                 public string ROLEREMARK{ get; set; }
-                public string DEFAULTPAGE{ get; set; }
+                public string DEFAULTGE{ get; set; }
                 public DateTime? ADDTIME{ get; set; }
                 public string ADDUSERID{ get; set; }
                 public string ADDUSERNAME{ get; set; }      
