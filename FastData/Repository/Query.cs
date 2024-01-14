@@ -149,6 +149,18 @@ namespace FastData.Repository
         }
         #endregion
 
+        #region 是否导航
+        /// <summary>
+        /// 是否导航
+        /// </summary>
+        /// <param name="isNavigate"></param>
+        /// <returns></returns>
+        public override IQuery Navigate(bool isNavigate = true)
+        {
+            this.Data.IsNavigate = isNavigate;
+            return this;
+        }
+        #endregion
 
         #region 返回list
         /// <summary>

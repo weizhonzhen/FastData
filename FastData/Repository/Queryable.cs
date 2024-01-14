@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -147,6 +148,19 @@ namespace FastData.Repository
         public override IQueryable<T> Filter(bool isFilter = true)
         {
             this.Data.IsFilter = isFilter;
+            return this;
+        }
+        #endregion
+
+        #region 是否导航
+        /// <summary>
+        /// 是否导航
+        /// </summary>
+        /// <param name="isNavigate"></param>
+        /// <returns></returns>
+        public override IQueryable<T> Navigate(bool isNavigate = true)
+        {
+            this.Data.IsNavigate = isNavigate;
             return this;
         }
         #endregion
@@ -1385,6 +1399,19 @@ namespace FastData.Repository
         public override IQueryable<T, T1> Filter(bool isFilter = true)
         {
             this.Data.IsFilter = isFilter;
+            return this;
+        }
+        #endregion
+
+        #region 是否导航
+        /// <summary>
+        /// 是否导航
+        /// </summary>
+        /// <param name="isNavigate"></param>
+        /// <returns></returns>
+        public override IQueryable<T, T1> Navigate(bool isNavigate = true)
+        {
+            this.Data.IsNavigate = isNavigate;
             return this;
         }
         #endregion

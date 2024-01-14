@@ -24,6 +24,8 @@ namespace FastData.Repository
 
         public abstract IQuery Filter(bool isFilter = true);
 
+        public abstract IQuery Navigate(bool isNavigate = true);
+
         public abstract string ToJson(DataContext db = null, bool isOutSql = false);
 
         public abstract Task<string> ToJsonAsy(DataContext db = null, bool isOutSql = false);
