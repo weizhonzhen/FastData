@@ -2,6 +2,7 @@
 {
     public enum FilterType
     {
+        All = 0,
         Execute_Sql_Model = 1,
         Query_List_Lambda = 2,
         Query_Dic_Lambda = 3,
