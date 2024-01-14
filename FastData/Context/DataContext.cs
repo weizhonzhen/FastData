@@ -470,7 +470,8 @@ namespace FastData.Context
 
                 BaseAop.AopAfter(item.TableName, sql.ToString(), param, config, true, AopType.Query_List_Lambda, data);
 
-                Navigate<T>(result, item.Config, false);
+                if (item.IsNavigate)
+                    Navigate<T>(result, item.Config, false);
 
                 return result;
             }
@@ -618,7 +619,8 @@ namespace FastData.Context
                     dr.Dispose();
                     dr = null;
 
-                    Navigate<T>(result, item.Config, true);
+                    if (item.IsNavigate)
+                        Navigate<T>(result, item.Config, true);
                 }
                 else
                     result.pageResult.list = new List<T>();
