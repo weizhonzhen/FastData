@@ -68,6 +68,11 @@ namespace FastData.Model
         /// 过滤
         /// </summary>
         internal bool IsFilter { get; set; } = true;
+
+        /// <summary>
+        /// 导航
+        /// </summary>
+        internal bool IsNavigate { get; set; } = true;
     }
     #endregion
 }
