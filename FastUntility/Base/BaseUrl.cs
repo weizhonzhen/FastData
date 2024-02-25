@@ -34,13 +34,13 @@ namespace FastUntility.Base
         /// <summary>
         /// get url(select)
         /// </summary>
-        public static string GetUrl(string url, int version = 1, int minor = 1)
+        public static string GetUrl(string url, int version = 1, int minor = 1, string mediaType = "application/json")
         {
             try
             {
                 var handle = new HttpRequestMessage();
                 handle.Version = new Version(version, minor);
-                handle.Content = new StringContent("", Encoding.UTF8);
+                handle.Content = new StringContent("", Encoding.UTF8,mediaType);
                 handle.Method = HttpMethod.Get;
                 handle.RequestUri = new Uri(url);
                 var response = http.SendAsync(handle).Result;
@@ -112,7 +112,7 @@ namespace FastUntility.Base
                 handle.Method = HttpMethod.Put;
                 handle.RequestUri = new Uri(url);
                 var response = http.SendAsync(handle).Result;
-                handle.Content.Dispose();
+                handle.Content?.Dispose();
                 handle.Dispose();
                 return response.Content.ReadAsStringAsync().Result;
             }
@@ -123,6 +123,28 @@ namespace FastUntility.Base
             }
         }
         #endregion
+
+        /// <summary>
+        /// post form
+        /// </summary>
+        public static string PostForm(string url, List<KeyValuePair<string, string>> param)
+        {
+            try
+            {
+                var handle = new HttpRequestMessage();
+                handle.Content = new FormUrlEncodedContent(param);
+                handle.Method = HttpMethod.Post;
+                handle.RequestUri = new Uri(url);
+                var response = http.SendAsync(handle).Result;
+                handle.Content?.Dispose();
+                handle.Dispose();
+                return response.Content.ReadAsStringAsync().Result;
+            }
+            catch (Exception ex)
+            {
+                return string.Empty;
+            }
+        }
 
         #region put url (update)
         /// <summary>
@@ -165,7 +187,29 @@ namespace FastUntility.Base
             }
         }
         #endregion
-        
+
+        /// <summary>
+        /// Put form
+        /// </summary>
+        public static string PutForm(string url, List<KeyValuePair<string, string>> param)
+        {
+            try
+            {
+                var handle = new HttpRequestMessage();
+                handle.Content = new FormUrlEncodedContent(param);
+                handle.Method = HttpMethod.Put;
+                handle.RequestUri = new Uri(url);
+                var response = http.SendAsync(handle).Result;
+                handle.Content?.Dispose();
+                handle.Dispose();
+                return response.Content.ReadAsStringAsync().Result;
+            }
+            catch (Exception ex)
+            {
+                return string.Empty;
+            }
+        }
+
         #region post soap
         /// <summary>
         /// post content(insert)
@@ -196,7 +240,7 @@ namespace FastUntility.Base
                 handle.Method = HttpMethod.Post;
                 handle.RequestUri = new Uri(url);
                 var response = http.SendAsync(handle).Result;
-                handle.Content.Dispose();
+                handle.Content?.Dispose();
                 handle.Dispose();
                 var result = response.Content.ReadAsStringAsync().Result;
 
@@ -243,5 +287,27 @@ namespace FastUntility.Base
             }
         }
         #endregion
+
+        /// <summary>
+        /// Delete form
+        /// </summary>
+        public static string DeleteForm(string url, List<KeyValuePair<string, string>> param)
+        {
+            try
+            {
+                var handle = new HttpRequestMessage();
+                handle.Content = new FormUrlEncodedContent(param);
+                handle.Method = HttpMethod.Delete;
+                handle.RequestUri = new Uri(url);
+                var response = http.SendAsync(handle).Result;
+                handle.Content?.Dispose();
+                handle.Dispose();
+                return response.Content.ReadAsStringAsync().Result;
+            }
+            catch (Exception ex)
+            {
+                return string.Empty;
+            }
+        }
     }
 }
