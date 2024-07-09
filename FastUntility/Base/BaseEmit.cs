@@ -56,25 +56,30 @@ namespace FastUntility.Base
 
                 Type defType = parameter.ParameterType;
                 if (parameter.ParameterType.Name == "Nullable`1" && parameter.ParameterType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                    defType = Nullable.GetUnderlyingType(parameter.ParameterType);
-
-                var local = iL.DeclareLocal(defType, true);
-
-                iL.Emit(OpCodes.Ldarg_1);
-
-                if (defType.IsValueType)
-                    iL.Emit(OpCodes.Unbox_Any, defType);
+                {
+                    var dyn = new DynamicSet<T>();
+                    dyn.SetValue(model, name, value);
+                }
                 else
-                    iL.Emit(OpCodes.Castclass, defType);
+                {
+                    var local = iL.DeclareLocal(defType, true);
 
-                iL.Emit(OpCodes.Stloc, local);
-                iL.Emit(OpCodes.Ldarg_0);
-                iL.Emit(OpCodes.Ldloc, local);
-                iL.EmitCall(OpCodes.Callvirt, method, null);
-                iL.Emit(OpCodes.Ret);
+                    iL.Emit(OpCodes.Ldarg_1);
 
-                var dyn = dynamicMethod.CreateDelegate(typeof(Action<T, object>)) as Action<T, object>;
-                dyn(model, Convert.ChangeType(value, defType));
+                    if (defType.IsValueType)
+                        iL.Emit(OpCodes.Unbox_Any, defType);
+                    else
+                        iL.Emit(OpCodes.Castclass, defType);
+
+                    iL.Emit(OpCodes.Stloc, local);
+                    iL.Emit(OpCodes.Ldarg_0);
+                    iL.Emit(OpCodes.Ldloc, local);
+                    iL.EmitCall(OpCodes.Callvirt, method, null);
+                    iL.Emit(OpCodes.Ret);
+
+                    var dyn = dynamicMethod.CreateDelegate(typeof(Action<T, object>)) as Action<T, object>;
+                    dyn(model, Convert.ChangeType(value, defType));
+                }
             }
             catch (Exception ex) { }
         }
@@ -98,13 +103,13 @@ namespace FastUntility.Base
                 if (parameter == null)
                     return;
 
-                var defType = parameter.ParameterType;
                 if (parameter.ParameterType.Name == "Nullable`1" && parameter.ParameterType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                    defType = Nullable.GetUnderlyingType(parameter.ParameterType);
-
-                value = Convert.ChangeType(value, defType);
-
-                Invoke(model, method, new object[] { value });
+                {
+                    var dyn = new FastUntility.Base.DynamicSet(model);
+                    dyn.SetValue(model, name, value);
+                }
+                else
+                    Invoke(model, method, new object[] { value });
             }
             catch (Exception ex) { }
         }
