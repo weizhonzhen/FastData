@@ -36,6 +36,7 @@ namespace FastData.Base
 
             dr.Close();
             dr.Dispose();
+            dr = null;
 
             return dt;
         }
@@ -176,7 +177,7 @@ namespace FastData.Base
                 else if (item.Config.DbType == DataDbType.SQLite)
                 {
                     #region sqlite
-                    sb.AppendFormat("select {2} from {3} where {4} limit {1} offset {0}"
+                    sb.AppendFormat("select {2} from {3} where {4} limit {0} offset {1}"
                                        , pModel.StarId
                                        , pModel.PageSize
                                        , string.Join(",", item.Field)
@@ -187,7 +188,7 @@ namespace FastData.Base
                 else if (item.Config.DbType == DataDbType.PostgreSql)
                 {
                     #region PostgreSql
-                    sb.AppendFormat("select {2} from {3} where {4} limit {1} offset {0}"
+                    sb.AppendFormat("select {2} from {3} where {4} limit {0} offset {1}"
                                        , pModel.StarId
                                        , pModel.PageSize
                                        , string.Join(",", item.Field)
@@ -340,10 +341,10 @@ namespace FastData.Base
                                     , sql, pModel.EndId, pModel.StarId);
 
                 if (config.DbType == DataDbType.PostgreSql)
-                    sql = string.Format("{0} limit {1} offset {2}", sql, pModel.PageSize, pModel.StarId);
+                    sql = string.Format("{0} limit {1} offset {2}", sql, pModel.StarId, pModel.PageSize);
 
                 if (config.DbType == DataDbType.SQLite)
-                    sql = string.Format("{0} limit {1} offset {2}", sql, pModel.PageSize, pModel.StarId);
+                    sql = string.Format("{0} limit {1} offset {2}", sql, pModel.StarId, pModel.PageSize);
 
                 if (param != null)
                     cmd.Parameters.AddRange(param.ToArray());
@@ -394,6 +395,7 @@ namespace FastData.Base
             dt.Load(dr);
             dr.Close();
             dr.Dispose();
+            dr = null;
             return dt;
         }
         #endregion
