@@ -57,7 +57,7 @@ namespace FastUntility.Base
                 Type defType = parameter.ParameterType;
                 if (parameter.ParameterType.Name == "Nullable`1" && parameter.ParameterType.GetGenericTypeDefinition() == typeof(Nullable<>))
                 {
-                    var dyn = new DynamicSet<T>();
+                    var dyn = new DynamicSet<T>(name);
                     dyn.SetValue(model, name, value);
                 }
                 else
@@ -105,7 +105,7 @@ namespace FastUntility.Base
 
                 if (parameter.ParameterType.Name == "Nullable`1" && parameter.ParameterType.GetGenericTypeDefinition() == typeof(Nullable<>))
                 {
-                    var dyn = new FastUntility.Base.DynamicSet(model);
+                    var dyn = new FastUntility.Base.DynamicSet(model, name);
                     dyn.SetValue(model, name, value);
                 }
                 else

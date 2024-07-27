@@ -186,12 +186,12 @@ namespace FastUntility.Base
         private static Action<object, string, object> SetValueDelegate;
 
         // 构建函数        
-        static DynamicSet()
+        public DynamicSet(string name)
         {
             var key = string.Format("DynamicSet<T>.{0}.{1}", typeof(T)?.Namespace, typeof(T).Name);
             if (!BaseCache.Exists(key))
             {
-                SetValueDelegate = GenerateSetValue();
+                SetValueDelegate = GenerateSetValue(name);
                 BaseCache.Set<object>(key, SetValueDelegate);
             }
             else
@@ -216,7 +216,7 @@ namespace FastUntility.Base
         /// 动态生成setvalue
         /// </summary>
         /// <returns></returns>
-        private static Action<object, string, object> GenerateSetValue()
+        private static Action<object, string, object> GenerateSetValue(string name)
         {
             var instance = Expression.Parameter(typeof(object), "instance");
             var memberName = Expression.Parameter(typeof(string), "memberName");
@@ -226,10 +226,13 @@ namespace FastUntility.Base
             var cases = new List<SwitchCase>();
             foreach (var propertyInfo in BaseDic.PropertyInfo<T>())
             {
-                var property = Expression.Property(Expression.Convert(instance, typeof(T)), propertyInfo.Name);
-                var setValue = Expression.Assign(property, Expression.Convert(newValue, propertyInfo.PropertyType));
-                var propertyHash = Expression.Constant(propertyInfo.Name.GetHashCode(), typeof(int));
-                cases.Add(Expression.SwitchCase(Expression.Convert(setValue, typeof(object)), propertyHash));
+                if (propertyInfo.Name == name)
+                {
+                    var property = Expression.Property(Expression.Convert(instance, typeof(T)), propertyInfo.Name);
+                    var setValue = Expression.Assign(property, Expression.Convert(newValue, propertyInfo.PropertyType));
+                    var propertyHash = Expression.Constant(propertyInfo.Name.GetHashCode(), typeof(int));
+                    cases.Add(Expression.SwitchCase(Expression.Convert(setValue, typeof(object)), propertyHash));
+                }
             }
             var switchEx = Expression.Switch(nameHash, Expression.Constant(null), cases.ToArray());
             var methodBody = Expression.Block(typeof(object), new[] { nameHash }, calHash, switchEx);
@@ -247,12 +250,12 @@ namespace FastUntility.Base
         private static Action<object, string, object> SetValueDelegate;
 
         // 构建函数        
-        public DynamicSet(object model)
+        public DynamicSet(object model,string name)
         {
             var key = string.Format("DynamicSet.{0}.{1}", model.GetType()?.Namespace, model.GetType().Name);
             if (!BaseCache.Exists(key))
             {
-                SetValueDelegate = GenerateSetValue(model);
+                SetValueDelegate = GenerateSetValue(model,name);
                 BaseCache.Set<object>(key, SetValueDelegate);
             }
             else
@@ -277,7 +280,7 @@ namespace FastUntility.Base
         /// 动态生成setvalue
         /// </summary>
         /// <returns></returns>
-        private static Action<object, string, object> GenerateSetValue(object model)
+        private static Action<object, string, object> GenerateSetValue(object model, string name)
         {
             var instance = Expression.Parameter(typeof(object), "instance");
             var memberName = Expression.Parameter(typeof(string), "memberName");
@@ -287,10 +290,13 @@ namespace FastUntility.Base
             var cases = new List<SwitchCase>();
             foreach (var propertyInfo in BaseDic.PropertyInfo(model))
             {
-                var property = Expression.Property(Expression.Convert(instance, model.GetType()), propertyInfo.Name);
-                var setValue = Expression.Assign(property, Expression.Convert(newValue, propertyInfo.PropertyType));
-                var propertyHash = Expression.Constant(propertyInfo.Name.GetHashCode(), typeof(int));
-                cases.Add(Expression.SwitchCase(Expression.Convert(setValue, typeof(object)), propertyHash));
+                if (propertyInfo.Name == name)
+                {
+                    var property = Expression.Property(Expression.Convert(instance, model.GetType()), propertyInfo.Name);
+                    var setValue = Expression.Assign(property, Expression.Convert(newValue, propertyInfo.PropertyType));
+                    var propertyHash = Expression.Constant(propertyInfo.Name.GetHashCode(), typeof(int));
+                    cases.Add(Expression.SwitchCase(Expression.Convert(setValue, typeof(object)), propertyHash));
+                }
             }
             var switchEx = Expression.Switch(nameHash, Expression.Constant(null), cases.ToArray());
             var methodBody = Expression.Block(typeof(object), new[] { nameHash }, calHash, switchEx);
