@@ -98,13 +98,7 @@ namespace FastUntility.Base
                 if (parameter == null)
                     return;
 
-                if (parameter.ParameterType.Name == "Nullable`1" && parameter.ParameterType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                {
-                    var dyn = new FastUntility.Base.DynamicSet(model, name);
-                    dyn.SetValue(model, name, value);
-                }
-                else
-                    Invoke(model, method, new object[] { value });
+                Invoke(model, method, new object[] { value });
             }
             catch (Exception ex) { }
         }
