@@ -1,14 +1,12 @@
-﻿using System;
+﻿using FastData.Model;
+using FastData.Property;
+using FastUntility.Base;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
-using FastData.Property;
-using FastData.Type;
-using FastData.Model;
-using FastData.CacheModel;
-using System.Linq;
-using System.Collections;
-using FastUntility.Base;
 using System.Dynamic;
+using System.Linq;
 
 namespace FastData.Base
 {
@@ -40,36 +38,54 @@ namespace FastData.Base
 
             while (dr.Read())
             {
+                var dic = new Dictionary<string, object>();
                 var item = new T();
 
                 if (field == null || field.Count == 0)
                 {
-                    foreach (var info in propertyList)
+                    colList.ForEach(a =>
                     {
-                        if (!colList.Exists(a => string.Compare( a, info.Name,true)==0))
-                            continue;
+                        if (dr[a] is DBNull)
+                            return;
+                        else
+                        {
+                            var info = propertyList.Find(b => string.Compare(b.Name, a, true) == 0);
 
-                        if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
-                            continue;
+                            if (info == null)
+                                return;
 
-                        item = SetValue<T>(item, dr, info, config);
-                    }
+                            if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
+                                return;
+
+                            dic.Add(info.Name, dr[a]);
+                        }
+                    });
                 }
                 else
                 {
-                    for (var i = 0; i < field.Count; i++)
+                    colList.ForEach(a =>
                     {
-                        if (!colList.Exists(a => string.Compare( a,field[i], true) ==0))
-                            continue;
-
-                        if (propertyList.Exists(a => string.Compare( a.Name,field[i], true) ==0))
+                        if (dr[a] is DBNull)
+                            return;
+                        else
                         {
-                            var info = propertyList.Find(a => string.Compare( a.Name, field[i], true) ==0);
-                            item = SetValue<T>(item, dr, info, config);
+                            if (!field.Exists(b => string.Compare(a, b, true) == 0))
+                                return;
+
+                            var info = propertyList.Find(b => string.Compare(b.Name, a, true) == 0);
+
+                            if (info == null)
+                                return;
+
+                            if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
+                                return;
+
+                            dic.Add(info.Name, dr[a]);
                         }
-                    }
+                    });
                 }
 
+                BaseEmit.Set(item, dic);
                 list.Add(item);
             }
                         
@@ -101,35 +117,53 @@ namespace FastData.Base
             while (dr.Read())
             {
                 var item = Activator.CreateInstance(model.GetType());
+                var dic = new Dictionary<string, object>();
 
                 if (field == null || field.Count == 0)
                 {
-                    foreach (var info in propertyList)
+                    colList.ForEach(a =>
                     {
-                        if (!colList.Exists(a =>string.Compare( a, info.Name, true) ==0))
-                            continue;
+                        if (dr[a] is DBNull)
+                            return;
+                        else
+                        {
+                            var info = propertyList.Find(b => string.Compare(b.Name, a, true) == 0);
 
-                        if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
-                            continue;
+                            if (info == null)
+                                return;
 
-                        item = SetValue(item, dr, info, config);
-                    }
+                            if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
+                                return;
+
+                            dic.Add(info.Name, dr[a]);
+                        }
+                    });
                 }
                 else
                 {
-                    for (var i = 0; i < field.Count; i++)
+                    colList.ForEach(a =>
                     {
-                        if (!colList.Exists(a =>string.Compare( a, field[i], true) ==0))
-                            continue;
-
-                        if (propertyList.Exists(a =>string.Compare( a.Name, field[i], true) ==0))
+                        if (dr[a] is DBNull)
+                            return;
+                        else
                         {
-                            var info = propertyList.Find(a =>string.Compare( a.Name, field[i], true) ==0);
-                            item = SetValue(item, dr, info, config);
+                            if (!field.Exists(b => string.Compare(a, b, true) == 0))
+                                return;
+
+                            var info = propertyList.Find(b => string.Compare(b.Name, a, true) == 0);
+
+                            if (info == null)
+                                return;
+
+                            if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
+                                return;
+
+                            dic.Add(info.Name, dr[a]);
                         }
-                    }
+                    });
                 }
 
+                BaseEmit.Set(item, dic);
                 list.GetType().GetMethods().ToList().ForEach(m =>
                 {
                     if (m.Name == "Add")
@@ -165,33 +199,51 @@ namespace FastData.Base
 
             while (dr.Read())
             {
+                var dic = new Dictionary<string, object>();
                 if (field == null || field.Count == 0)
                 {
-                    foreach (var info in propertyList)
+                    colList.ForEach(a =>
                     {
-                        if (!colList.Exists(a =>string.Compare( a, info.Name, true) ==0))
-                            continue;
+                        if (dr[a] is DBNull)
+                            return;
+                        else
+                        {
+                            var info = propertyList.Find(b => string.Compare(b.Name, a, true) == 0);
 
-                        if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
-                            continue;
+                            if (info == null)
+                                return;
 
-                        result = SetValue(result, dr, info, config);
-                    }
+                            if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
+                                return;
+
+                            dic.Add(info.Name, dr[a]);
+                        }
+                    });
                 }
                 else
                 {
-                    for (var i = 0; i < field.Count; i++)
+                    colList.ForEach(a =>
                     {
-                        if (!colList.Exists(a =>string.Compare( a, field[i], true) ==0))
-                            continue;
-
-                        if (propertyList.Exists(a =>string.Compare( a.Name,field[i], true) ==0))
+                        if (dr[a] is DBNull)
+                            return;
+                        else
                         {
-                            var info = propertyList.Find(a =>string.Compare( a.Name, field[i], true) ==0);
-                            result = SetValue(result, dr, info, config);
+                            if (!field.Exists(b => string.Compare(a, b, true) == 0))
+                                return;
+
+                            var info = propertyList.Find(b => string.Compare(b.Name, a, true) == 0);
+
+                            if (info == null)
+                                return;
+
+                            if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
+                                return;
+
+                            dic.Add(info.Name, dr[a]);
                         }
-                    }
+                    });
                 }
+                BaseEmit.Set(result, dic);
             }
 
             return result;
@@ -233,95 +285,6 @@ namespace FastData.Base
         }
         #endregion
 
-
-        #region set value T
-        /// <summary>
-        /// set value
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="item"></param>
-        /// <param name="dynSet"></param>
-        /// <param name="dr"></param>
-        /// <param name="info"></param>
-        /// <param name="config"></param>
-        private static T SetValue<T>(T item, DbDataReader dr, PropertyModel info, ConfigModel config)
-        {
-            try
-            {
-                var colName = config.DbType == DataDbType.Oracle ? info.Name.ToUpper() : info.Name;
-                var id = dr.GetOrdinal(colName);
-                if (DataDbType.Oracle == config.DbType)
-                    ReadOracle(item, dr, id, info);
-                else if (!dr.IsDBNull(id))
-                    BaseEmit.Set<T>(item, info.Name, dr.GetValue(id));
-
-                return item;
-            }
-            catch { return item; }
-        }
-        #endregion
-
-        #region set value model
-        /// <summary>
-        /// set value
-        /// </summary>
-        /// <param name="model"></param>
-        /// <param name="dynSet"></param>
-        /// <param name="dr"></param>
-        /// <param name="info"></param>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        private static Object SetValue(Object item, DbDataReader dr, PropertyModel info, ConfigModel config)
-        {
-            try
-            {
-                var colName = config.DbType == DataDbType.Oracle ? info.Name.ToUpper() : info.Name;
-                var id = dr.GetOrdinal(colName);
-                if (DataDbType.Oracle == config.DbType)
-                    ReadOracle(item, dr, id, info);
-                else if (!dr.IsDBNull(id))
-                    BaseEmit.Set(item, info.Name, dr.GetValue(id));
-
-                return item;
-            }
-            catch
-            {
-                return item;
-            }
-        }
-        #endregion
-
-        private static void ReadOracle(Object item, DbDataReader dr, int id, PropertyModel info)
-        {
-            object value = null;
-            var typeName = dr.GetDataTypeName(id).ToLower();
-            if (typeName == "clob" || typeName == "nclob")
-            {
-                var temp = BaseEmit.Invoke(dr, dr.GetType().GetMethod("GetOracleClob"), new object[] { id });
-                if (temp != null)
-                {
-                    value = BaseEmit.Get(temp, "Value");
-                    BaseEmit.Invoke(temp, temp.GetType().GetMethod("Close"), null);
-                    BaseEmit.Invoke(temp, temp.GetType().GetMethod("Dispose"), null);
-                }
-            }
-            else if (typeName == "blob")
-            {
-                var temp = BaseEmit.Invoke(dr, dr.GetType().GetMethod("GetOracleBlob"), new object[] { id });
-                if (temp != null)
-                {
-                    value = BaseEmit.Get(temp, "Value");
-                    BaseEmit.Invoke(temp, temp.GetType().GetMethod("Close"), null);
-                    BaseEmit.Invoke(temp, temp.GetType().GetMethod("Dispose"), null);
-                }
-            }
-            else
-                value = dr.GetValue(id);
-
-            if (!dr.IsDBNull(id))
-                BaseEmit.Set(item, info.Name, value);
-        }
-
         #region get datareader col
         private static List<string> GetCol(DbDataReader dr)
         {
@@ -332,7 +295,6 @@ namespace FastData.Base
             }
             return list;
         }
-
         #endregion
     }
 }
