@@ -455,7 +455,7 @@ namespace FastData.Context
 
                 if (item.Take == 1)
                 {
-                    result.item = BaseDataReader.ToList<T>(dr, item.Config, item.AsName).FirstOrDefault<T>() ?? new T();
+                    result.item = BaseDataReader.ToItem<T>(dr, item.Config, item.AsName) ?? new T();
                     data = result.item;
                 }
                 else
