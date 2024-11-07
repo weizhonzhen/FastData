@@ -32,6 +32,7 @@ namespace FastData.Base
                 return list;
 
             var propertyList = PropertyCache.GetPropertyInfo<T>(config.IsPropertyCache);
+            var dics = new List<Dictionary<string, object>>();
 
             if (dr.HasRows)
                 colList = GetCol(dr);
@@ -85,10 +86,12 @@ namespace FastData.Base
                     });
                 }
 
-                BaseEmit.Set(item, dic);
-                list.Add(item);
+                dics.Add(dic);
+                //BaseEmit.Set(item, dic);
+                //list.Add(item);
             }
-                        
+
+            BaseEmit.Set<T>(list, dics);
             return list;
         }
         #endregion
@@ -110,6 +113,7 @@ namespace FastData.Base
                 return null;
 
             var propertyList = PropertyCache.GetPropertyInfo(model, config.IsPropertyCache);
+            var dics = new List<Dictionary<string, object>>();
 
             if (dr.HasRows)
                 colList = GetCol(dr);
@@ -163,14 +167,17 @@ namespace FastData.Base
                     });
                 }
 
-                BaseEmit.Set(item, dic);
-                list.GetType().GetMethods().ToList().ForEach(m =>
-                {
-                    if (m.Name == "Add")
-                        BaseEmit.Invoke(list, m, new object[] { item });
-                });
+                //BaseEmit.Set(item, dic);
+                //list.GetType().GetMethods().ToList().ForEach(m =>
+                //{
+                //    if (m.Name == "Add")
+                //        BaseEmit.Invoke(list, m, new object[] { item });
+                //});
+
+                dics.Add(dic);
             }
 
+            BaseEmit.Set(model.GetType(), list, dics);
             return (IList)list;
         }
         #endregion
@@ -247,6 +254,81 @@ namespace FastData.Base
             }
 
             return result;
+        }
+        #endregion
+
+        #region to model
+        /// <summary>
+        ///  to model
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dr"></param>
+        /// <param name="dbType"></param>
+        /// <returns></returns>
+        public static T ToItem<T>(DbDataReader dr, ConfigModel config, List<string> field = null) where T : class, new()
+        {
+            var model = new T();
+            var colList = new List<string>();
+
+            if (dr == null)
+                return model;
+
+            if (dr.HasRows)
+                colList = GetCol(dr);
+
+            var propertyList = PropertyCache.GetPropertyInfo<T>(config.IsPropertyCache);
+
+            while (dr.Read())
+            {
+                var dic = new Dictionary<string, object>();
+
+                if (field == null || field.Count == 0)
+                {
+                    colList.ForEach(a =>
+                    {
+                        if (dr[a] is DBNull)
+                            return;
+                        else
+                        {
+                            var info = propertyList.Find(b => string.Compare(b.Name, a, true) == 0);
+
+                            if (info == null)
+                                return;
+
+                            if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
+                                return;
+
+                            dic.Add(info.Name, dr[a]);
+                        }
+                    });
+                }
+                else
+                {
+                    colList.ForEach(a =>
+                    {
+                        if (dr[a] is DBNull)
+                            return;
+                        else
+                        {
+                            if (!field.Exists(b => string.Compare(a, b, true) == 0))
+                                return;
+
+                            var info = propertyList.Find(b => string.Compare(b.Name, a, true) == 0);
+
+                            if (info == null)
+                                return;
+
+                            if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
+                                return;
+
+                            dic.Add(info.Name, dr[a]);
+                        }
+                    });
+                }
+
+                BaseEmit.Set(model, dic);
+            }
+            return model;
         }
         #endregion
 
