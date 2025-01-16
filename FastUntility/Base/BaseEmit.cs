@@ -72,13 +72,7 @@ namespace FastUntility.Base
                     SetMethod(key, method);
                 }
 
-                var dynKey = $"SetEmit_{type}_T_{type.Module}";
-                var dynamicMethod = GetDyn(dynKey);
-                if (dynamicMethod == null)
-                {
-                    dynamicMethod = new DynamicMethod("SetEmit", null, new[] { type, typeof(object) }, type.Module);
-                    SetDyn(dynKey, dynamicMethod);
-                }
+                var dynamicMethod = new DynamicMethod("SetEmit", null, new[] { type, typeof(object) }, type.Module);
 
                 var iL = dynamicMethod.GetILGenerator();
 
@@ -87,26 +81,78 @@ namespace FastUntility.Base
                     return;
 
                 Type defType = parameter.ParameterType;
+                var info = EmitParam(defType);
                 var local = iL.DeclareLocal(defType, true);
 
-                iL.Emit(OpCodes.Ldarg_1);
+                if (defType == typeof(bool) || defType == typeof(bool?))
+                {
+                    if (value == null && defType == typeof(bool?))
+                        iL.Emit(OpCodes.Ldnull);
+                    else if ((value.GetType() == typeof(bool) || value.GetType() == typeof(bool?)) && (bool)value == true)
+                    {
+                        iL.Emit(OpCodes.Ldc_I4_1);
+                        iL.Emit(OpCodes.Box, typeof(bool));
+                    }
+                    else if ((value.GetType() == typeof(bool) || value.GetType() == typeof(bool?)) && (bool)value == false)
+                        iL.Emit(OpCodes.Ldc_I4_0);
+                    else
+                    {
+                        if (value.ToStr().ToInt(9) == 0)
+                            iL.Emit(OpCodes.Ldc_I4_0);
+                        else
+                            iL.Emit(OpCodes.Ldc_I4_1);
 
-                if (defType.IsValueType)
-                    iL.Emit(OpCodes.Unbox_Any, defType);
+                        if (defType == typeof(bool))
+                            iL.Emit(OpCodes.Box, typeof(bool));
+                        else
+                            iL.Emit(OpCodes.Newobj, typeof(bool?).GetConstructor(new Type[] { typeof(bool) }));
+                    }
+                }
+                else if (value == null && defType.IsGenericType)
+                    iL.Emit(OpCodes.Ldnull);
                 else
-                    iL.Emit(OpCodes.Castclass, defType);
+                {
+                    if (info.OpCodeParam == OpCodes.Ldc_R8)
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr().ToDouble(0));
+                    else if (info.OpCodeParam == OpCodes.Ldstr)
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr());
+                    else if (info.OpCodeParam == OpCodes.Ldc_R4)
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr().ToFloat(0));
+                    else if (info.OpCodeParam == OpCodes.Ldc_I4)
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr().ToInt(0));
+                    else if (info.OpCodeParam == OpCodes.Ldc_I4_S)
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr().ToInt16(0));
+                    else if (info.OpCodeParam == OpCodes.Ldc_I8 && (info.type == typeof(long) || info.GenericType == typeof(long)) && value != null)
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr().ToLong(0));
+                    else if (info.OpCodeParam == OpCodes.Ldc_I8 && (info.type == typeof(DateTime) || info.GenericType == typeof(DateTime)) && value != null)
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr().ToDate().Ticks);
+                    else if (info.OpCodeParam == OpCodes.Ldc_I8 && (info.type == typeof(TimeSpan) || info.GenericType == typeof(TimeSpan)) && value != null)
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr().ToDate().Ticks);
+
+                    if (info.GenericType != null)
+                    {
+                        var constructorstu = info.type.GetConstructor(new Type[] { info.GenericType });
+                        if (!info.IsGenericType && info.OpCodeNewobj != null && constructorstu != null)
+                            iL.Emit(info.OpCodeNewobj.Value, constructorstu);
+                        if (info.IsGenericType && info.GenericOpCodeNewobj != null && info.IsDateTime)
+                            iL.Emit(info.OpCodeNewobj.Value, info.GenericType.GetConstructor(new Type[] { typeof(long) }));
+                        if (info.IsGenericType && info.GenericOpCodeNewobj != null && constructorstu != null)
+                            iL.Emit(info.GenericOpCodeNewobj.Value, constructorstu);
+                    }
+                }
+
+                if (defType.IsClass && (defType != typeof(string) || defType != typeof(String)))
+                    iL.Emit(OpCodes.Ldarg_1);
 
                 iL.Emit(OpCodes.Stloc, local);
                 iL.Emit(OpCodes.Ldarg_0);
                 iL.Emit(OpCodes.Ldloc, local);
                 iL.EmitCall(OpCodes.Callvirt, method, null);
-                iL.Emit(OpCodes.Ret);
 
+                iL.Emit(OpCodes.Ret);
                 var dyn = dynamicMethod.CreateDelegate(typeof(Action<T, object>)) as Action<T, object>;
-                if (parameter.ParameterType.Name == "Nullable`1" && parameter.ParameterType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                    dyn(model, value);
-                else
-                    dyn(model, Convert.ChangeType(value, defType));
+
+                dyn(model, value);
             }
             catch (Exception ex) { }
         }
@@ -126,11 +172,87 @@ namespace FastUntility.Base
                     SetMethod(key, method);
                 }
 
+                var dynamicMethod = new DynamicMethod("SetEmit", null, new[] { type, typeof(object) }, type.Module);
+
+                var iL = dynamicMethod.GetILGenerator();
+
                 var parameter = method.GetParameters()[0];
                 if (parameter == null)
                     return;
 
-                Invoke(model, method, new object[] { value });
+                Type defType = parameter.ParameterType;
+                var info = EmitParam(defType);
+                var local = iL.DeclareLocal(defType, true);
+
+                if (defType == typeof(bool) || defType == typeof(bool?))
+                {
+                    if (value == null && defType == typeof(bool?))
+                        iL.Emit(OpCodes.Ldnull);
+                    else if ((value.GetType() == typeof(bool) || value.GetType() == typeof(bool?)) && (bool)value == true)
+                    {
+                        iL.Emit(OpCodes.Ldc_I4_1);
+                        iL.Emit(OpCodes.Box, typeof(bool));
+                    }
+                    else if ((value.GetType() == typeof(bool) || value.GetType() == typeof(bool?)) && (bool)value == false)
+                        iL.Emit(OpCodes.Ldc_I4_0);
+                    else
+                    {
+                        if (value.ToStr().ToInt(9) == 0)
+                            iL.Emit(OpCodes.Ldc_I4_0);
+                        else
+                            iL.Emit(OpCodes.Ldc_I4_1);
+
+                        if (defType == typeof(bool))
+                            iL.Emit(OpCodes.Box, typeof(bool));
+                        else
+                            iL.Emit(OpCodes.Newobj, typeof(bool?).GetConstructor(new Type[] { typeof(bool) }));
+                    }
+                }
+                else if (value == null && defType.IsGenericType)
+                    iL.Emit(OpCodes.Ldnull);
+                else
+                {
+                    if (info.OpCodeParam == OpCodes.Ldc_R8)
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr().ToDouble(0));
+                    else if (info.OpCodeParam == OpCodes.Ldstr)
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr());
+                    else if (info.OpCodeParam == OpCodes.Ldc_R4)
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr().ToFloat(0));
+                    else if (info.OpCodeParam == OpCodes.Ldc_I4)
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr().ToInt(0));
+                    else if (info.OpCodeParam == OpCodes.Ldc_I4_S)
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr().ToInt16(0));
+                    else if (info.OpCodeParam == OpCodes.Ldc_I8 && (info.type == typeof(long) || info.GenericType == typeof(long)))
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr().ToLong(0));
+                    else if (info.OpCodeParam == OpCodes.Ldc_I8 && (info.type == typeof(DateTime) || info.GenericType == typeof(DateTime)))
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr().ToDate().Ticks);
+                    else if (info.OpCodeParam == OpCodes.Ldc_I8 && (info.type == typeof(TimeSpan) || info.GenericType == typeof(TimeSpan)))
+                        iL.Emit(info.OpCodeParam.Value, value.ToStr().ToDate().Ticks);
+
+                    if (info.GenericType != null)
+                    {
+                        var constructorstu = info.type.GetConstructor(new Type[] { info.GenericType });
+                        if (!info.IsGenericType && info.OpCodeNewobj != null && constructorstu != null)
+                            iL.Emit(info.OpCodeNewobj.Value, constructorstu);
+                        if (info.IsGenericType && info.GenericOpCodeNewobj != null && info.IsDateTime)
+                            iL.Emit(info.OpCodeNewobj.Value, info.GenericType.GetConstructor(new Type[] { typeof(long) }));
+                        if (info.IsGenericType && info.GenericOpCodeNewobj != null && constructorstu != null)
+                            iL.Emit(info.GenericOpCodeNewobj.Value, constructorstu);
+                    }
+                }
+
+                if (defType.IsClass && (defType != typeof(string) || defType != typeof(String)))
+                    iL.Emit(OpCodes.Ldarg_1);
+
+                iL.Emit(OpCodes.Stloc, local);
+                iL.Emit(OpCodes.Ldarg_0);
+                iL.Emit(OpCodes.Ldloc, local);
+                iL.EmitCall(OpCodes.Callvirt, method, null);
+
+                iL.Emit(OpCodes.Ret);
+                var dyn = dynamicMethod.CreateDelegate(typeof(Action<object, object>)) as Action<object, object>;
+
+                dyn(model, value);
             }
             catch (Exception ex) { }
         }
@@ -141,6 +263,7 @@ namespace FastUntility.Base
             {
                 var type = typeof(T);
                 var dynamicMethod = new DynamicMethod("SetEmit", null, new[] { type, typeof(object) }, type.Module);
+
                 var iL = dynamicMethod.GetILGenerator();
 
                 foreach (var item in dic)
@@ -177,6 +300,7 @@ namespace FastUntility.Base
             {
                 var type = model.GetType();
                 var dynamicMethod = new DynamicMethod("SetEmit", null, new[] { type, typeof(object) }, type.Module);
+
                 var iL = dynamicMethod.GetILGenerator();
 
                 foreach (var item in dic)
@@ -294,12 +418,16 @@ namespace FastUntility.Base
                             else if (info.OpCodeParam == OpCodes.Ldc_I8 && (info.type == typeof(TimeSpan) || info.GenericType == typeof(TimeSpan)))
                                 iL.Emit(info.OpCodeParam.Value, item.Value.ToStr().ToDate().Ticks);
 
-                            if (!info.IsGenericType && info.OpCodeNewobj != null)
-                                iL.Emit(info.OpCodeNewobj.Value, info.type.GetConstructor(new Type[] { info.GenericType }));
-                            if (info.IsGenericType && info.GenericOpCodeNewobj != null && info.IsDateTime)
-                                iL.Emit(info.OpCodeNewobj.Value, info.GenericType.GetConstructor(new Type[] { typeof(long) }));
-                            if (info.IsGenericType && info.GenericOpCodeNewobj != null)
-                                iL.Emit(info.GenericOpCodeNewobj.Value, info.type.GetConstructor(new Type[] { info.GenericType }));
+                            if (info.GenericType != null)
+                            {
+                                var constructorstu = info.type.GetConstructor(new Type[] { info.GenericType });
+                                if (!info.IsGenericType && info.OpCodeNewobj != null && constructorstu != null)
+                                    iL.Emit(info.OpCodeNewobj.Value, constructorstu);
+                                if (info.IsGenericType && info.GenericOpCodeNewobj != null && info.IsDateTime)
+                                    iL.Emit(info.OpCodeNewobj.Value, info.GenericType.GetConstructor(new Type[] { typeof(long) }));
+                                if (info.IsGenericType && info.GenericOpCodeNewobj != null && constructorstu != null)
+                                    iL.Emit(info.GenericOpCodeNewobj.Value, constructorstu);
+                            }
                         }
                         iL.EmitCall(OpCodes.Callvirt, method, null);
                     }
@@ -402,12 +530,16 @@ namespace FastUntility.Base
                             else if (info.OpCodeParam == OpCodes.Ldc_I8 && (info.type == typeof(TimeSpan) || info.GenericType == typeof(TimeSpan)))
                                 iL.Emit(info.OpCodeParam.Value, item.Value.ToStr().ToDate().Ticks);
 
-                            if (!info.IsGenericType && info.OpCodeNewobj != null)
-                                iL.Emit(info.OpCodeNewobj.Value, info.type.GetConstructor(new Type[] { info.GenericType }));
-                            if (info.IsGenericType && info.GenericOpCodeNewobj != null && info.IsDateTime)
-                                iL.Emit(info.OpCodeNewobj.Value, info.GenericType.GetConstructor(new Type[] { typeof(long) }));
-                            if (info.IsGenericType && info.GenericOpCodeNewobj != null)
-                                iL.Emit(info.GenericOpCodeNewobj.Value, info.type.GetConstructor(new Type[] { info.GenericType }));
+                            if (info.GenericType != null)
+                            {
+                                var constructorstu = info.type.GetConstructor(new Type[] { info.GenericType });
+                                if (!info.IsGenericType && info.OpCodeNewobj != null && constructorstu != null)
+                                    iL.Emit(info.OpCodeNewobj.Value, constructorstu);
+                                if (info.IsGenericType && info.GenericOpCodeNewobj != null && info.IsDateTime)
+                                    iL.Emit(info.OpCodeNewobj.Value, info.GenericType.GetConstructor(new Type[] { typeof(long) }));
+                                if (info.IsGenericType && info.GenericOpCodeNewobj != null && constructorstu != null)
+                                    iL.Emit(info.GenericOpCodeNewobj.Value, constructorstu);
+                            }
                         }
                         iL.EmitCall(OpCodes.Callvirt, method, null);
                     }
@@ -472,12 +604,16 @@ namespace FastUntility.Base
                 else if (info.OpCodeParam == OpCodes.Ldc_I8 && (info.type == typeof(TimeSpan) || info.GenericType == typeof(TimeSpan)))
                     iL.Emit(info.OpCodeParam.Value, item.Value.ToStr().ToDate().Ticks);
 
-                if (!info.IsGenericType && info.OpCodeNewobj != null)
-                    iL.Emit(info.OpCodeNewobj.Value, info.type.GetConstructor(new Type[] { info.GenericType }));
-                if (info.IsGenericType && info.GenericOpCodeNewobj != null && info.IsDateTime)
-                    iL.Emit(info.OpCodeNewobj.Value, info.GenericType.GetConstructor(new Type[] { typeof(long) }));
-                if (info.IsGenericType && info.GenericOpCodeNewobj != null)
-                    iL.Emit(info.GenericOpCodeNewobj.Value, info.type.GetConstructor(new Type[] { info.GenericType }));
+                if (info.GenericType != null)
+                {
+                    var constructorstu = info.type.GetConstructor(new Type[] { info.GenericType });
+                    if (!info.IsGenericType && info.OpCodeNewobj != null && constructorstu != null)
+                        iL.Emit(info.OpCodeNewobj.Value, constructorstu);
+                    if (info.IsGenericType && info.GenericOpCodeNewobj != null && info.IsDateTime)
+                        iL.Emit(info.OpCodeNewobj.Value, info.GenericType.GetConstructor(new Type[] { typeof(long) }));
+                    if (info.IsGenericType && info.GenericOpCodeNewobj != null && constructorstu != null)
+                        iL.Emit(info.GenericOpCodeNewobj.Value, constructorstu);
+                }
             }
             ExecIL(iL, local, method);
         }
@@ -488,13 +624,7 @@ namespace FastUntility.Base
                 return null;
 
             var type = typeof(T);
-            var dynKey = $"GetEmit_T_{type}_{type.Module}";
-            var dynamicMethod = GetDyn(dynKey);
-            if (dynamicMethod == null)
-            {
-                dynamicMethod = new DynamicMethod("GetEmit", typeof(object), new[] { typeof(object) }, type, true);
-                SetDyn(dynKey, dynamicMethod);
-            }
+            var dynamicMethod = new DynamicMethod("GetEmit", typeof(object), new[] { typeof(object) }, type, true);
 
             var key = $"get_{name}_{type.FullName}";
             MethodInfo method = GetMethod(key);
@@ -533,13 +663,9 @@ namespace FastUntility.Base
                 return null;
 
             var type = model.GetType();
-            var dynKey = $"GetEmit_model_{type}_{type.Module}";
-            var dynamicMethod = GetDyn(dynKey);
-            if (dynamicMethod == null)
-            {
-                dynamicMethod = new DynamicMethod("GetEmit", typeof(object), new[] { typeof(object) }, type, true);
-                SetDyn(dynKey, dynamicMethod);
-            }
+
+            var dynamicMethod = new DynamicMethod("GetEmit", typeof(object), new[] { typeof(object) }, type, true);
+
             var key = $"get_{name}_{type.FullName}";
             MethodInfo method = GetMethod(key);
 
@@ -579,13 +705,8 @@ namespace FastUntility.Base
                 return null;
             try
             {
-                var dynKey = $"InvokeEmit_{typeof(EmitInvoke).Module}";
-                var dynamicMethod = GetDyn(dynKey);
-                if (dynamicMethod == null)
-                {
-                    dynamicMethod = new DynamicMethod("InvokeEmit", typeof(object), new Type[] { typeof(object), typeof(object[]) }, typeof(EmitInvoke).Module);
-                    SetDyn(dynKey, dynamicMethod);
-                }
+                var dynamicMethod = new DynamicMethod("InvokeEmit", typeof(object), new Type[] { typeof(object), typeof(object[]) }, typeof(EmitInvoke).Module);
+
                 var iL = dynamicMethod.GetILGenerator();
                 var info = methodInfo.GetParameters();
                 var type = new Type[info.Length];
