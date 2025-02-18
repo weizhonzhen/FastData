@@ -34,19 +34,6 @@ namespace FastUntility.Base
             }
         }
 
-        private static void SetDyn(string key, DynamicMethod dyn)
-        {
-            if (!cacheDyn.ContainsKey(key))
-            {
-                cacheDyn.TryAdd(key, dyn);
-            }
-            else
-            {
-                cacheDyn.TryRemove(key, out _);
-                cacheDyn.TryAdd(key, dyn);
-            }
-        }
-
         private static DynamicMethod GetDyn(string key)
         {
             if (cacheDyn.ContainsKey(key))
@@ -338,13 +325,8 @@ namespace FastUntility.Base
                 var listType = typeof(List<T>);
                 var type = typeof(T);
 
-                var dynKey = $"SetEmit_{listType}_{listType.Module}";
-                var dynamicMethod = GetDyn(dynKey);
-                if (dynamicMethod == null)
-                {
-                    dynamicMethod = new DynamicMethod("SetEmit", null, new[] { listType, typeof(List<Dictionary<string, object>>) }, type.Module);
-                    SetDyn(dynKey, dynamicMethod);
-                }
+                var dynamicMethod = new DynamicMethod("SetEmit", null, new[] { listType, typeof(List<Dictionary<string, object>>) }, type.Module);
+
                 var iL = dynamicMethod.GetILGenerator();
 
                 var addKey = $"Add_{listType.FullName}";
@@ -451,12 +433,7 @@ namespace FastUntility.Base
                 var listType = list.GetType();
 
                 var dynKey = $"SetEmit_{listType}_{listType.Module}";
-                var dynamicMethod = GetDyn(dynKey);
-                if (dynamicMethod == null)
-                {
-                    dynamicMethod = new DynamicMethod("SetEmit", null, new[] { typeof(object), typeof(List<Dictionary<string, object>>) }, type.Module);
-                    SetDyn(dynKey, dynamicMethod);
-                }
+                var dynamicMethod = new DynamicMethod("SetEmit", null, new[] { typeof(object), typeof(List<Dictionary<string, object>>) }, type.Module);
                 var iL = dynamicMethod.GetILGenerator();
 
                 var addKey = $"Add_{listType.FullName}";
